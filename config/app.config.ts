@@ -2,7 +2,7 @@
 
 export const appConfig = {
   appName: "SALAM AlBayyinah",
-  appNameFull: "SALAM| Sistem Administrasi dan Layanan Akademik AlBayyinah",
+  appNameFull: "SALAM | Sistem Administrasi dan Layanan Akademik AlBayyinah",
   description: `SALAM adalah sistem administrasi dan layanan akademik AlBayyinah.`,
   // baseUrl: getBaseUrl(), // NOT USE TEMPORARY
   // Contact information (displayed on contact page)
