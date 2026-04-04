@@ -1,0 +1,275 @@
+---
+description: Automatic Toast Integration for Forms, Tables, and Actions using Sonner
+globs:
+[
+  "features/**/form/**/*.tsx",
+  "features/**/table/**/*.tsx",
+  "features/**/api/**/*.ts",
+  "features/**/components/**/*.tsx"
+]
+alwaysApply: true
+---
+
+# Toast Integration System
+
+All user-triggered actions MUST automatically trigger toast notifications using:
+
+import { toast } from "@/components/ui/sonner"
+
+---
+
+# Global Setup
+
+Toaster is already initialized in app/layout.tsx.
+
+Rules:
+
+- Do NOT create additional Toaster instances
+- Do NOT override global Toaster configuration
+- Always use the global Toaster
+
+---
+
+# Core Principle
+
+Toast must be:
+
+- automatic
+- consistent
+- tied to user actions
+- impossible to forget
+
+---
+
+# Form Integration (REQUIRED)
+
+All forms MUST use toast.promise on submit.
+
+Pattern:
+
+onSubmit: async (values) => {
+return toast.promise(submit(values), {
+loading: "Saving...",
+success: "Saved successfully",
+error: "Failed to save"
+})
+}
+
+Rules:
+
+- MUST use toast.promise
+- MUST include loading, success, and error
+- MUST NOT use try/catch without toast
+
+---
+
+# Create / Update Message Standard
+
+Create → "Created successfully"  
+Update → "Updated successfully"  
+Save → "Saved successfully"
+
+---
+
+# Table Row Actions (REQUIRED)
+
+All row actions MUST use toast.promise.
+
+Pattern:
+
+toast.promise(deleteItem(id), {
+loading: "Deleting...",
+success: "Deleted successfully",
+error: "Failed to delete"
+})
+
+Applies to:
+
+- delete
+- update status
+- duplicate
+- activate / deactivate
+
+---
+
+# Bulk Actions (REQUIRED)
+
+All bulk actions MUST show toast.
+
+Pattern:
+
+toast.promise(bulkDelete(ids), {
+loading: `Deleting ${ids.length} items...`,
+success: "Bulk delete successful",
+error: "Bulk delete failed"
+})
+
+---
+
+# Toggle / Status Update
+
+Use either:
+
+toast.success("Status updated")
+
+OR
+
+toast.promise(updateStatus(), {
+loading: "Updating...",
+success: "Status updated",
+error: "Failed to update status"
+})
+
+---
+
+# API Layer Rule
+
+API functions MUST throw errors.
+
+Example:
+
+export async function createMaterial(data) {
+const res = await fetch(...)
+
+if (!res.ok) {
+throw new Error("Create failed")
+}
+
+return res.json()
+}
+
+Rules:
+
+- Do NOT use toast inside API layer
+- Toast MUST be handled in UI layer
+
+---
+
+# CSV Import Integration
+
+Must support:
+
+Success:
+toast.success("Import completed")
+
+Partial:
+toast.warning("Some rows failed to import")
+
+Error:
+toast.error("Import failed")
+
+---
+
+# CSV Export Integration
+
+Pattern:
+
+toast.success("Export started")
+
+Optional:
+
+toast.success("Export completed")
+
+---
+
+# Long Running Process
+
+Use toast.promise.
+
+Pattern:
+
+toast.promise(processData(), {
+loading: "Processing...",
+success: "Process completed",
+error: "Process failed"
+})
+
+---
+
+# No Changes Case
+
+If no changes detected:
+
+toast.warning("No changes detected")
+
+---
+
+# Delete Confirmation Pattern
+
+Flow:
+
+1. confirm dialog
+2. execute action
+3. toast
+
+Pattern:
+
+if (!confirm("Delete this item?")) return
+
+toast.promise(deleteItem(id), {
+loading: "Deleting...",
+success: "Deleted successfully",
+error: "Failed to delete"
+})
+
+---
+
+# Error Message Rules
+
+Errors MUST:
+
+- be human-readable
+- be short
+- avoid technical details
+
+Bad:
+"500 Internal Server Error"
+
+Good:
+"Failed to save data"
+
+---
+
+# UX Rules
+
+- One action → one toast
+- Avoid duplicate toasts
+- Use promise toast for async
+- Keep message under 60 characters
+
+---
+
+# Naming Convention
+
+Use consistent messages:
+
+Created successfully  
+Updated successfully  
+Deleted successfully  
+Saved successfully  
+Failed to save  
+Failed to delete
+
+---
+
+# Forbidden
+
+Do NOT:
+
+- use alert()
+- forget toast in user actions
+- show raw error messages
+- duplicate toast calls
+- use other toast libraries
+- create custom toast systems
+
+---
+
+# Goal
+
+All user actions must have:
+
+- clear feedback
+- consistent UX
+- non-blocking notification
+- enterprise-grade behavior

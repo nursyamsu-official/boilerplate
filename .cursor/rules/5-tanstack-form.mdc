@@ -326,6 +326,7 @@ Rules:
 - Submission state MUST be reflected in the UI
 - Prevent duplicate submissions while a submit is pending
 - Success and failure handling SHOULD be explicit
+- All form submissions MUST follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 Examples:
 
@@ -509,6 +510,7 @@ Rules:
 - Server errors MUST be surfaced to the user clearly
 - Validation errors and submission errors SHOULD be distinguishable
 - Error messaging SHOULD be actionable and user-friendly
+- Error messages MUST follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 ---
 
@@ -522,6 +524,7 @@ Rules:
 - Inputs MAY be disabled during submission when appropriate
 - Loading state for edit forms SHOULD be distinct from empty form state
 - Pending UI SHOULD prevent accidental duplicate interaction
+- Async submission SHOULD use toast.promise for loading feedback via Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 Examples:
 
