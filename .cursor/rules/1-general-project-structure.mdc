@@ -14,6 +14,8 @@ Next.js routing still lives inside `app/`, but **pages should only import logic 
 
 ```
 app/                  → Next.js App Router (routing layer only)
+  (auth)/             → Authentication pages
+    auth/             → Login, Register, Forgot Password, Reset Password pages
   (public)/           → Public pages
     page.tsx          → Home page
     about-us/         → About us page
@@ -22,7 +24,6 @@ app/                  → Next.js App Router (routing layer only)
     contact-us/       → Contact us page
 
   (protected)/        → Authenticated application
-    auth/             → Login, Register, Forgot Password, Reset Password pages
     dashboard/        → Main application
       [feature]/page.tsx → Feature route page  (route only,server component, do not "use client")
   api/                → API routes
