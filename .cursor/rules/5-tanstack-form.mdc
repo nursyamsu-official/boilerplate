@@ -76,12 +76,12 @@ The form system follows a **Feature-Owned Form + Shared UI Primitive** architect
 - `components/form/TextareaField.tsx`
 - `components/form/CheckboxField.tsx`
 - `components/form/RadioGroupField.tsx`
-- `components/ui/Button.tsx`
-- `components/ui/Input.tsx`
-- `components/ui/Select.tsx`
-- `components/ui/Textarea.tsx`
-- `components/ui/Checkbox.tsx`
-- `components/ui/RadioGroup.tsx`
+- `components/ui/button.tsx`
+- `components/ui/input.tsx`
+- `components/ui/select.tsx`
+- `components/ui/textarea.tsx`
+- `components/ui/checkbox.tsx`
+- `components/ui/radio-group.tsx`
 
 ---
 
