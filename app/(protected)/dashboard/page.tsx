@@ -1,6 +1,8 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { appConfig } from "@/config/app.config";
 import { Button } from "@/components/ui/button";
+import { authRoutes } from "@/features/auth";
 
 export const metadata: Metadata = {
   title: `Dashboard - ${appConfig.appName}`,
@@ -9,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function DashboardPage() {
   return (
-    <div>
+    <div className="space-y-6">
       <h1 className="text-2xl font-bold">
         Dashboard - {appConfig.appNameFull}
       </h1>
@@ -19,7 +21,12 @@ export default function DashboardPage() {
         voluptates quibusdam dolore nam dolor nemo commodi, rerum esse et atque
         eaque.
       </p>
-      <Button variant="outline">Go to Dashboard</Button>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline">Go to Dashboard</Button>
+        <Button asChild>
+          <Link href={authRoutes.security}>Change password</Link>
+        </Button>
+      </div>
     </div>
   );
 }

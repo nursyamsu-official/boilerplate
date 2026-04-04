@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Lora } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { AppNavbar } from "@/components/navbar/AppNavbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
@@ -49,8 +50,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
+          <TooltipProvider>
+            <AppNavbar />
+            <main className="flex-1">{children}</main>
+          </TooltipProvider>
+          <Toaster position="top-right" richColors duration={4000} />
         </ThemeProvider>
       </body>
     </html>
