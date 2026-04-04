@@ -1,0 +1,619 @@
+---
+description: Enterprise feature based architecture for Next.js App Router using TanStack Table, TanStack Form, Shadcn UI, TailwindCSS, Server Actions, Zod, Prisma, Better Auth, Lucide Icons
+globs: ["app/**", "features/**", "components/**"]
+alwaysApply: true
+---
+
+# Enterprise Feature Based Architecture Rule
+
+All business logic must follow a **feature-based architecture**.
+Each business domain must be isolated inside `features/`.
+
+Next.js routing stays inside `app/`, but route files must remain thin and only compose feature modules.
+
+Technology stack used in this project:
+
+- Next.js App Router
+- TanStack Table (table engine)
+- TanStack Form (form engine)
+- Shadcn UI (UI layer)
+- TailwindCSS
+- Server Actions for mutations
+- Zod for validation
+- Prisma for database access
+- Better Auth for authentication
+- Lucide Icons for icons
+
+UI must remain **headless, reusable, domain-oriented**.
+
+---
+
+# 1. Feature Module structure:
+
+Each domain must live inside:
+
+`features/[feature-name]/`
+
+Example:
+
+- `features/materials/`
+- `features/vendors/`
+- `features/uoms/`
+- `features/users/`
+
+A feature may contain:
+
+- `actions/` - contains server actions and mutation entry points for the feature
+- `components/` - contains feature-owned presentation components and UI blocks
+- `hooks/` - contains reusable feature-scoped hooks for UI behavior and state handling
+- `lib/` - contains feature-owned mappers, transformers, and helpers
+- `repositories/` - contains data access logic and persistence queries for the feature
+- `services/` - contains use cases, orchestration, and business rules for the feature
+- `schemas/` - contains validation schemas for inputs, forms, filters, and requests
+- `table/` - contains TanStack Table configuration and table-specific UI for the feature
+- `types/` - contains TypeScript types and interfaces owned by the feature
+- `constants/` - contains feature-scoped constants, enums, and static configuration values
+- `index.ts` - contains the public export surface for the feature
+
+Each folder must have a clear and limited responsibility.
+
+---
+
+# 2. Pages Must Be Thin
+
+Location:
+`app/**/page.tsx`
+
+Purpose:
+Page files are route entry points only. They define route structure and delegate feature behavior to feature modules.
+
+Rules:
+
+- Must only compose and render feature components or route-level layout blocks
+- Must NOT contain business logic
+- Must NOT contain form logic
+- Must NOT contain table logic
+- Must NOT contain data access logic
+- Must NOT contain validation logic
+- Must NOT contain repository logic
+- Must NOT contain service orchestration
+- Should keep logic minimal and route-focused
+- Should delegate implementation details to the owning feature
+- Should use metadata to set the title and description of the page and import appConfig to get the description
+
+Example:
+`app/dashboard/materials/page.tsx`
+
+Allowed:
+
+- rendering feature entry components such as `<MaterialTable />`
+- passing `params` and `searchParams` to feature modules
+- lightweight route composition
+- use metadata to set the title and description of the page and import appConfig to get the description
+
+Example:
+
+```tsx
+export const metadata: Metadata = {
+  title: "Materials",
+  description: `Materials | ${appConfig.description}`,
+};
+```
+
+Not allowed:
+
+- defining table columns inside the page
+- implementing form state inside the page
+- calling repositories directly from the page
+- placing business rules inside the page
+
+---
+
+# 3. TanStack Table Usage
+
+Purpose:
+TanStack Table must follow feature boundaries. Feature-specific table behavior, configuration, state, and table UI must stay inside the owning feature.
+
+Rules:
+
+- Feature-specific table logic must live inside the owning feature module
+- Shared data-table primitives may live in `components/data-table/`
+- Only generic and reusable table primitives may be shared
+- Feature-owned table files must NOT be placed in shared folders
+- Columns, row actions, filters, toolbars, and feature-specific table wrappers should live inside `features/[feature-name]/table/`
+- Detailed TanStack Table implementation rules are defined in `.cursor/rules/folder-structure/3-tanstack-table-enterprise.mdc` and `.cursor/rules/folder-structure/4-tanstack-table-ui-conventions.mdc`
+
+---
+
+# 4. TanStack Form Usage
+
+Purpose:
+TanStack Form must follow feature boundaries. Feature-specific form composition, form state handling, and form UI must stay inside the owning feature.
+
+Rules:
+
+- Feature-specific form logic must live inside the owning feature module
+- Shared form primitives may live in `components/form/`
+- Only generic and reusable form primitives may be shared
+- Feature-owned form files must NOT be placed in shared folders
+- Feature forms, form sections, and feature-specific form hooks should live inside the owning feature, typically under `features/[feature-name]/components/`
+- Detailed TanStack Form implementation rules are defined in `.cursor/rules/folder-structure/5-tanstack-form.mdc` and `.cursor/rules/folder-structure/6-tanstack-form-ui-conventions.mdc`
+
+---
+
+# 5. Actions
+
+Location:
+`features/[feature-name]/actions/`
+
+Purpose:
+Handle **server mutations and server actions**.
+
+Scope:
+
+- create
+- update
+- delete
+- complex server workflows
+- other feature-specific actions
+
+Rules:
+
+- Must use `"use server"`
+- Must validate input using **schemas**
+- Must call **services**
+- Must NOT access database directly
+- Must NOT contain UI logic
+
+Examples:
+
+- `material-create.action.ts`
+- `material-update.action.ts`
+- `material-toggle-status.action.ts`
+- `material-toggle-status-bulk.action.ts`
+- `material-delete.action.ts`
+- `material-delete-bulk.action.ts`
+
+---
+
+# 6. Components
+
+Location:
+`features/[feature-name]/components/`
+
+Purpose:
+Store UI components that belong to a single feature and represent the feature’s presentation layer.
+
+Scope:
+
+- forms
+- drawers
+- dialogs
+- cards
+- detail sections
+- feature-specific layout blocks
+- small presentational widgets specific to the feature
+
+Rules:
+
+- Must contain presentation logic only
+- Must NOT contain business logic
+- Must NOT contain database access logic
+- Must NOT contain repository logic
+- Must NOT contain service orchestration logic
+- May use hooks for UI state, form state, and interaction state
+- May trigger actions from event handlers or form submissions
+- May receive processed data through props
+- Should remain scoped to the feature
+- Must NOT be used as cross-feature shared components
+- If a component becomes generic and reusable across multiple features, it must be moved to a shared UI location
+- Components specific to TanStack Table must live in `features/[feature-name]/table/`, not in `components/`
+
+Guidelines:
+
+- Prefer small, focused components with clear responsibility
+- Separate presentational UI from data loading and domain decision logic
+- Keep components easy to compose inside pages, dialogs, forms, and feature sections
+- Use Server Components by default when possible
+- Use Client Components only when interactivity is required
+
+Examples:
+
+- `MaterialForm.tsx`
+- `MaterialCreateDrawer.tsx`
+- `MaterialCreateDialog.tsx`
+- `MaterialEditDrawer.tsx`
+- `MaterialEditDialog.tsx`
+- `MaterialStatusBadge.tsx`
+
+---
+
+# 7. Hooks
+
+Location:
+`features/[feature-name]/hooks/`
+
+Purpose:
+This folder contains reusable feature-specific React hooks for client-side behavior.
+
+Hooks should be used to extract shared UI logic from components, not to store server business logic.
+
+Allowed responsibilities:
+
+- component state orchestration
+- form orchestration
+- table state orchestration
+- modal/drawer state
+- filter state
+- search param synchronization
+- action pending/error handling on the client
+
+Disallowed responsibilities:
+
+- database access
+- Prisma calls
+- repository logic
+- server-only service logic
+- domain mutation logic that should live in actions/services
+
+Rules:
+
+- Hooks must belong to one feature only
+- Keep hooks focused and composable
+- Do not create hooks without a real reuse or complexity reason
+- Hooks may invoke server actions from client components
+
+Examples:
+
+- `use-material-form.ts`
+- `use-material-form-defaults.ts`
+- `use-material-form-options.ts`
+
+---
+
+# 8. Services
+
+Location:
+`features/[feature-name]/services/`
+
+Purpose:
+Services contain business rules, domain constraints, and feature-level orchestration.
+
+Typical scope:
+
+- business rules
+- domain constraints
+- orchestration across repositories
+- transactional application flow
+- feature-specific use cases
+
+Rules:
+
+- Must NOT contain UI logic
+- Must NOT depend on React
+- Must NOT define schema validation
+- May enforce business validation and domain rules
+- Should call repositories for data access
+- May coordinate multiple repositories
+
+Examples:
+
+- `material-create.service.ts`
+- `material-update.service.ts`
+- `material-toggle-status.service.ts`
+- `material-toggle-status-bulk.service.ts`
+- `material-delete.service.ts`
+- `material-delete-bulk.service.ts`
+- `material-get-by-id.service.ts`
+- `material-get-list.service.ts`
+
+---
+
+# 9. Repositories
+
+Location:
+`features/[feature-name]/repositories/`
+
+Purpose:
+Repositories contain Prisma queries and persistence logic for the owning feature.
+
+Typical scope:
+
+- Prisma queries
+- create/update/delete persistence operations
+- filtering, sorting, and pagination queries
+- low-level database access
+- transaction-aware persistence operations
+
+Rules:
+
+- Must contain persistence logic only
+- Must NOT contain business rules
+- Must NOT contain UI logic
+- Must NOT depend on React
+- Must NOT call actions
+- Must NOT call services
+
+Examples:
+
+- `material-list.repository.ts`
+- `material-update.repository.ts`
+- `material-get-by-id.repository.ts`
+- `material-get-list.repository.ts`
+- `material-delete.repository.ts`
+- `material-delete-bulk.repository.ts`
+- `material-toggle-status.repository.ts`
+- `material-toggle-status-bulk.repository.ts`
+
+Example usage:
+`prisma.mdMaterial.create()`
+
+---
+
+# 10. Schemas
+
+Location:
+`features/[feature-name]/schemas/`
+
+Purpose:
+Schemas define runtime validation for inputs owned by a feature.
+
+Preferred library:
+Zod
+
+Allowed scope:
+
+- form input validation
+- server action payload validation
+- filter/search param validation
+- bulk action validation
+- import/export row validation
+- safe input coercion and transformation
+
+Rules:
+
+- Must contain validation concerns only
+- Must NOT contain UI logic
+- Must NOT contain database access
+- Must NOT contain business orchestration
+- May use `refine`, `superRefine`, `transform`, and `coerce`
+- Must NOT enforce business rules that require database state
+
+Examples:
+
+- `material-filter.schema.ts`
+- `material-create.schema.ts`
+- `material-update.schema.ts`
+- `material-delete.schema.ts`
+- `material-import.schema.ts`
+
+---
+
+# 11. Types
+
+Location:
+`features/[feature-name]/types/`
+
+Purpose:
+Types define compile-time contracts for the owning feature.
+
+Allowed scope:
+
+- domain types
+- DTO types
+- table row types
+- form value types
+- filter value types
+- action result types
+- option types
+- view model types
+
+Rules:
+
+- Must NOT contain runtime logic
+- Must NOT contain business logic
+- Must NOT contain UI logic
+- May be used by actions, services, repositories, hooks, and components
+- Prefer inferring input types from schemas when possible
+- Avoid duplicate type definitions
+
+Examples:
+
+- `material.type.ts`
+- `material-form.type.ts`
+- `material-create.type.ts`
+- `material-table.type.ts`
+- `material-filter.type.ts`
+
+---
+
+# 12. Schema to Type Inference
+
+Types should be inferred from schemas when a schema already exists.
+
+Example:
+
+`type MaterialCreateType = z.infer<typeof materialCreateSchema>`
+
+---
+
+# 13. Constants
+
+Location:
+features/[feature-name]/constants/
+
+Purpose:
+Store **static, immutable values** that are **scoped to a single feature**.
+
+## Allowed Scope
+
+This directory MAY contain ONLY:
+
+- enums
+- static labels / text
+- keys / identifiers
+- static mappings
+- feature-specific default values
+- feature-local configuration (non-global)
+
+## Examples
+
+- MATERIAL_TABLE_SEARCH_PLACEHOLDER
+- MATERIAL_STATUS_LABEL
+
+## Strict Rules
+
+Constants MUST NOT contain:
+
+- any logic
+- business logic
+- UI logic (rendering rules, conditional UI, responsiveness)
+- validation logic
+- runtime logic (functions, calculations, Date, Math, env access)
+- side effects
+- framework or library dependencies (React, Next.js, zod, etc.)
+
+Constants MUST:
+
+- be static and immutable
+- be plain values only (primitives, arrays, object literals, enums)
+- NOT depend on state, props, environment variables, or execution time
+
+## Global Default Values Rule
+
+DO NOT define **application-wide default values** inside feature constants.
+
+If a value is:
+
+- shared across multiple features
+- application-wide
+- configurable or environment-dependent
+
+It MUST be defined in:
+
+`config/app.config.ts`
+
+### ❌ Forbidden in Feature Constants
+
+- pagination page size
+- pagination max limit
+- toast duration
+- toast position
+
+### ✅ Correct Location
+
+- pagination.defaultPageSize
+- pagination.maxLimit
+- toastConfig.duration
+- toastConfig.position
+
+## Decision Guide
+
+| Value Type                  | Allowed Location             |
+| --------------------------- | ---------------------------- |
+| Feature-specific labels     | features/[feature]/constants |
+| Feature domain enums        | features/[feature]/constants |
+| Global pagination defaults  | config/app.config.ts         |
+| Cross-feature configuration | config/app.config.ts         |
+| Computed or dynamic values  | ❌ Not allowed               |
+
+## Golden Rule
+
+If a value can change due to **user input, environment, time, or logic**, it is **NOT a constant**.
+
+---
+
+# 14. index.ts
+
+Location:
+features/[feature-name]/index.ts
+
+Purpose:
+Single public entry point for the feature.
+
+Scope:
+
+- Re-export public API
+- Simplify imports
+- Hide internal implementation
+
+Example:
+`export * from "./actions"`
+`export * from "./components"`
+`export * from "./constants"`
+`export * from "./hooks"`
+`export * from "./repositories"`
+`export * from "./schemas"`
+`export * from "./services"`
+`export * from "./table"`
+`export * from "./types"`
+
+Usage:
+`import { MaterialForm, MaterialCreateAction } from "@/features/materials"`
+
+---
+
+# 15. Data Flow Standard
+
+All features must follow this flow:
+
+`Component/hook → Action → Service → Repository → Prisma Database`
+
+Example flow:
+
+→ MaterialForm  
+→ MaterialCreateAction  
+→ MaterialCreateService  
+→ MaterialCreateRepository  
+→ Prisma Database
+
+Rules:
+
+- Actions may call services
+- Services may call repositories
+- Repositories may call Prisma Database
+- Components and hooks must NOT call repositories directly
+- Components and hooks may call actions
+- Components and hooks may call services
+
+---
+
+# 16. Import and Export Integration
+
+Purpose:
+Import and export flows must remain feature-owned and must follow the same feature boundaries as forms, tables, actions, services, repositories, and schemas.
+
+Rules:
+
+- Import and export logic MUST belong to the owning feature
+- Feature-specific import and export behavior MUST NOT be implemented in global shared folders
+- Import and export UI MAY live in `features/[feature-name]/components/`
+- Table-related export triggers and feature-specific export table helpers MAY live in `features/[feature-name]/table/`
+- Import and export hooks MAY live in `features/[feature-name]/hooks/`
+- Import and export parsers, mappers, transformers, and helper utilities SHOULD live in `features/[feature-name]/lib/`
+- Import and export validation schemas MUST live in `features/[feature-name]/schemas/`
+- Import and export server entry points MUST live in `features/[feature-name]/actions/`
+- Import and export business rules MUST live in `features/[feature-name]/services/`
+- Import and export persistence access MUST live in `features/[feature-name]/repositories/` when persistence is required
+- Shared import and export helpers MAY be extracted only if they are fully generic and reusable across multiple features
+- Raw imported rows MUST NOT be persisted directly without validation and feature-owned mapping
+- Exported rows MUST be mapped intentionally and MUST NOT be derived accidentally from arbitrary rendered UI output
+
+Examples:
+
+- `features/materials/components/MaterialImportForm.tsx`
+- `features/materials/components/MaterialExportButton.tsx`
+- `features/materials/hooks/use-material-import.ts`
+- `features/materials/actions/materials-import.action.ts`
+- `features/materials/actions/materials-export.action.ts`
+- `features/materials/lib/material-import-parser.ts`
+- `features/materials/lib/material-export-mapper.ts`
+- `features/materials/schemas/material-import.schema.ts`
+- `features/materials/table/material-export-columns.ts`
+
+Reference:
+Detailed technical rules are defined in:
+
+- `.cursor/rules/export-import/1-data-import-export.mdc`
+- `.cursor/rules/export-import/2-csv-export.mdc`
+- `.cursor/rules/export-import/3-csv-import.mdc`

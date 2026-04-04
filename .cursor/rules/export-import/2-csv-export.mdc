@@ -1,0 +1,234 @@
+---
+description: CSV export technical rules for feature-based Next.js App Router applications
+globs:
+[
+  "features/**/actions/**/*export*.ts",
+  "features/**/components/**/*Export*.tsx",
+  "features/**/hooks/**/*export*.ts",
+  "features/**/lib/**/*export*.ts",
+  "features/**/lib/**/*csv*.ts",
+  "features/**/table/**/*export*.ts",
+  "features/**/table/**/*csv*.ts"
+]
+alwaysApply: true
+---
+
+# CSV Export Rule
+
+CSV export is optional and MUST be implemented only when it provides real user value for the feature.
+
+This rule defines technical CSV export behavior.
+
+It complements:
+
+- feature structure rules
+- table architecture rules
+- data import and export architecture rules
+
+---
+
+# 1. Export Modes
+
+CSV export modes MAY include:
+
+- selected rows
+- filtered rows
+- current page rows
+- full dataset
+
+Rules:
+
+- Export mode MUST be defined explicitly per feature
+- Export scope MUST be understandable to the user
+- Selected-row export semantics MUST be explicit, especially when selection can span pagination
+- Filtered-row export semantics MUST be explicit, especially when filtering is server-side
+- Full-dataset export MUST NOT silently export more data than the user expects
+
+---
+
+# 2. Ownership and Placement
+
+Rules:
+
+- CSV export logic MUST live in the owning feature
+- Export mappers SHOULD remain feature-owned
+- Shared CSV helpers MAY be extracted only if they are generic and reusable
+- Export logic MAY live in `features/[feature-name]/table/`, `features/[feature-name]/lib/`, or `features/[feature-name]/export/` depending on complexity
+- Placement MUST remain consistent within the project
+
+Examples:
+
+- `features/materials/actions/export-materials.ts`
+- `features/materials/lib/material-export-mapper.ts`
+- `features/materials/lib/material-csv.ts`
+- `features/materials/table/material-export-columns.ts`
+
+---
+
+# 3. Export Row Definitions
+
+Export rows MUST be defined explicitly.
+
+Rules:
+
+- Export columns MUST NOT be derived implicitly from arbitrary UI rendering
+- Export definitions SHOULD be based on explicit column or field mapping
+- Exported columns MAY differ from visible table columns when export-specific labels or values are needed
+- Hidden internal columns MUST NOT be exported unless explicitly intended
+- Computed export fields MAY be used when the feature requires derived values
+
+Recommended export definition shape MAY include:
+
+- header label
+- field key
+- export formatter
+- fallback value
+- inclusion rule
+
+---
+
+# 4. Data Scope and Permissions
+
+Exported data MUST respect user scope and feature permissions.
+
+Rules:
+
+- Exported data MUST include only fields allowed for the current user and context
+- Sensitive, internal, or restricted fields MUST NOT be exported unless explicitly intended
+- Permission-sensitive export filtering SHOULD be enforced server-side
+- Client-visible data MUST NOT automatically be assumed export-safe
+
+---
+
+# 5. Formatting Rules
+
+CSV output MUST be formatted intentionally.
+
+Rules:
+
+- Header labels MUST be explicit
+- Values MUST be serialized consistently
+- Null and undefined values MUST be handled intentionally
+- Dates SHOULD be formatted intentionally and consistently
+- Numbers SHOULD be formatted intentionally and consistently
+- Booleans SHOULD use predictable exported values
+- Enum-like values SHOULD use consistent display or code representation per feature
+- Delimiter choice MUST be explicit if the project does not use a single default
+- Quote escaping MUST be handled correctly
+- Embedded commas, quotes, and line breaks MUST be handled correctly
+
+Recommended defaults unless project rules specify otherwise:
+
+- UTF-8 text output
+- comma as delimiter
+- double quote escaping according to CSV conventions
+- stable column order
+
+---
+
+# 6. Filename Conventions
+
+Export filenames SHOULD be predictable and feature-specific.
+
+Rules:
+
+- Filenames SHOULD identify the feature or dataset
+- Filenames MAY include export mode
+- Filenames MAY include a timestamp or date suffix
+- Filenames SHOULD avoid ambiguous generic names such as `export.csv`
+
+Examples:
+
+- `materials.csv`
+- `materials-filtered-2026-03-24.csv`
+- `materials-selected.csv`
+
+---
+
+# 7. Client vs Server Export
+
+Client-side and server-side export MUST be chosen intentionally.
+
+Client-side export is appropriate when:
+
+- the dataset is already available in the client
+- the export scope is small
+- no authoritative server filtering is required
+- performance remains acceptable
+
+Server-side export is preferred when:
+
+- the dataset is large
+- the export scope exceeds the current client state
+- filtering or permissions must be enforced authoritatively
+- export formatting requires server-owned data enrichment
+
+Rules:
+
+- Large dataset exports SHOULD use server-side generation
+- Client-side export SHOULD be limited to data already available in the client unless the feature intentionally fetches the full export scope
+- Export logic MUST NOT silently export incomplete data when users expect full filtered results
+
+---
+
+# 8. Table Integration
+
+CSV export MAY integrate with TanStack Table, but MUST remain explicit.
+
+Rules:
+
+- Export behavior MUST define whether it uses selected rows, filtered rows, current page rows, or a server-side query
+- Export configuration SHOULD be derived from feature-owned table definitions or dedicated export mappers
+- Export logic MUST NOT depend on arbitrary DOM content or rendered cell text
+- Sorting and filtering behavior SHOULD be reflected in export when the feature promises that scope
+
+---
+
+# 9. Loading and Failure Handling
+
+Export actions MUST communicate status clearly.
+
+Rules:
+
+- Loading state SHOULD be visible for slow exports
+- Export buttons SHOULD prevent accidental repeated triggers when appropriate
+- Export failures SHOULD provide user-facing feedback
+- Empty export results SHOULD be handled intentionally
+- Features SHOULD define whether exporting zero rows is allowed, blocked, or warned
+
+---
+
+# 10. Performance Rules
+
+Rules:
+
+- Large exports SHOULD avoid building excessive in-memory payloads on the client
+- Expensive formatting SHOULD be centralized and reusable when repeated
+- Export mapping SHOULD remain stable and readable
+- Full-dataset exports SHOULD avoid relying on paginated client caches
+
+---
+
+# 11. Forbidden
+
+Do NOT:
+
+- export arbitrary rendered table cell output as the source of truth
+- export hidden sensitive fields accidentally
+- assume selected rows always mean current-page rows unless explicitly defined
+- silently export incomplete filtered results
+- place feature-specific export mapping in generic shared folders
+
+---
+
+# 12. Goal
+
+All CSV exports SHOULD be:
+
+- explicit
+- feature-owned
+- scoped correctly
+- consistently formatted
+- permission-aware
+- maintainable
+- reliable at scale

@@ -1,0 +1,398 @@
+---
+description: TanStack Form UI Conventions for Next.js App Router using Shadcn UI, TailwindCSS, Lucide Icons
+globs:
+[
+  "features/**/components/**/*Form*.tsx",
+  "features/**/components/**/*Drawer*.tsx",
+  "features/**/components/**/*Dialog*.tsx",
+  "features/**/hooks/**/*form*.ts",
+  "features/**/hooks/**/*Form*.ts",
+  "components/forms/**",
+  "components/ui/form/**"
+]
+alwaysApply: true
+---
+
+# TanStack Form UI Conventions
+
+This rule defines visual and interaction conventions for all TanStack Form implementations.
+
+It complements the architecture rule and focuses on:
+
+- layout consistency
+- field presentation
+- interaction patterns
+- feedback states
+- dialog and drawer behavior
+- responsive usability
+
+UI MUST use:
+
+- semantic HTML
+- TailwindCSS
+- Shadcn UI
+- Lucide Icons for icons
+
+Lucide icons MAY be used where icons improve clarity.
+
+---
+
+# 1. Visual Consistency
+
+All forms SHOULD look and behave like part of one unified system.
+
+Rules:
+
+- Use shared field primitives before creating new field patterns
+- Keep label spacing, field spacing, helper text, error text, and action layout consistent across features
+- Avoid one-off form styling per feature unless the screen has a documented special case
+- Prefer shared wrappers and utilities over repeating long class combinations
+
+---
+
+# 2. Semantic Structure
+
+Forms MUST use semantic HTML.
+
+Required structure:
+
+- `<form>`
+- `<label>`
+- `<input>`, `<textarea>`, `<select>`, or equivalent accessible control
+- submit button
+
+Rules:
+
+- Every interactive form flow MUST use a real `<form>`
+- Labels MUST be associated correctly with inputs
+- Do NOT rely on placeholder text as the only field label
+- Group related fields semantically when appropriate
+
+Recommended patterns:
+
+- use `fieldset` and `legend` for strongly related field groups
+- use headings for larger form sections
+- use clear submit and cancel regions
+
+---
+
+# 3. Form Layout
+
+Form layout SHOULD remain consistent and easy to scan.
+
+Rules:
+
+- Use predictable vertical spacing between fields
+- Group related fields into sections when forms are medium or large
+- Keep action areas visually separate from field areas
+- Prefer simple one-column layout by default
+- Use multi-column layout only when readability remains strong
+
+Guidelines:
+
+- small forms → single column
+- medium forms → grouped sections
+- large forms → sectioned layout with clear headings
+- modal and drawer forms → compact but readable spacing
+
+---
+
+# 4. Labels, Help Text, and Messages
+
+Field labeling MUST be clear.
+
+Rules:
+
+- Every field MUST have a visible label unless there is a documented accessibility-safe alternative
+- Help text SHOULD be placed close to the field it explains
+- Error messages MUST appear consistently near the field
+- Required and optional states SHOULD be visually consistent across the application
+- Labels SHOULD remain concise and descriptive
+
+Guidelines:
+
+- label → what the field is
+- help text → how to fill it correctly
+- error text → what is wrong and what to fix
+
+---
+
+# 5. Field Sizing and Density
+
+Field sizing SHOULD be consistent across forms.
+
+Rules:
+
+- Use a shared sizing strategy for input height, padding, and text size
+- Do NOT mix inconsistent field heights in the same form without a clear reason
+- Dense layouts MAY be used in drawers or admin-heavy screens
+- Readability-first layouts SHOULD be used for complex or high-risk input forms
+
+Guideline:
+
+- compact density → operational/admin workflows
+- medium density → default
+- larger spacing → complex onboarding or high-attention forms
+
+---
+
+# 6. Required and Optional Fields
+
+Required vs optional status MUST be communicated clearly.
+
+Rules:
+
+- Required indicators SHOULD be consistent across all forms
+- Optional fields SHOULD be explicitly marked only if that is the project convention
+- Do NOT rely on color alone to show required state
+- Required indicators SHOULD remain close to the label
+
+---
+
+# 7. Error State UI
+
+Error states MUST be easy to notice and understand.
+
+Rules:
+
+- Invalid fields SHOULD have a clear visual error state
+- Field-level error messages MUST appear near the corresponding field
+- Form-level errors SHOULD appear in a visible summary area when appropriate
+- Error messaging MUST be specific and actionable
+- Error state styling SHOULD remain consistent across field types
+
+Examples:
+
+- `Name is required`
+- `End date must be after start date`
+- `Failed to save changes. Please try again.`
+
+---
+
+# 8. Success and Informational Feedback
+
+Forms MAY display non-error feedback where useful.
+
+Rules:
+
+- Success feedback SHOULD be clear but not noisy
+- Informational text SHOULD not compete visually with errors
+- Confirmation messaging SHOULD appear in a predictable location
+- Status feedback SHOULD match the severity and scope of the event
+
+Examples:
+
+- save success
+- draft saved
+- import preview ready
+- import validation completed
+- remote validation passed
+
+---
+
+# 9. Submit Area and Actions
+
+Action areas SHOULD be consistent.
+
+Rules:
+
+- Primary submit action SHOULD be visually prominent
+- Secondary actions such as cancel or reset SHOULD be clearly distinguishable
+- Destructive actions MUST be visually differentiated
+- Action alignment SHOULD be consistent across similar forms
+- Submit areas SHOULD remain easy to find at a glance
+
+Guidelines:
+
+- small forms → actions below fields
+- large forms → sticky or repeated submit area only when clearly helpful
+- dialogs/drawers → compact footer action bar
+
+---
+
+# 10. Pending and Disabled States
+
+Pending state MUST be communicated clearly.
+
+Rules:
+
+- Submit buttons MUST reflect pending state
+- Buttons MAY be disabled during submission when appropriate
+- Inputs MAY be disabled during submission if interaction should pause
+- Pending UI SHOULD not remove important context
+- Disabled controls SHOULD remain understandable and visually consistent
+
+Examples:
+
+- `Save` → `Saving...`
+- disabled submit while request is in flight
+- spinner or subtle loading indicator inside the submit button
+
+---
+
+# 11. Field Components and Wrappers
+
+Shared field wrappers SHOULD create a predictable structure.
+
+Recommended primitives:
+
+- `FormField`
+- `FormLabel`
+- `FormControl`
+- `FormDescription`
+- `FormMessage`
+
+Rules:
+
+- Field wrappers SHOULD render label, control, description, and message in a consistent order
+- Shared field wrappers MUST stay domain-agnostic
+- Feature-specific field composition MAY wrap shared field primitives
+- Repeated field layouts SHOULD be standardized
+
+---
+
+# 12. Conditional Fields
+
+Conditional fields SHOULD remain understandable.
+
+Rules:
+
+- Showing and hiding fields MUST feel predictable
+- Newly shown fields SHOULD have clear labels and defaults
+- Hidden fields SHOULD not silently keep invalid state when reset is required
+- Conditional sections SHOULD be visually grouped
+- Complex conditional layouts SHOULD be simplified when possible
+
+---
+
+# 13. Async Inputs and Searchable Controls
+
+Async fields SHOULD make remote behavior clear.
+
+Examples:
+
+- async combobox
+- searchable select
+- remote autocomplete
+- dependent dropdown
+
+Rules:
+
+- Loading state for async options SHOULD be visible
+- Empty results SHOULD be communicated clearly
+- Debounced search SHOULD provide clear input feedback
+- Selected values SHOULD remain understandable after load completes
+- Async controls SHOULD not feel visually different from the rest of the form system
+
+---
+
+# 14. Dialog Forms
+
+Forms inside dialogs SHOULD be compact, clear, and safe to dismiss.
+
+Rules:
+
+- Dialog title and purpose MUST be clear
+- The primary action SHOULD be visible without confusion
+- Unsaved changes behavior SHOULD be considered when dismissal is possible
+- Focus SHOULD move into the dialog correctly
+- Error and success messaging SHOULD remain visible inside the dialog context
+
+Guidelines:
+
+- use dialogs for short to medium forms
+- avoid very long, section-heavy forms inside small dialogs
+
+---
+
+# 15. Drawer Forms
+
+Forms inside drawers SHOULD support focused editing flows.
+
+Rules:
+
+- Drawer header SHOULD clearly identify the task
+- Content area SHOULD scroll independently when needed
+- Footer actions SHOULD remain easy to reach
+- Long drawers SHOULD preserve orientation with visible section structure
+- Dense spacing MAY be used, but readability must remain strong
+
+Guidelines:
+
+- use drawers for edit flows, side-context updates, and operational forms
+- avoid overly complex multi-step experiences inside narrow drawers unless carefully designed
+
+---
+
+# 16. Sectioned Forms
+
+Large forms SHOULD be broken into sections.
+
+Rules:
+
+- Sections SHOULD have clear headings
+- Related fields SHOULD stay together
+- Section spacing SHOULD be visually stronger than field spacing
+- Long forms MAY use dividers, cards, tabs, or accordions when appropriate
+- Navigation aids SHOULD be used only when they improve clarity
+
+---
+
+# 17. Responsive Behavior
+
+Forms MUST remain usable on smaller screens.
+
+Rules:
+
+- Prefer stacked layouts on narrow screens
+- Avoid multi-column layouts that collapse poorly
+- Keep labels, help text, and errors readable on mobile
+- Action buttons SHOULD remain easy to tap
+- Dialogs and drawers SHOULD adapt safely to smaller viewports
+
+---
+
+# 18. Accessibility and Focus
+
+Visual conventions MUST support accessibility.
+
+Rules:
+
+- Focus states MUST remain visible
+- Inputs and controls MUST have accessible labels
+- Error messages MUST be associated with the correct fields
+- Keyboard navigation MUST remain intact
+- Color MUST not be the only way to communicate error, success, or required state
+- Focus management SHOULD be handled carefully in dialogs and drawers
+
+---
+
+# 19. Styling Discipline
+
+Rules:
+
+- Inline CSS is forbidden
+- Prefer shared Tailwind and Shadcn UI conventions
+- Repeated class combinations SHOULD be extracted into shared wrappers or utilities
+- Avoid visual drift between feature forms
+
+Forbidden:
+
+- inconsistent label spacing across similar forms
+- random submit button placement
+- inconsistent error styling
+- one-off field layouts without shared convention
+
+---
+
+# 20. Goal
+
+All form UIs SHOULD be:
+
+- visually consistent
+- easy to scan
+- accessible
+- responsive
+- predictable
+- aligned with the design system
+- comfortable for repeated operational use

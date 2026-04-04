@@ -1,0 +1,628 @@
+---
+description: TanStack Form architecture rules for feature-owned forms in Next.js App Router using Shadcn UI, TailwindCSS, Lucide Icons
+globs:
+[
+  "features/**/components/**/*Form*.tsx",
+  "features/**/components/**/*Drawer*.tsx",
+  "features/**/components/**/*Dialog*.tsx",
+  "features/**/hooks/**/*form*.ts",
+  "features/**/hooks/**/*Form*.ts"
+]
+alwaysApply: true
+---
+
+# TanStack Form Rule
+
+All complex feature forms MUST use **TanStack Form** as the form engine.
+
+TanStack Form is responsible for:
+
+- form state
+- field state
+- validation flow integration
+- submission state
+- touched state
+- dirty state
+- field-level and form-level error state
+
+UI MUST be implemented using:
+
+- semantic HTML
+- TailwindCSS
+- Shadcn UI
+- Lucide Icons for icons
+
+This rule extends the general folder-structure rules and applies specifically to feature-owned forms.
+
+---
+
+# 1. Architecture Overview
+
+The form system follows a **Feature-Owned Form + Shared UI Primitive** architecture.
+
+## Structure:
+
+- `features/[feature-name]/components/` → feature-specific forms, sections, drawers, dialogs, and form composition
+- `features/[feature-name]/hooks/` → reusable feature-scoped form hooks and orchestration helpers
+- `features/[feature-name]/schemas/` → feature-owned validation schemas
+- `features/[feature-name]/actions/` → server actions and mutation entry points
+- `features/[feature-name]/lib/` → optional feature-owned mappers, transformers, and form helpers
+- `components/form/` → shared form-aware wrappers integrated with TanStack Form
+- `components/ui/` → shared low-level UI primitives
+
+## Core Rules
+
+- Feature-specific form logic MUST stay inside the owning feature
+- Feature-owned forms MUST NOT be placed in global shared folders
+- Shared form-aware components MUST remain generic and reusable across features
+- Shared UI primitives MUST remain presentation-focused
+- Form architecture MUST preserve clear boundaries between UI, validation, mutation entry, and business logic
+
+## Examples:
+
+- `features/materials/components/MaterialForm.tsx`
+- `features/materials/components/MaterialCreateDrawer.tsx`
+- `features/materials/components/MaterialEditDialog.tsx`
+- `features/materials/hooks/use-material-form.ts`
+- `features/materials/hooks/use-material-form-defaults.ts`
+- `features/materials/schemas/create-material.schema.ts`
+- `features/materials/schemas/update-material.schema.ts`
+- `features/materials/actions/create-material.action.ts`
+- `features/materials/actions/update-material.action.ts`
+- `features/materials/lib/material-form-defaults.ts`
+- `features/materials/lib/material-form-mapper.ts`
+- `components/form/TextField.tsx`
+- `components/form/SelectField.tsx`
+- `components/form/TextareaField.tsx`
+- `components/form/CheckboxField.tsx`
+- `components/form/RadioGroupField.tsx`
+- `components/ui/Button.tsx`
+- `components/ui/Input.tsx`
+- `components/ui/Select.tsx`
+- `components/ui/Textarea.tsx`
+- `components/ui/Checkbox.tsx`
+- `components/ui/RadioGroup.tsx`
+
+---
+
+# 2. Ownership and Boundaries
+
+Forms MUST follow feature boundaries.
+
+Rules:
+
+- Feature forms MUST live inside the owning feature
+- Feature form sections and field groups MUST live inside the same feature
+- Shared field primitives MUST be generic and reusable
+- Feature-specific submit behavior MUST NOT be moved into shared components `components/form/*` and `components/ui/*`
+- Validation schemas MUST live in `schemas/`
+- Business logic MUST NOT live inside form components
+- Database access MUST NOT live inside form components
+- Repository access MUST NOT live inside form components
+- Service orchestration MUST NOT live inside form components
+
+Interpretation:
+
+- the form layer owns rendering and form interaction
+- the feature layer owns composition and submit wiring
+- the mutation layer owns persistence entry
+- the domain layer owns business rules
+
+---
+
+# 3. Shared vs Feature-Specific Responsibilities
+
+## Shared UI primitives MAY include:
+
+- text inputs
+- textareas
+- number inputs
+- select inputs
+- comboboxes
+- checkboxes
+- radio groups
+- date inputs
+- switches
+
+## Shared form-aware wrappers MAY include:
+
+- `TextField`
+- `TextareaField`
+- `SelectField`
+- `CheckboxField`
+- `RadioGroupField`
+- generic field adapters for TanStack Form
+- generic label, description, and error helpers
+
+## Feature-owned form files SHOULD include:
+
+- full forms
+- form sections
+- feature-specific field composition
+- feature-specific default value preparation
+- feature-specific submit wiring
+- feature-specific conditional field rendering
+- feature-specific mapping between server payload and form values
+
+Rules:
+
+- Shared components MUST remain domain-agnostic
+- Shared components MUST NOT import feature-local files
+- Feature-owned forms MAY compose shared primitives
+- Feature-owned forms MUST own field arrangement and feature-specific behavior
+- Shared form-aware wrappers SHOULD encapsulate repeated TanStack Form integration patterns
+
+---
+
+# 4. Naming and File Conventions
+
+Rules:
+
+- React component files SHOULD use PascalCase
+- Hook files SHOULD follow project-standard hook naming consistently
+- Schema files SHOULD use kebab-case and end with `.schema`
+- Mapper and defaults files SHOULD use kebab-case
+- Naming MUST clearly communicate ownership and responsibility
+
+Recommended examples:
+
+- `UserForm.tsx`
+- `UserCreateDrawer.tsx`
+- `UserEditDialog.tsx`
+- `UserProfileSection.tsx`
+- `use-user-form.ts`
+- `use-user-form-defaults.ts`
+- `use-user-form-options.ts`
+- `user-form.schema.ts`
+- `user-filter.schema.ts`
+- `user-form-defaults.ts`
+- `user-form-mapper.ts`
+
+---
+
+# 4. Form Location
+
+Primary feature form files SHOULD live in:
+`features/[feature-name]/components/`
+
+Examples:
+
+- `UserForm.tsx`
+- `UserCreateDrawer.tsx`
+- `UserEditDialog.tsx`
+- `UserProfileSection.tsx`
+
+Reusable feature form hooks SHOULD live in:
+`features/[feature-name]/hooks/`
+
+Examples:
+
+- `use-user-form.ts`
+- `use-user-form-defaults.ts`
+
+Validation schemas SHOULD live in:
+`features/[feature-name]/schemas/`
+
+Examples:
+
+- `user-form-schema.ts`
+- `user-filter-schema.ts`
+
+Rules:
+
+- Full form components MUST remain in feature-owned component folders
+- Hooks related to form composition or reusable field behavior SHOULD remain inside the feature
+- Validation logic MUST NOT be duplicated inside form components
+
+---
+
+# 5. Validation Rules
+
+Validation MUST use schema validation.
+
+Preferred library:
+
+- Zod
+
+Rules:
+
+- Validation schemas MUST live in `features/[feature-name]/schemas/`
+- Form validation MUST be driven by schema or explicit typed validation logic
+- Form components MUST NOT contain large inline validation blocks
+- Validation messages SHOULD be user-friendly and field-specific
+- Cross-field validation SHOULD be defined in the schema layer or a dedicated typed validation helper
+- Server-side validation MUST remain possible even when client-side validation exists
+
+Examples:
+
+- required fields
+- string length rules
+- enum validation
+- number ranges
+- date validation
+- cross-field rules such as start date before end date
+
+---
+
+# 6. Form State Management
+
+TanStack Form MUST manage:
+
+- values
+- field meta
+- touched state
+- dirty state
+- submission state
+- validation state
+
+Rules:
+
+- Form state MUST be centralized in TanStack Form
+- Avoid duplicating form state in multiple local `useState` values unless strictly needed for external UI concerns
+- Keep derived UI state separate from core form values when appropriate
+- Default values MUST be explicit and typed
+- Form field names SHOULD remain stable and predictable
+
+---
+
+# 7. Default Values
+
+Forms MUST define clear default values.
+
+Rules:
+
+- Default values MUST be explicit
+- Default values SHOULD be typed
+- Create and edit flows MAY use different default value builders
+- Data transformation from server payload to form defaults SHOULD happen before or during form initialization
+- Default value preparation SHOULD be extracted when it becomes reusable or non-trivial
+
+Recommended locations:
+
+- inside the form component when trivial
+- inside `hooks/` when reusable
+- inside a feature helper when mapping becomes complex
+
+---
+
+# 8. Server and Client Architecture
+
+Forms MUST follow **Server → Client separation**.
+
+Server responsibilities:
+
+- fetch existing data for edit flows
+- fetch option data when needed
+- prepare initial values
+- perform server actions or mutations
+- enforce authoritative validation and persistence
+
+Client responsibilities:
+
+- TanStack Form state
+- interactive field rendering
+- local validation feedback
+- submission interaction
+- optimistic and pending UI where appropriate
+
+Rules:
+
+- Interactive forms MUST be client components
+- Data fetching MUST NOT happen inside low-level shared field primitives
+- Server Components MAY pass initial values and option data into feature form components
+- Form components MUST delegate persistence to actions or other approved mutation entry points
+
+---
+
+# 9. Submission Architecture
+
+Form submission MUST remain explicit and feature-owned.
+
+Rules:
+
+- Forms MAY submit through server actions, mutation hooks, or other approved feature entry points
+- Submission handlers MUST remain in the owning feature
+- Shared input primitives MUST NOT own submission behavior
+- Submission state MUST be reflected in the UI
+- Prevent duplicate submissions while a submit is pending
+- Success and failure handling SHOULD be explicit
+
+Examples:
+
+- create entity
+- update entity
+- approve request
+- publish draft
+- import structured input
+
+---
+
+# 10. Import Form Integration
+
+Some features MAY implement CSV or structured-data import flows using TanStack Form.
+
+Typical import form responsibilities MAY include:
+
+- file input state
+- import option fields
+- delimiter or mode selection when applicable
+- preview trigger
+- confirmation input
+- submission state
+- result summary state
+
+Rules:
+
+- Import forms MUST remain feature-owned
+- Import form UI MUST live inside the owning feature
+- Import validation schemas MUST live in `features/[feature-name]/schemas/`
+- Import parsing, normalization, and row mapping MUST NOT be buried inside JSX
+- Import forms MAY collect upload options and trigger preview or confirmation workflows
+- TanStack Form SHOULD manage import-related input state when the import flow includes real form interaction
+- Raw imported rows MUST NOT be treated as valid domain input without validation
+- Authoritative row validation and persistence MUST remain possible on the server even when client preview exists
+- Multi-stage import flows MAY separate preview and final commit into distinct feature-owned components
+- Import-specific helper utilities SHOULD live in `features/[feature-name]/lib/` or other feature-owned modules according to responsibility
+
+Examples:
+
+- `MaterialImportForm.tsx`
+- `MaterialImportPreviewForm.tsx`
+- `use-material-import.ts`
+- `material-import.schema.ts`
+- `material-import-parser.ts`
+- `import-materials.action.ts`
+
+Reference:
+Detailed import rules are defined in:
+
+- `.cursor/rules/folder-structure/data-import-export.mdc`
+- `.cursor/rules/folder-structure/csv-import.mdc`
+
+---
+
+# 11. Form Composition
+
+Forms SHOULD be composed from small, focused building blocks.
+
+Examples:
+
+- full form component
+- section component
+- field group component
+- submit footer
+- dialog or drawer wrapper
+
+Rules:
+
+- Prefer composition over very large monolithic forms
+- Group related fields into sections when the form is large
+- Keep field rendering readable
+- Extract repeated field groups when they are reused within the feature
+- Do NOT over-fragment small forms into too many files
+
+---
+
+# 12. Field Components
+
+Fields SHOULD be built from reusable primitives.
+
+Common field primitives:
+
+- `FormField`
+- `FormLabel`
+- `FormControl`
+- `FormDescription`
+- `FormMessage`
+
+Rules:
+
+- Labels SHOULD be visible and associated correctly
+- Error messages MUST be rendered consistently
+- Help text SHOULD be used when fields need clarification
+- Required and optional states SHOULD be visually clear
+- Shared field wrappers MUST remain generic
+
+---
+
+# 13. Conditional Fields
+
+Conditional fields are allowed when driven by feature requirements.
+
+Rules:
+
+- Conditional rendering MUST remain predictable
+- Hidden fields SHOULD be handled intentionally
+- Do NOT keep stale values accidentally when business rules require reset or clearing
+- Conditional logic SHOULD remain readable and typed
+- Complex conditional behavior SHOULD be extracted from the JSX body when needed
+
+---
+
+# 14. Async Fields and Remote Options
+
+Some forms require async option loading or dynamic suggestions.
+
+Rules:
+
+- Async option fetching SHOULD happen in feature-owned hooks or higher-level components
+- Shared input primitives MUST NOT own domain-specific fetching logic
+- Loading, empty, and error states for remote options SHOULD be explicit
+- Debounced search SHOULD be used where remote search inputs are involved
+- Option mapping SHOULD remain typed
+
+Examples:
+
+- searchable select
+- async combobox
+- dependent dropdowns
+- remote autocomplete
+
+---
+
+# 15. Dialog and Drawer Forms
+
+Forms may be rendered inside dialogs or drawers.
+
+Rules:
+
+- Dialog or drawer wrappers MAY live in `components/`
+- The actual form MAY be embedded directly or composed as a child form component
+- Open or close state SHOULD remain separate from form state
+- Closing behavior after successful submit SHOULD be explicit
+- Unsaved changes behavior SHOULD be considered for dismissible forms
+
+Examples:
+
+- `UserCreateDrawer.tsx`
+- `UserEditDialog.tsx`
+
+---
+
+# 16. Form Hooks
+
+Reusable feature-scoped hooks MAY support form composition.
+
+Examples:
+
+- `use-user-form.ts`
+- `use-user-form-defaults.ts`
+- `use-user-form-options.ts`
+
+Rules:
+
+- Form hooks MUST remain feature-scoped unless truly generic
+- Hooks MAY encapsulate default value preparation, option mapping, submit wiring, or field helpers
+- Hooks MUST NOT hide important business decisions without clear naming
+- Hooks SHOULD return typed values and handlers
+
+---
+
+# 17. Error Handling
+
+Forms MUST handle errors clearly.
+
+Rules:
+
+- Field-level errors MUST appear near the relevant field
+- Form-level errors SHOULD appear in a visible summary area when appropriate
+- Server errors MUST be surfaced to the user clearly
+- Validation errors and submission errors SHOULD be distinguishable
+- Error messaging SHOULD be actionable and user-friendly
+
+---
+
+# 18. Loading and Pending States
+
+Forms MUST communicate pending state.
+
+Rules:
+
+- Submit buttons MUST reflect pending state
+- Inputs MAY be disabled during submission when appropriate
+- Loading state for edit forms SHOULD be distinct from empty form state
+- Pending UI SHOULD prevent accidental duplicate interaction
+
+Examples:
+
+- disabled submit button
+- loading label such as `Saving...`
+- skeleton for initial edit-form load
+
+---
+
+# 19. Readability and Maintainability
+
+Form code MUST remain readable.
+
+Rules:
+
+- Avoid very large inline JSX blocks when extraction improves clarity
+- Avoid deeply nested anonymous render logic
+- Keep field names, schema names, and action names aligned
+- Prefer explicit typing over implicit shape assumptions
+- Avoid scattering form rules across too many unrelated files
+
+---
+
+# 20. Accessibility
+
+Forms MUST support accessibility.
+
+Rules:
+
+- Inputs MUST have accessible labels
+- Error messages MUST be readable and associated with inputs
+- Required fields MUST be communicated clearly
+- Keyboard navigation MUST remain intact
+- Focus management SHOULD be handled correctly for dialogs and drawers
+- Placeholder text MUST NOT be the only label
+
+---
+
+# 21. Styling Rules
+
+Forms MUST follow these rules:
+
+- use semantic HTML
+- use TailwindCSS
+- use Shadcn UI
+- use Lucide Icons for icons
+- inline CSS is forbidden
+
+Rules:
+
+- Form styling MUST remain consistent with the shared design system
+- Field spacing, label style, error style, and action layout SHOULD be consistent across features
+- Repeated form layout patterns SHOULD be extracted into reusable wrappers or utilities when appropriate
+- Avoid one-off visual patterns without a documented reason
+
+---
+
+# 22. Performance Rules
+
+Rules:
+
+- Avoid unnecessary rerenders across many fields
+- Memoize expensive derived data when needed
+- Keep option lists and mapping stable where possible
+- Avoid heavy calculations inside render
+- Use debouncing for remote search where appropriate
+- Split large forms into sections when it improves performance and maintainability
+
+Forbidden:
+
+- business logic inside field render code
+- database access inside form components
+- repository access inside form components
+- large inline validation blocks inside UI files
+- one-off uncontrolled form systems for complex feature forms
+
+---
+
+# 23. Forbidden
+
+Do NOT:
+
+- place feature-specific forms in shared folders
+- put validation schemas inside form UI files
+- fetch data inside low-level shared field primitives
+- call repositories directly from form components
+- implement business rules directly inside the form UI layer
+- duplicate the same validation rules across multiple files
+- bypass TanStack Form for complex feature forms
+
+---
+
+# 24. Goal
+
+All generated forms SHOULD be:
+
+- feature-owned
+- readable
+- maintainable
+- typed
+- accessible
+- scalable
+- validation-driven
+- consistent across the application

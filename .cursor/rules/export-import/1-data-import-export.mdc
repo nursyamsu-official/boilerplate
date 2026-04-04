@@ -1,0 +1,317 @@
+---
+description: Data import and export architecture rules for feature-based Next.js App Router applications
+globs:
+[
+  "features/**/actions/**/*import*.ts",
+  "features/**/actions/**/*export*.ts",
+  "features/**/components/**/*Import*.tsx",
+  "features/**/components/**/*Export*.tsx",
+  "features/**/hooks/**/*import*.ts",
+  "features/**/hooks/**/*export*.ts",
+  "features/**/lib/**/*import*.ts",
+  "features/**/lib/**/*export*.ts",
+  "features/**/schemas/**/*import*.ts",
+  "features/**/schemas/**/*export*.ts"
+]
+alwaysApply: true
+---
+
+# Data Import and Export Rule
+
+Import and export flows MUST be feature-owned.
+
+This rule defines architecture and boundaries for data import and export across features.
+
+It applies to:
+
+- CSV import
+- CSV export
+- spreadsheet-style import or export flows
+- preview and validation flows before commit
+- server-side and client-side import or export entry points
+
+This rule does NOT define:
+
+- table UI conventions
+- form UI conventions
+- field styling
+- detailed CSV encoding rules
+
+---
+
+# 1. Ownership
+
+Import and export behavior MUST belong to the owning feature.
+
+Rules:
+
+- Import logic MUST live inside the owning feature
+- Export logic MUST live inside the owning feature
+- Shared helpers MAY be extracted only if they are generic and reusable
+- Feature-specific mapping, validation, and transformation MUST remain feature-owned
+- Domain-specific import or export rules MUST NOT be placed in global shared folders
+
+Examples:
+
+- `features/materials/actions/import-materials.ts`
+- `features/materials/actions/export-materials.ts`
+- `features/materials/components/MaterialImportForm.tsx`
+- `features/materials/components/MaterialExportButton.tsx`
+- `features/materials/hooks/use-material-import.ts`
+- `features/materials/lib/material-import-parser.ts`
+- `features/materials/lib/material-export-mapper.ts`
+- `features/materials/schemas/material-import-schema.ts`
+
+---
+
+# 2. Recommended Locations
+
+Import and export files SHOULD be placed according to responsibility.
+
+Recommended structure:
+
+- `features/[feature-name]/components/` → import forms, export buttons, preview dialogs, result summaries
+- `features/[feature-name]/hooks/` → import or export orchestration hooks
+- `features/[feature-name]/actions/` → mutation entry points, server actions, export endpoints
+- `features/[feature-name]/schemas/` → import validation schemas and typed parsing rules
+- `features/[feature-name]/lib/` → parsers, mappers, transformers, normalization helpers
+
+Optional structure for large features:
+
+- `features/[feature-name]/import/`
+- `features/[feature-name]/export/`
+
+Rules:
+
+- Placement MUST remain consistent within the project
+- Small projects MAY keep import or export helpers in `lib/`
+- Larger projects MAY split import and export into dedicated folders
+- Low-level shared parsers MUST remain generic if extracted globally
+
+---
+
+# 3. Responsibilities by Layer
+
+## Components
+
+Components MAY handle:
+
+- file selection
+- preview rendering
+- import confirmation
+- export trigger UI
+- result summaries
+- progress and feedback
+
+Components MUST NOT handle:
+
+- database access
+- repository calls
+- complex parsing rules
+- business rule orchestration
+- persistence logic
+
+## Hooks
+
+Hooks MAY handle:
+
+- import state orchestration
+- export state orchestration
+- progress state
+- preview state
+- mapping UI selections into action input
+
+Hooks MUST NOT hide important domain behavior behind unclear abstractions.
+
+## Schemas
+
+Schemas MAY handle:
+
+- file row validation
+- typed shape validation
+- column requirements
+- cross-field validation for row data
+
+Schemas MUST NOT contain persistence logic.
+
+## Actions
+
+Actions MAY handle:
+
+- server-side import execution
+- export dataset generation
+- authoritative validation
+- persistence entry
+- permission checks
+- result aggregation
+
+Actions MUST NOT contain UI code.
+
+## Lib
+
+Lib MAY handle:
+
+- CSV parsing helpers
+- normalization helpers
+- row mapping
+- export mapping
+- file naming helpers
+- transformation from raw row to validated draft input
+
+Lib MUST remain readable, typed, and responsibility-focused.
+
+---
+
+# 4. Server and Client Boundaries
+
+Import and export MUST follow clear server and client separation.
+
+Client responsibilities MAY include:
+
+- choosing files
+- previewing rows
+- local pre-validation
+- selecting export mode
+- selecting export scope
+- showing progress and results
+
+Server responsibilities MAY include:
+
+- authoritative validation
+- permission enforcement
+- full dataset export
+- persistence
+- duplicate detection
+- batch processing
+- transaction handling
+- audit logging where required
+
+Rules:
+
+- Client-side logic MUST NOT be treated as authoritative for data safety
+- Server-side validation MUST remain possible even if client-side validation exists
+- Large imports SHOULD be processed on the server
+- Large exports SHOULD be generated on the server
+- Sensitive data filtering MUST be enforced on the server when relevant
+
+---
+
+# 5. Validation and Mapping
+
+Import and export flows MUST use explicit validation and mapping.
+
+Rules:
+
+- Raw file rows MUST NOT be persisted directly without validation
+- Import rows SHOULD be normalized before validation when needed
+- Export rows SHOULD be mapped intentionally rather than derived accidentally from rendered UI
+- Row shape, domain shape, and persistence shape MAY differ
+- Mapping logic SHOULD be explicit and typed
+- Validation messages SHOULD support troubleshooting when practical
+
+Common mappings:
+
+- raw CSV row → normalized row
+- normalized row → validated input
+- validated input → mutation payload
+- entity record → export row
+
+---
+
+# 6. Preview and Confirmation
+
+Preview flows are recommended when import or export behavior is non-trivial.
+
+Preview MAY include:
+
+- parsed row preview
+- column mapping preview
+- duplicate detection preview
+- validation summary
+- row error summary
+- export scope summary
+
+Rules:
+
+- Preview SHOULD be used for risky, bulk, or destructive import flows
+- Preview SHOULD make scope and consequences understandable
+- Users SHOULD be able to distinguish valid rows, invalid rows, and skipped rows when relevant
+- Confirmation SHOULD happen before committing large or sensitive imports
+
+---
+
+# 7. Error Handling
+
+Import and export flows MUST handle errors clearly.
+
+Rules:
+
+- Validation errors SHOULD be distinguishable from system errors
+- Row-level errors SHOULD be reported when practical
+- Import failure summaries SHOULD explain what failed and why
+- Export failures SHOULD provide clear user-facing feedback
+- Partial success behavior MUST be defined explicitly per feature
+
+Examples:
+
+- full failure
+- partial import success
+- skipped duplicate rows
+- rejected invalid rows
+- export denied due to permission scope
+
+---
+
+# 8. Security and Data Scope
+
+Import and export MUST respect feature permissions and data scope.
+
+Rules:
+
+- Features MUST export only fields allowed for the current user and context
+- Sensitive, internal, or restricted fields MUST NOT be exported unless explicitly intended
+- Imports MUST validate field-level and record-level permissions when required
+- Hidden UI fields MUST NOT be assumed safe for export
+- Server-side enforcement MUST be used when permission scope matters
+
+---
+
+# 9. Performance and Scalability
+
+Import and export flows MUST scale appropriately.
+
+Rules:
+
+- Large imports SHOULD use batching or streaming where appropriate
+- Large exports SHOULD avoid loading excessive data into the client
+- Expensive duplicate checks SHOULD be delegated to the appropriate layer
+- Heavy parsing or mapping MUST NOT block interactive UI unnecessarily
+- Bulk operations SHOULD remain observable with progress or result summaries when possible
+
+---
+
+# 10. Forbidden
+
+Do NOT:
+
+- place feature-specific import or export logic in unrelated shared folders
+- persist raw rows directly without validation
+- derive export rows directly from arbitrary rendered table cells
+- put repository calls inside UI components
+- hide important import or export side effects inside unclear helper layers
+- assume client-only validation is sufficient for authoritative import safety
+
+---
+
+# 11. Goal
+
+All import and export flows SHOULD be:
+
+- feature-owned
+- explicit
+- typed
+- validated
+- maintainable
+- permission-aware
+- scalable
+- understandable to users

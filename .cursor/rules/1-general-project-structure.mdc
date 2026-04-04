@@ -1,0 +1,65 @@
+---
+description: Global Project structure and file organization using Feature-based Folder Structure
+globs:
+  ["app/**", "features/**", "components/**", "lib/**", "prisma/**", "config/**"]
+alwaysApply: true
+---
+
+# Project Structure
+
+This project uses a **feature-based architecture**.  
+Each business domain is organized inside the `features/` directory.
+
+Next.js routing still lives inside `app/`, but **pages should only import logic from features**.
+
+```
+app/                  → Next.js App Router (routing layer only)
+  (public)/           → Public pages
+    page.tsx          → Home page
+    about-us/         → About us page
+    faq/              → FAQ page
+    pricing/          → Pricing page
+    contact-us/       → Contact us page
+
+  (protected)/        → Authenticated application
+    auth/             → Login, Register, Forgot Password, Reset Password pages
+    dashboard/        → Main application
+      [feature]/page.tsx → Feature route page  (route only,server component, do not "use client")
+  api/                → API routes
+  docs/               → Documentation pages
+
+features/             → Business features directory
+  [feature-name]/     → Feature directory (e.g. materials, vendors, uoms)
+    actions/          → contains server actions and mutation entry points for the feature
+    components/       → contains feature-owned presentation components and UI blocks
+    hooks/            → contains reusable feature-scoped hooks for UI behavior and state handling
+    repositories/     → contains data access logic and persistence queries for the feature
+    services/         → contains use cases, orchestration, and business rules for the feature
+    schemas/          → contains validation schemas for inputs, forms, filters, and requests
+    table/            → contains TanStack Table configuration and table-specific UI for the feature
+    types/            → contains TypeScript types and interfaces owned by the feature
+    constants/        → contains feature-scoped constants, enums, and static configuration values
+    index.ts          → contains the public export surface for the feature
+
+components/           → Reusable React components
+  data-table/         → Data table shared components (e.g. DataTable.tsx, TableContainer.tsx, TableViewOptions.tsx, etc.)
+  form/               → Form shared components (e.g. TextField.tsx, SelectField.tsx, TextareaField.tsx, etc.)
+  ui/                 → UI shared components (e.g. button.tsx, input.tsx, select.tsx, etc.)
+  navbar/             → Navbar components
+  footer/             → Footer components
+
+config/               → Application configuration
+  app.config.ts       → App name, description, URLs
+  storage.config.ts   → File upload settings
+
+lib/                  → Core utilities
+  prisma.ts           → Prisma client & helpers
+  utils.ts            → Utility functions
+  auth.ts             → Auth utilities
+  auth-client.ts      → Auth client utilities
+
+prisma/               → Prisma ORM
+  schema.prisma       → Database schema (models, enums, relations)
+  migrations/         → SQL migrations
+  seeders/            → Seeders for the database
+```

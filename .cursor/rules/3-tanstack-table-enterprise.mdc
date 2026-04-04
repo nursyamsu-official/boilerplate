@@ -1,0 +1,695 @@
+---
+description: TanStack Table Enterprise System for Next.js App Router using Shadcn UI, TailwindCSS, Lucide Icons
+globs: ["components/data-table/**", "features/**/table/**"]
+alwaysApply: true
+---
+
+# TanStack Table Enterprise Rule
+
+All application tables MUST use **TanStack Table** as the table engine.
+
+TanStack Table is responsible for:
+
+- table state
+- sorting
+- filtering
+- pagination
+- column visibility
+- row selection
+- column pinning
+- column resizing
+- column ordering
+- virtualization
+
+UI MUST be implemented using:
+
+- semantic HTML
+- TailwindCSS
+- Shadcn UI
+- Lucide Icons for icons
+
+This rule extends the general folder-structure rules and applies specifically to feature-owned table systems.
+
+---
+
+# 1. Architecture Overview
+
+The table system follows a **Shared Engine + Feature Configuration** architecture.
+
+Structure:
+
+- `components/data-table` → shared reusable table primitives
+- `features/[feature-name]/table` → feature specific table configuration, composition, and table behavior
+
+Examples:
+
+- `components/data-table/DataTable.tsx`
+- `components/data-table/TableContainer.tsx`
+- `components/data-table/TablePagination.tsx`
+- `components/data-table/TableViewOptions.tsx`
+- `components/data-table/TableEmpty.tsx`
+- `components/data-table/TableSkeleton.tsx`
+- `features/materials/table/columns.tsx` or `features/materials/table/columns.ts`
+- `features/materials/table/MaterialTable.tsx`
+- `features/materials/table/MaterialRowactions.tsx`
+
+Rules:
+
+- Shared table primitives MUST be generic and domain-agnostic
+- Feature-specific table files MUST stay inside the owning feature
+- Table-related files that only serve one feature MUST NOT be placed in shared folders like `components/data-table/`
+- New feature tables MUST NOT be placed under `features/**/components/`
+
+---
+
+# 2. Shared Table Engine
+
+All reusable table components MUST live in:
+
+`components/data-table/`
+
+Examples:
+
+- `DataTable.tsx`
+- `TableContainer.tsx`
+- `TableToolbar.tsx`
+- `TablePagination.tsx`
+- `TableFilters.tsx`
+- `TableViewOptions.tsx`
+- `TableEmpty.tsx`
+- `TableSkeleton.tsx`
+- `TableSelection.tsx`
+- `TableColumnPinning.tsx`
+- `TableColumnResize.tsx`
+
+Rules:
+
+- MUST be fully reusable
+- MUST NOT depend on domain models
+- MUST use TypeScript generics where appropriate
+- MUST NOT contain feature-specific business rules
+- MUST accept configuration and callbacks via props
+- MUST NOT fetch data directly
+- MUST NOT import feature-local files
+
+Example:
+
+export function DataTable<TData>({
+columns,
+data,
+}: DataTableProps<TData>) {
+// ...
+}
+
+---
+
+# 3. Feature Table Configuration
+
+Each feature MUST define its own table configuration.
+
+Location:
+`features/[feature-name]/table/`
+
+Example:
+
+- `features/materials/table/columns.tsx` or `features/materials/table/columns.ts`
+- `features/materials/table/MaterialTable.tsx`
+- `features/materials/table/MaterialRowActions.tsx`
+- `features/materials/table/MaterialBulkActions.tsx`
+
+Rules:
+
+- Column definitions MUST live in columns.ts or columns.tsx
+- Use columns.tsx when column headers or cells render JSX
+- Feature table composition MAY live in [Feature]Table.tsx
+- Feature row actions, bulk actions, export helpers, and feature-specific filters MUST live in the same feature table folder
+- Feature table files MUST NOT be moved to shared folders unless they become fully generic and reusable
+
+---
+
+# 4. Baseline Table Features
+
+The following are the default baseline for enterprise list pages:
+
+- sorting
+- column filtering
+- global filtering
+- pagination
+- column visibility
+- loading state
+- empty state
+- accessible keyboard and focus behavior
+
+Rules:
+
+- Baseline features SHOULD be enabled unless the screen is intentionally simplified
+- Embedded, read-only, or compact tables MAY use a reduced feature set
+- Action columns, checkbox columns, and utility columns SHOULD explicitly disable unsupported features such as sorting or hiding where appropriate
+
+---
+
+# 5. Optional Enterprise Features
+
+The following capabilities MUST be enabled only when the use case requires them:
+
+- row selection
+- bulk actions
+- column pinning
+- column resizing
+- column ordering
+- CSV export
+- CSV import
+- virtualization
+- URL state synchronization
+
+Rules:
+
+- Do NOT enable advanced capabilities by default without a clear user need
+- Prefer progressive enhancement over feature overload
+- Optional capabilities MUST remain feature-driven, not globally forced
+
+---
+
+# 6. Server Client Architecture
+
+Tables MUST follow **Server → Client separation**.
+
+Server responsibilities:
+
+- fetch data
+- apply server-side filtering, sorting, or pagination when needed
+- prepare typed data for the table
+- pass data and metadata into client components
+
+Client responsibilities:
+
+- TanStack Table state
+- interactive rendering
+- local UI interactions
+- client-only behaviors such as column visibility, row selection, and menu interactions
+
+Rules:
+
+- Data fetching is forbidden inside reusable table components
+- Interactive TanStack table components MUST be client components
+- Server components MAY pass data, total, page, pageSize, filters, and other typed inputs into client table modules
+- Route files and server components MUST delegate interactive table behavior to the owning feature table module
+
+Example flow:
+
+page.tsx
+→ fetch data on the server
+→ render <MaterialTable data={data} total={total} />
+
+---
+
+# 7. Table Container
+
+Tables SHOULD be rendered inside a scroll container when horizontal or vertical overflow is possible.
+
+Example:
+
+<div className="overflow-auto rounded-lg border">
+  <DataTable {...props} />
+</div>
+
+Rules:
+
+- Use a scroll container when the table can overflow horizontally or vertically
+- Prefer responsive sizing over arbitrary fixed heights
+- Use constrained heights only when the screen layout requires sticky header, sticky footer, or bounded scrolling behavior
+
+---
+
+# 8. Sticky Header
+
+Headers must remain visible while scrolling.
+
+Example:
+
+<thead class="sticky top-0 z-10 bg-neutral text-neutral-content">
+
+Rules:
+
+- header must have background color
+- header must have z-index
+
+---
+
+# 9. Sticky Footer
+
+Tables use sticky footer for:
+
+- pagination
+- summary rows
+
+Example:
+
+<tfoot className="sticky bottom-0 z-10 bg-neutral text-neutral-content">
+
+Rules:
+
+- Footer must remain visible during vertical scroll
+- Footer must have background color
+- Footer must have z-index
+
+---
+
+# 10. Sticky Columns
+
+Allowed sticky columns:
+
+selection checkbox
+primary identifier
+row actions
+
+Example:
+
+<td class="sticky left-0 bg-base-100">
+
+Rules:
+
+- maximum 2 sticky columns
+- sticky columns must define background color
+
+---
+
+# 11. Table Toolbar
+
+Tables MAY include a toolbar when the use case needs search, filters, actions, or view controls.
+
+Common toolbar actions:
+
+- search
+- create
+- export
+- import
+- column visibility
+- reset filters
+- bulk actions
+
+Rules:
+
+- Toolbar content MUST be capability-driven
+- Do NOT render actions that the feature does not support
+- Shared toolbar primitives MAY live in `components/data-table/TableToolbar.tsx`
+- Feature-specific toolbar actions MUST be composed in the owning feature like `features/[feature-name]/table/` for example `features/materials/table/MaterialTableToolbar.tsx`
+- Toolbar state and handlers SHOULD remain typed and explicit
+
+---
+
+# 12. Column Sorting
+
+Columns SHOULD support sorting when sorting is meaningful for the data.
+
+Rules:
+
+- Use enableSorting per column
+- Sorting UI MUST clearly indicate unsorted, ascending, and descending states
+- Non-sortable columns such as row actions MUST explicitly disable sorting
+- Sorting logic MUST remain declarative in column definitions
+
+---
+
+# 13. Filtering
+
+Tables MAY support:
+
+- global search
+- column filters
+- multi-column filters
+
+Common filter types:
+
+- text
+- select
+- range
+- date
+
+Rules:
+
+- Global search SHOULD use debounce
+- Recommended debounce delay: 300–500ms
+- Filter state shape MUST be explicit and typed
+- Server-side filtering SHOULD be used when datasets are large or authoritative filtering is required
+- Feature-specific filters MUST live inside the owning feature table module
+
+---
+
+# 14. Pagination
+
+Pagination MUST support the mode required by the screen:
+
+- client-side pagination
+- server-side pagination
+
+Rules:
+
+- Pagination UI SHOULD expose previous and next controls
+- Page size selection is recommended for data-heavy admin pages
+- Total rows and total pages SHOULD be shown when available
+- Shared pagination UI MAY live in components/data-table/TablePagination.tsx
+- Pagination state MUST stay aligned with the chosen client-side or server-side strategy
+
+---
+
+# 15. Column Visibility
+
+Users MAY be allowed to toggle visible columns.
+
+Rules:
+
+- Use columnVisibility state
+- Only expose visibility toggles for columns that can safely be hidden
+- Critical identifier columns and action columns MAY remain always visible
+- Visibility defaults SHOULD be intentional and feature-specific
+
+---
+
+# 16. Column Pinning
+
+Users MAY pin columns when horizontal scanning is important.
+
+Rules:
+
+- Use columnPinning state
+- Support left and right pinning only when the use case benefits from it
+- Avoid pinning too many columns
+- Pinning SHOULD improve usability, not reduce visible space unnecessarily
+
+---
+
+# 17. Column Resizing
+
+Column resizing is optional.
+
+Rules:
+
+- Use columnSizing state when resizing is enabled
+- Resize handles MUST be visible and usable
+- Do NOT enable column resizing on very simple tables unless needed
+- Resizing SHOULD be consistent across header and body layout
+
+---
+
+# 18. Column Reordering
+
+Column reordering is optional.
+
+Rules:
+
+- Use columnOrder state when reordering is enabled
+- Only enable drag-and-drop reordering when it provides real user value
+- Reordering MUST preserve a stable and predictable user experience
+
+---
+
+# 19. Row Actions
+
+Row actions typically belong in the final column of admin tables.
+
+Rules:
+
+- Shared row-action UI primitives MAY live in `components/ui` or `components/form` or `components/data-table/`
+- Feature-specific row-action logic MUST live in `features/[feature-name]/table/` for example `features/materials/table/MaterialRowActions.tsx`
+- Actions MUST be relevant to the row’s domain state
+- Row-action columns MUST disable sorting
+- Row-action columns SHOULD disable hiding unless there is a strong reason not to
+
+Common actions:
+
+- view
+- edit
+- delete
+- activate
+- deactivate
+- duplicate
+
+---
+
+# 20. Row Selection
+
+Row selection is optional and SHOULD be enabled only when bulk operations exist.
+
+Rules:
+
+- Selection requires a checkbox column and select-all behavior where applicable
+- Do NOT enable row selection if the table has no selected-row workflow
+- Selection state MUST be explicit and predictable
+
+---
+
+# 21. Bulk Actions
+
+Bulk action UI SHOULD appear only when rows are selected.
+
+Rules:
+
+- Shared bulk-action UI primitives MAY live in `components/data-ui` or `components/form` or `components/data-table/`
+- Feature-specific bulk-action logic MUST live in `features/[feature-name]/table/` for example `features/materials/table/MaterialBulkActions.tsx`
+- Bulk actions MUST be explicitly supported by the feature’s permissions and business rules
+- Bulk operations SHOULD clearly communicate scope and affected rows
+
+---
+
+# 22. CSV Export Integration
+
+CSV export is optional and MUST be enabled only when the feature has a clear export use case.
+
+Export modes MAY include:
+
+- selected rows
+- filtered rows
+- current page rows
+- full dataset
+
+Rules:
+
+- Export behavior MUST be defined explicitly per feature
+- Export scope MUST be understandable to the user
+- Export behavior MUST define whether it uses selected rows, filtered rows, current page rows, or a server-side query result
+- Selected-row export semantics MUST be explicit, especially when row selection can span pagination
+- Filtered-row export semantics MUST be explicit, especially when filtering is server-side
+- Full-dataset export MUST NOT silently export more data than the user expects
+- Export configuration SHOULD be derived from feature-owned table definitions or dedicated export mappers
+- Export logic MUST NOT depend on arbitrary DOM content or rendered cell text
+- Exported rows SHOULD reflect the intended table filters and sorting when the feature promises that scope
+- Large dataset exports SHOULD use server-side generation
+- Feature-specific export helpers, export column definitions, and export handlers SHOULD live in `features/[feature-name]/table/` or `features/[feature-name]/lib/`
+- Shared CSV export helpers MAY be extracted only if they are generic and reusable
+
+Examples:
+
+- `features/materials/table/MaterialExportMenu.tsx`
+- `features/materials/table/material-export-columns.ts`
+- `features/materials/lib/material-export-mapper.ts`
+- `features/materials/actions/materials-export.action.ts`
+
+Reference:
+Detailed CSV export behavior is defined in:
+
+- `.cursor/rules/export-import/1-data-import-export.mdc`
+- `.cursor/rules/export-import/2-csv-export.mdc`
+
+---
+
+# 23. CSV Import Integration
+
+CSV import is optional and MUST be enabled only when the feature has a valid bulk-input use case.
+
+Typical flow MAY include:
+
+- upload CSV
+- parse rows
+- preview rows
+- validate
+- confirm import
+- persist result
+- show summary
+
+Rules:
+
+- Import logic MUST remain feature-specific
+- Import UI MUST NOT be buried inside generic shared table primitives unless it is fully generic and reusable
+- Table-related import entry points MAY live in feature table toolbar or other feature-owned table actions
+- Import parsing, normalization, duplicate handling, and validation MUST remain in feature-owned modules
+- Import preview MAY reuse table primitives for row preview, validation preview, or duplicate preview
+- Import preview tables MUST still follow feature-owned table configuration
+- Raw parsed rows MUST NOT be persisted directly
+- Import confirmation MUST remain explicit for non-trivial bulk workflows
+- Large imports SHOULD be handled server-side
+- Validation and duplicate detection against persisted data SHOULD be enforced server-side when authoritative results are required
+
+Examples:
+
+- `features/materials/table/MaterialImportTrigger.tsx`
+- `features/materials/components/MaterialImportForm.tsx`
+- `features/materials/components/MaterialImportPreviewDialog.tsx`
+- `features/materials/lib/material-import-parser.ts`
+- `features/materials/schemas/material-import.schema.ts`
+- `features/materials/actions/materials-import.action.ts`
+
+Reference:
+Detailed CSV import behavior is defined in:
+
+- `.cursor/rules/export-import/1-data-import-export.mdc`
+- `.cursor/rules/export-import/3-csv-import.mdc`
+
+---
+
+# 24. Virtualization
+
+Use virtualization for large datasets or expensive row rendering.
+
+Rules:
+
+- Consider TanStack Virtual when row count or cell complexity causes render lag
+- Virtualization is strongly recommended for large scrollable datasets
+- Shared virtualization helpers MAY live in components/data-table/TableVirtualized.tsx
+- Do NOT introduce virtualization complexity for small tables without measurable need
+
+---
+
+# 25. Loading State
+
+Tables MUST support a loading state.
+
+Rules:
+
+- Use a shared loading primitive such as TableSkeleton.tsx
+- Skeleton layout SHOULD roughly match the visible table structure
+- Loading state MUST be visually distinct from empty state
+
+---
+
+# 26. Empty State
+
+Tables MUST support an empty state.
+
+Rules:
+
+- Empty state SHOULD clearly distinguish between:
+- no data yet
+- no results after filters
+- Provide a reset-filters action when filters are active
+- Empty state messaging SHOULD be feature-aware and user-friendly
+
+---
+
+# 27. Performance Rules
+
+Required:
+
+- Memoize column definitions when needed
+- Memoize expensive derived data when needed
+- Keep cell renderers lightweight
+- Prefer stable references for callbacks and configuration passed into large tables
+
+Forbidden:
+
+- inline column definitions inside render
+- heavy calculations in render
+- unnecessary full-table rerenders
+- mixing multiple table engines in the same application
+
+Rules:
+
+- Use virtualization when rendering cost becomes significant
+- Prefer server-side operations for large datasets when appropriate
+- Avoid unnecessary prop churn into shared table primitives
+
+---
+
+# 28. Styling Rules
+
+Tables MUST follow these rules:
+
+- Use semantic HTML
+- Use TailwindCSS
+- Use Shadcn UI
+- Use Lucide Icons for icons
+- Inline CSS is forbidden
+
+Rules:
+
+- Styling MUST remain consistent with the shared design system
+- Reusable visual patterns SHOULD be extracted into shared primitives or utilities
+- Avoid one-off styling patterns per feature without a clear reason
+
+example:
+
+`<table className="table table-zebra">`
+
+---
+
+# 29. URL State Synchronization
+
+URL synchronization is recommended for index and management pages with searchable or filterable tables.
+
+Examples:
+
+- ?page=1
+- ?pageSize=20
+- ?sort=name
+- ?order=asc
+- ?search=steel
+
+Benefits:
+
+- deep linking
+- shareable state
+- browser navigation support
+
+Rules:
+
+- Use URL sync for primary list pages with search, filters, sorting, or pagination
+- Embedded local tables MAY skip URL sync
+- URL parameter names SHOULD remain stable and predictable
+- Parsing and serialization logic SHOULD be typed and centralized when reused
+
+---
+
+# 30. Accessibility
+
+Tables MUST support:
+
+- keyboard navigation
+- focus states
+- aria attributes where needed
+- correct header semantics
+- accessible labels for interactive controls
+
+Rules:
+
+- Interactive controls inside cells MUST be keyboard reachable
+- Sort and filter controls MUST expose accessible labels
+- Header cells SHOULD use correct semantics and scope where appropriate
+- Focus indicators MUST remain visible
+
+---
+
+# 31. Forbidden
+
+Do NOT:
+
+- fetch data inside reusable table components
+- place feature-specific table files in shared folders
+- define columns inline inside page or render files
+- mutate data during render
+- mix multiple table engines
+- create one-off table implementations that bypass the shared system
+
+---
+
+# 32. Goal
+
+All generated tables SHOULD be:
+
+- production-ready
+- scalable
+- accessible
+- performant
+- feature-owned
+- reusable where appropriate
+- maintainable
+- consistent across the application

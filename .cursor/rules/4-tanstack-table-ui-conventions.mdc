@@ -1,0 +1,444 @@
+---
+description: TanStack Table UI Conventions for Next.js App Router using Shadcn UI, TailwindCSS, Lucide Icons
+globs: ["components/data-table/**", "features/**/table/**"]
+alwaysApply: true
+---
+
+# TanStack Table UI Conventions
+
+This rule defines visual and interaction conventions for all TanStack Table implementations.
+
+It complements the enterprise architecture rule and focuses on:
+
+- layout consistency
+- visual hierarchy
+- interaction patterns
+- responsive behavior
+- usability conventions
+
+UI MUST use:
+
+- semantic HTML
+- TailwindCSS
+- Shadcn UI
+- Lucide Icons for icons
+
+---
+
+# 1. Visual Consistency
+
+All tables SHOULD look and behave like part of one unified system.
+
+Rules:
+
+- Use shared table primitives before creating new visual patterns
+- Keep spacing, density, hover behavior, empty state style, and toolbar layout consistent across features
+- Avoid one-off table styling per feature unless the screen has a documented special case
+- Prefer design-system classes and shared utilities over ad hoc class combinations
+
+---
+
+# 2. Semantic Structure
+
+Tables MUST use semantic HTML.
+
+Required structure:
+
+- `<table>`
+- `<thead>`
+- `<tbody>`
+- `<tr>`
+- `<th>`
+- `<td>`
+
+Rules:
+
+- Use proper table semantics for real tabular data
+- Do NOT replace semantic table markup with generic div layouts unless virtualization or a specialized rendering strategy requires it
+- When advanced rendering changes semantics, accessibility behavior MUST be preserved
+
+---
+
+# 3. Table Container
+
+Use a container that supports overflow safely.
+
+Recommended pattern:
+
+```tsx
+<div className="bg-base-100 overflow-auto rounded-lg border">
+  <table className="table-zebra table">...</table>
+</div>
+```
+
+Rules:
+
+- Use horizontal scrolling for wide tables
+- Use bounded vertical scrolling only when the screen layout benefits from it
+- Prefer responsive containers over arbitrary hardcoded heights
+- Container borders, radius, and background SHOULD remain consistent with the design system
+
+---
+
+# 4. Density and Size
+
+Table density SHOULD be consistent across the application.
+
+Rules:
+
+- Use a shared density strategy for compact, normal, and large table sizes
+- Prefer a shared utility such as getTableSizeClass() when the project supports table density switching
+- Use table-xs, table-sm, table-md, or table-lg intentionally
+- Do NOT choose size variants randomly per feature
+
+Guideline:
+
+- compact tables → dense admin screens
+- medium tables → default choice
+- large tables → readability-first screens
+
+---
+
+# 5. Header Styling
+
+Headers SHOULD be visually distinct and easy to scan.
+
+Rules:
+
+- Header rows SHOULD have a clear background
+- Header text SHOULD be legible and visually separated from body rows
+- Sortable headers SHOULD communicate interactivity
+- Sticky headers MUST define background color and z-index
+
+Recommended example:
+
+```tsx
+<thead className="sticky top-0 z-10 bg-base-100">
+```
+
+---
+
+# 6. Row Styling
+
+Rows SHOULD remain readable and scannable.
+
+Rules:
+
+- Zebra striping MAY be used for large data grids
+- Hover state SHOULD be consistent across all tables
+- Selected rows MUST be visually distinguishable
+- Disabled or inactive rows SHOULD communicate state clearly without reducing legibility
+- Avoid excessive decorative styling inside rows
+
+Recommended examples:
+
+- table-zebra
+- hover:bg-base-200
+
+---
+
+# 7. Cell Content
+
+Cells SHOULD prioritize readability and alignment.
+
+Rules:
+
+- Keep cell content concise where possible
+- Use truncation intentionally for long text
+- Numeric values SHOULD be visually aligned consistently
+- Status values SHOULD use shared badges or chips when available
+- Avoid placing large blocks of UI inside a single cell unless necessary
+
+Guidelines:
+
+- identifiers → nowrap when important
+- descriptions → truncate or wrap based on screen goals
+- actions → keep compact and predictable
+
+---
+
+# 8. Sorting UI
+
+Sorting interactions MUST be visually clear.
+
+Rules:
+
+- Sortable headers SHOULD display a visible sorting indicator
+- Unsorted, ascending, and descending states SHOULD be distinguishable
+- Icons SHOULD remain visually consistent across all tables
+- Sorting affordances SHOULD not rely on color alone
+
+Recommended icons:
+
+- ascending → ArrowUp
+- descending → ArrowDown
+- unsorted → subtle neutral indicator or no active direction icon
+
+---
+
+# 9. Filtering UI
+
+Filtering UI SHOULD be easy to discover and use.
+
+Rules:
+
+- Global search SHOULD appear in a predictable toolbar location
+- Filter controls SHOULD align with the table they affect
+- Advanced filters SHOULD not overwhelm simple tables
+- Reset filters action SHOULD appear when filters are active
+- Debounced search inputs SHOULD still provide clear user feedback
+
+Guideline:
+
+- keep simple filters visible
+- move complex filters into a popover, dropdown, or drawer when needed
+
+---
+
+# 10. Toolbar Layout
+
+Toolbar layout SHOULD stay consistent across features.
+
+Common toolbar regions:
+
+- left: title, search, primary filters
+- right: create, export, import, column controls, view controls
+
+Rules:
+
+- Do NOT overload the toolbar with unsupported actions
+- Frequently used actions SHOULD appear first
+- Secondary controls MAY move into menus on smaller screens
+- Toolbar actions SHOULD use consistent spacing and button sizing
+
+# 11. Icons and Actions Labels
+
+When icons are used, they SHOULD follow consistent conventions.
+
+Recommended actions:
+
+- search → Search
+- create → Plus
+- export → Download
+- import → Upload
+- columns → Columns
+- pinning → Pin
+- reset filters → RotateCcw
+- bulk actions → CheckCircle
+- view → Eye
+- edit → Pencil
+- delete → Trash
+- activate → Check
+- deactivate → X
+- duplicate → Copy
+- more actions → MoreHorizontal
+
+Rules:
+
+- Use Lucide icons consistently
+- Icons SHOULD match action meaning clearly
+- Icon-only buttons MUST provide accessible labels
+- Text labels MAY be paired with icons on larger screens
+- Avoid mixing icon sets across the table system
+
+---
+
+# 12. Row Actions UI
+
+Row actions SHOULD be compact and predictable.
+
+Desktop guidance:
+
+- prefer inline action buttons for small action counts
+- use a menu when actions become numerous
+
+Mobile guidance:
+
+- prefer a menu or overflow pattern such as a three-dots trigger
+
+Rules:
+
+- Row actions SHOULD usually be placed in the final column
+- Destructive actions MUST be visually distinguishable
+- Disabled actions SHOULD communicate why they are unavailable when appropriate
+- Action layout SHOULD remain consistent across similar tables
+
+---
+
+# 13. Selection UI
+
+Selection behavior SHOULD be obvious.
+
+Rules:
+
+- Selection checkbox column SHOULD appear near the start of the table
+- Select-all behavior SHOULD be clear
+- Selected row count SHOULD be visible when bulk actions are active
+- Bulk action bars SHOULD appear only when rows are selected
+
+---
+
+# 14. Export UI
+
+Export UI SHOULD be easy to discover, explicit in scope, and consistent across feature tables.
+
+Rules:
+
+- Export actions SHOULD appear in a predictable toolbar location
+- Export actions SHOULD clearly communicate scope such as selected, filtered, current page, or full dataset
+- Export labels MUST avoid ambiguous wording such as a generic `Export` when multiple scopes exist
+- Export actions MAY use a dropdown or menu when multiple export modes are supported
+- Export actions SHOULD be disabled when export is unavailable for the current state
+- Export loading state SHOULD be visible for slow or server-generated exports
+- Empty export results SHOULD be handled intentionally with clear user feedback
+- Export actions SHOULD remain visually secondary to the primary create action unless export is the primary workflow of the screen
+
+Examples:
+
+- `Export selected`
+- `Export filtered`
+- `Export current page`
+- `Export all`
+
+---
+
+# 15. Import UI
+
+Import UI SHOULD make the bulk-input flow understandable and safe.
+
+Rules:
+
+- Import actions SHOULD appear in a predictable toolbar location
+- Import actions SHOULD use clear labels such as `Import CSV`
+- Import flows SHOULD communicate the stages clearly when preview and confirmation are involved
+- Import preview, validation summary, and result summary SHOULD be visually distinct
+- Validation errors SHOULD be easy to scan before confirmation
+- Risky or destructive import flows SHOULD require explicit confirmation
+- Import progress and final outcome SHOULD be visible to the user
+- Import actions SHOULD not visually blend with destructive bulk actions unless the workflow explicitly requires that emphasis
+
+Examples:
+
+- `Import CSV`
+- `Preview import`
+- `Confirm import`
+- `Rows to create`
+- `Rows to update`
+- `Rows with errors`
+
+---
+
+# 16. Sticky Elements
+
+Sticky elements SHOULD improve usability, not clutter the layout.
+
+Rules:
+
+- Sticky headers are recommended for scrollable tables
+- Sticky columns SHOULD be used sparingly
+- Sticky footers SHOULD be used only when persistent controls are helpful
+- Sticky elements MUST define background color to avoid transparency issues
+- Layering and z-index SHOULD remain predictable
+
+---
+
+# 17. Pagination UI
+
+Pagination SHOULD be simple and consistent.
+
+Rules:
+
+- Previous and next controls SHOULD always be easy to reach
+- Page size selector MAY be shown on data-heavy management screens
+- Total count SHOULD be visible when available
+- Pagination controls SHOULD not compete visually with primary row actions
+
+# 18. Empty State UI
+
+Empty state SHOULD communicate the situation clearly.
+
+Rules:
+
+- Distinguish between:
+  - no records yet
+  - no results from filters
+- Empty states SHOULD provide a next step when appropriate
+- Reset-filters action SHOULD be visible when filters cause empty results
+- Avoid generic empty messaging without context
+
+Examples:
+
+- "No records yet"
+- "No results found"
+- "Try adjusting your filters"
+
+---
+
+# 19. Loading State UI
+
+Loading state SHOULD preserve layout stability.
+
+Rules:
+
+- Use skeletons instead of generic spinners for table loading when possible
+- Skeleton rows SHOULD approximate the final table structure
+- Loading UI SHOULD not be confused with empty state
+- Avoid layout jumps between loading, loaded, and empty states
+
+---
+
+# 20. Responsive Behavior
+
+Tables MUST remain usable on smaller screens.
+
+Rules:
+
+- Use horizontal scroll for wide tables before collapsing important data
+- Move low-priority controls into menus on smaller screens
+- Avoid rendering too many inline actions on narrow layouts
+- Keep primary identifiers and critical actions accessible
+- Responsive behavior SHOULD be deliberate, not accidental
+
+---
+
+# 21. Accessibility and Focus
+
+Visual conventions MUST support accessibility.
+
+Rules:
+
+- Focus states MUST remain visible
+- Interactive icons and buttons MUST have accessible labels
+- Tooltip content MUST not be the only source of meaning
+- Color MUST not be the only indicator of sorting, status, or destructive behavior
+
+---
+
+# 22. Syling Dicipline
+
+Rules:
+
+- Inline CSS is forbidden
+- Prefer shared Tailwind and Shadcn UI conventions
+- Repeated class combinations SHOULD be extracted into shared utilities or wrappers
+- Avoid visual drift between feature tables
+
+Forbidden:
+
+- inconsistent hover colors across tables
+- random icon choices for the same action
+- inconsistent action placement
+- one-off density rules without shared convention
+
+---
+
+# 23. Goal
+
+All table UIs SHOULD be:
+
+- visually consistent
+- easy to scan
+- responsive
+- accessible
+- predictable
+- aligned with the design system

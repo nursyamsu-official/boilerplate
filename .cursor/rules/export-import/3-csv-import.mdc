@@ -1,0 +1,315 @@
+---
+description: CSV import technical rules for feature-based Next.js App Router applications
+globs:
+[
+  "features/**/actions/**/*import*.ts",
+  "features/**/components/**/*Import*.tsx",
+  "features/**/hooks/**/*import*.ts",
+  "features/**/lib/**/*import*.ts",
+  "features/**/lib/**/*csv*.ts",
+  "features/**/schemas/**/*import*.ts"
+]
+alwaysApply: true
+---
+
+# CSV Import Rule
+
+CSV import is optional and MUST be implemented only when it provides real user value for the feature.
+
+This rule defines technical CSV import behavior.
+
+It complements:
+
+- feature structure rules
+- form architecture rules
+- data import and export architecture rules
+
+---
+
+# 1. Ownership and Placement
+
+Rules:
+
+- CSV import logic MUST live in the owning feature
+- Import parsing, normalization, validation, and mapping SHOULD remain feature-owned
+- Shared CSV helpers MAY be extracted only if they are generic and reusable
+- Import logic MAY live in `features/[feature-name]/lib/`, `features/[feature-name]/import/`, `features/[feature-name]/actions/`, and `features/[feature-name]/schemas/` according to responsibility
+- Placement MUST remain consistent within the project
+
+Examples:
+
+- `features/materials/components/MaterialImportForm.tsx`
+- `features/materials/hooks/use-material-import.ts`
+- `features/materials/actions/import-materials.ts`
+- `features/materials/lib/material-import-parser.ts`
+- `features/materials/lib/material-import-mapper.ts`
+- `features/materials/schemas/material-import-schema.ts`
+
+---
+
+# 2. Import Flow Stages
+
+CSV import SHOULD be treated as a staged flow when the feature is non-trivial.
+
+Common stages MAY include:
+
+- file selection
+- file parsing
+- header validation
+- row normalization
+- row validation
+- duplicate detection
+- preview
+- confirmation
+- persistence
+- result summary
+
+Rules:
+
+- Stages MAY be simplified for small imports
+- Non-trivial imports SHOULD separate parsing, validation, and persistence
+- Raw rows MUST NOT be persisted directly
+
+---
+
+# 3. Accepted File Expectations
+
+Import expectations MUST be explicit.
+
+Rules:
+
+- Required columns MUST be defined explicitly
+- Optional columns MUST be defined explicitly
+- Header names SHOULD be matched intentionally
+- Features MUST define whether header matching is strict or normalized
+- The feature SHOULD define how blank rows are handled
+- The feature SHOULD define how extra unknown columns are handled
+- File size or row count limits SHOULD be defined when relevant
+
+Examples of policy choices:
+
+- reject unknown headers
+- ignore unknown headers
+- allow case-insensitive header matching
+- trim whitespace before header comparison
+
+---
+
+# 4. Parsing and Normalization
+
+Parsing MUST remain explicit and predictable.
+
+Rules:
+
+- Raw CSV rows SHOULD be normalized before validation when needed
+- Trimming, empty-string handling, and default normalization SHOULD be consistent
+- Parsing helpers MUST handle quoted values, delimiters, and line breaks correctly
+- Normalization MUST NOT silently destroy meaningful source data
+- Row numbers SHOULD be preserved for diagnostics when practical
+
+Common normalization examples:
+
+- trim surrounding whitespace
+- normalize empty strings to `null`
+- normalize boolean-like text
+- normalize enum aliases
+- normalize header casing
+
+---
+
+# 5. Validation
+
+CSV imports MUST use explicit validation.
+
+Rules:
+
+- Row data MUST be validated before persistence
+- Validation SHOULD distinguish parse errors, header errors, row validation errors, and persistence errors
+- Validation schemas SHOULD be typed
+- Cross-field row validation SHOULD be supported where required
+- Import validation MUST NOT rely only on client-side checks
+- Server-side validation MUST remain possible even when client preview exists
+
+Validation MAY include:
+
+- required fields
+- string length
+- enum validation
+- number ranges
+- date parsing
+- cross-field rules
+- reference existence checks
+
+---
+
+# 6. Mapping
+
+Import mapping MUST be explicit.
+
+Common mappings MAY include:
+
+- raw row → normalized row
+- normalized row → validated row input
+- validated row input → mutation payload
+- import row → domain command
+
+Rules:
+
+- Mapping logic SHOULD NOT be buried inside UI components
+- Mapping logic SHOULD remain typed and readable
+- Import row shape and persistence shape do NOT need to be identical
+- Derived values MAY be computed intentionally during mapping
+
+---
+
+# 7. Duplicate and Conflict Handling
+
+Duplicate handling MUST be defined per feature.
+
+Duplicate handling MAY include:
+
+- reject duplicates
+- skip duplicates
+- merge duplicates
+- update existing records
+- flag duplicates for user confirmation
+
+Rules:
+
+- Duplicate policy MUST be explicit
+- The feature SHOULD define whether duplicate checks are intra-file, against persisted data, or both
+- Duplicate summaries SHOULD be visible when relevant
+- Conflict resolution MUST NOT be hidden from the user in risky workflows
+
+---
+
+# 8. Preview and Confirmation
+
+Preview is recommended for non-trivial CSV imports.
+
+Preview MAY include:
+
+- parsed rows
+- normalized values
+- validation errors
+- duplicate flags
+- rows to create
+- rows to update
+- rows to skip
+
+Rules:
+
+- Bulk imports SHOULD provide a preview before persistence when risk is meaningful
+- Preview SHOULD make row outcomes understandable
+- Users SHOULD be able to distinguish valid rows, invalid rows, skipped rows, and duplicate rows when relevant
+- Confirmation SHOULD happen before committing large or destructive imports
+
+---
+
+# 9. Persistence Strategy
+
+Persistence behavior MUST be explicit.
+
+Rules:
+
+- The feature MUST define whether import is all-or-nothing or partial-success
+- Batch size SHOULD be intentional for large imports
+- Transaction strategy SHOULD be chosen intentionally
+- Server-side persistence MUST remain authoritative
+- Import results SHOULD report created, updated, skipped, and failed counts when relevant
+
+Examples of persistence models:
+
+- strict all-or-nothing import
+- partial import with invalid rows skipped
+- upsert-based import
+- preview then confirmed batch commit
+
+---
+
+# 10. Error Reporting
+
+CSV imports MUST provide useful error reporting.
+
+Rules:
+
+- Header errors SHOULD be shown clearly
+- Row-level errors SHOULD include row reference when practical
+- Error summaries SHOULD distinguish validation errors from system errors
+- Import results SHOULD be understandable without reading logs
+- Error messaging SHOULD help users fix and retry the file
+
+Examples:
+
+- `Missing required column: material_code`
+- `Row 14: base_uom is required`
+- `Row 22: category_code is invalid`
+- `Import failed while saving batch 3`
+
+---
+
+# 11. Client vs Server Responsibilities
+
+Client responsibilities MAY include:
+
+- file selection
+- local preview
+- local pre-validation
+- import confirmation UI
+- rendering row error summaries
+
+Server responsibilities MAY include:
+
+- authoritative validation
+- duplicate detection against persisted data
+- persistence
+- permission checks
+- transaction handling
+- final import result generation
+
+Rules:
+
+- Client preview MUST NOT be treated as authoritative persistence approval
+- Server-side validation MUST remain possible even if preview already passed
+- Large imports SHOULD be processed on the server
+- Permission-sensitive decisions MUST be enforced server-side
+
+---
+
+# 12. Performance Rules
+
+Rules:
+
+- Large imports SHOULD avoid blocking the UI with heavy parsing or validation
+- Batch processing SHOULD be used when appropriate
+- Repeated lookup-heavy validation SHOULD be optimized intentionally
+- Import flows SHOULD preserve enough diagnostics for troubleshooting
+- Very large imports MAY require server-side parsing or staged processing
+
+---
+
+# 13. Forbidden
+
+Do NOT:
+
+- persist raw CSV rows directly
+- bury row mapping and validation inside JSX
+- assume client-side preview guarantees server success
+- hide duplicate handling policy
+- silently ignore invalid rows unless the feature explicitly defines that behavior
+- place feature-specific import logic in generic shared folders
+
+---
+
+# 14. Goal
+
+All CSV imports SHOULD be:
+
+- explicit
+- validated
+- feature-owned
+- typed
+- diagnosable
+- safe to retry
+- scalable
+- understandable to users
