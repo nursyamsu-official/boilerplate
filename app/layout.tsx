@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { appConfig } from "@/config/app.config";
+import { AppNavbar } from "@/features/auth";
 
 const lora = Lora({ subsets: ["latin"], variable: "--font-serif" });
 
@@ -49,8 +50,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster />
+          <TooltipProvider>
+            <AppNavbar />
+            <main className="flex-1">{children}</main>
+          </TooltipProvider>
+          <Toaster richColors={true} duration={3000} closeButton={true} />
         </ThemeProvider>
       </body>
     </html>

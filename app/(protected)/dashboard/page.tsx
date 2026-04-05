@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { appConfig } from "@/config/app.config";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: `Dashboard - ${appConfig.appName}`,
@@ -20,6 +21,11 @@ export default function DashboardPage() {
         eaque.
       </p>
       <Button variant="outline">Go to Dashboard</Button>
+      <Button asChild variant="outline">
+        <Link href="/dashboard/settings/security/change-password">
+          Security Settings
+        </Link>
+      </Button>
     </div>
   );
 }
