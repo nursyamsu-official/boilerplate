@@ -25,6 +25,7 @@ export function SignInForm() {
   const router = useRouter()
   const getRedirectUrl = useAuthRedirectUrl()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitPending, setIsSubmitPending] = useState(false)
   const [isGooglePending, setIsGooglePending] = useState(false)
   const submitLockRef = useRef(false)
   const googlePendingRef = useRef(false)
@@ -66,7 +67,7 @@ export function SignInForm() {
     },
   })
 
-  const isPending = form.state.isSubmitting || isGooglePending
+  const isPending = form.state.isSubmitting || isSubmitPending || isGooglePending
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -76,11 +77,13 @@ export function SignInForm() {
     }
 
     submitLockRef.current = true
+    setIsSubmitPending(true)
 
     try {
       await form.handleSubmit()
     } finally {
       submitLockRef.current = false
+      setIsSubmitPending(false)
     }
   }
 
@@ -192,8 +195,8 @@ export function SignInForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={!form.state.canSubmit || isPending}>
-            {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            {form.state.isSubmitting ? "Signing in..." : "Sign in"}
+            {isPending ? <LoaderCircle className="animate-spin" /> : null}
+            {isPending ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </div>

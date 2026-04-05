@@ -1,6 +1,6 @@
 "use client"
 
-import { type FormEvent, useRef } from "react"
+import { type FormEvent, useRef, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { LoaderCircle } from "lucide-react"
 
@@ -23,6 +23,7 @@ import { changePasswordSchema } from "@/features/auth/schemas/change-password.sc
 
 export function ChangePasswordForm() {
   const submitLockRef = useRef(false)
+  const [isSubmitPending, setIsSubmitPending] = useState(false)
 
   const form = useForm({
     defaultValues: {
@@ -35,24 +36,25 @@ export function ChangePasswordForm() {
       onChange: changePasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      return toast.promise(
-        assertAuthClientSuccess(
-          changePassword({
-            currentPassword: value.currentPassword,
-            newPassword: value.newPassword,
-            revokeOtherSessions: value.revokeOtherSessions,
-          })
-        ),
-        {
-          loading: "Saving...",
-          success: "Your password has been updated successfully",
-          error: "Failed to save",
-        }
+      const request = assertAuthClientSuccess(
+        changePassword({
+          currentPassword: value.currentPassword,
+          newPassword: value.newPassword,
+          revokeOtherSessions: value.revokeOtherSessions,
+        })
       )
+
+      toast.promise(request, {
+        loading: "Saving...",
+        success: "Your password has been updated successfully",
+        error: "Failed to save",
+      })
+
+      await request
     },
   })
 
-  const isPending = form.state.isSubmitting
+  const isPending = form.state.isSubmitting || isSubmitPending
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -62,11 +64,13 @@ export function ChangePasswordForm() {
     }
 
     submitLockRef.current = true
+    setIsSubmitPending(true)
 
     try {
       await form.handleSubmit()
     } finally {
       submitLockRef.current = false
+      setIsSubmitPending(false)
     }
   }
 
@@ -152,8 +156,8 @@ export function ChangePasswordForm() {
           </form.Field>
 
           <Button type="submit" disabled={!form.state.canSubmit || isPending}>
-            {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            {form.state.isSubmitting ? "Saving..." : "Save password"}
+            {isPending ? <LoaderCircle className="animate-spin" /> : null}
+            {isPending ? "Saving..." : "Save password"}
           </Button>
         </form>
       </CardContent>

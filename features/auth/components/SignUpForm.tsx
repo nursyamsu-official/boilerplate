@@ -24,6 +24,7 @@ export function SignUpForm() {
   const getRedirectUrl = useAuthRedirectUrl()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [isSubmitPending, setIsSubmitPending] = useState(false)
   const [isGooglePending, setIsGooglePending] = useState(false)
   const submitLockRef = useRef(false)
   const googlePendingRef = useRef(false)
@@ -68,7 +69,7 @@ export function SignUpForm() {
     },
   })
 
-  const isPending = form.state.isSubmitting || isGooglePending
+  const isPending = form.state.isSubmitting || isSubmitPending || isGooglePending
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -78,11 +79,13 @@ export function SignUpForm() {
     }
 
     submitLockRef.current = true
+    setIsSubmitPending(true)
 
     try {
       await form.handleSubmit()
     } finally {
       submitLockRef.current = false
+      setIsSubmitPending(false)
     }
   }
 
@@ -222,8 +225,8 @@ export function SignUpForm() {
           </form.Field>
 
           <Button type="submit" className="w-full" disabled={!form.state.canSubmit || isPending}>
-            {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            {form.state.isSubmitting ? "Creating..." : "Create account"}
+            {isPending ? <LoaderCircle className="animate-spin" /> : null}
+            {isPending ? "Creating..." : "Create account"}
           </Button>
         </form>
       </div>

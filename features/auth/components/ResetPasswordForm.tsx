@@ -24,6 +24,7 @@ type ResetPasswordFormProps = {
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [isSubmitPending, setIsSubmitPending] = useState(false)
   const submitLockRef = useRef(false)
 
   const form = useForm({
@@ -67,7 +68,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     },
   })
 
-  const isPending = form.state.isSubmitting
+  const isPending = form.state.isSubmitting || isSubmitPending
 
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -77,11 +78,13 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     }
 
     submitLockRef.current = true
+    setIsSubmitPending(true)
 
     try {
       await form.handleSubmit()
     } finally {
       submitLockRef.current = false
+      setIsSubmitPending(false)
     }
   }
 
@@ -159,8 +162,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
             className="w-full"
             disabled={!token || !form.state.canSubmit || isPending}
           >
-            {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            {form.state.isSubmitting ? "Saving..." : "Save new password"}
+            {isPending ? <LoaderCircle className="animate-spin" /> : null}
+            {isPending ? "Saving..." : "Save new password"}
           </Button>
         </form>
       </div>
