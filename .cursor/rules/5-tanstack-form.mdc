@@ -340,6 +340,68 @@ Examples:
 - publish draft
 - import structured input
 
+# 9A. Async Submission Contract (CRITICAL)
+
+TanStack Form submission MUST follow a strict async contract.
+
+Rules:
+
+- The actual async operation MUST be assigned to a variable:
+  `const submitPromise = mutationFn(values)`
+- The form submission handler MUST await the original promise:
+  `await submitPromise`
+- UI helpers (such as toast.promise) MUST NOT wrap the main awaited promise directly
+
+❌ Forbidden pattern:
+`await toast.promise(asyncFn())`
+
+Reason:
+
+- This breaks TanStack Form submission tracking
+- Causes isSubmitting to resolve too early
+- Leads to double submission and incorrect UI state
+
+✅ Required pattern:
+
+```tsx
+const submitPromise = asyncFn();
+
+toast.promise(submitPromise, {
+  loading: "Saving...",
+  success: "Success",
+  error: "Error",
+});
+
+await submitPromise;
+```
+
+---
+
+# 9B. Double Submission Protection
+
+Rules:
+
+- Submission MUST be idempotent at UI level
+- Form MUST NOT allow multiple in-flight submissions
+
+Required safeguards:
+
+1. Use TanStack Form state:
+   `disabled={form.state.isSubmitting}`
+2. Submission handler MUST NOT trigger parallel calls
+3. Optional (recommended hard guard):
+   `if (form.state.isSubmitting) return`
+
+---
+
+# 9C. Submission State Integrity
+
+Rules:
+
+- isSubmitting MUST remain true for the FULL lifecycle of the async request
+- No abstraction layer may hide or replace the original promise
+- All async side effects MUST depend on the same promise instance
+
 ---
 
 # 10. Import Form Integration
@@ -525,7 +587,7 @@ Forms MUST communicate pending state.
 Rules:
 
 - Submit buttons MUST reflect pending state
-- Inputs MAY be disabled during submission when appropriate
+- Inputs MUST be disabled during submission when appropriate
 - Loading state for edit forms SHOULD be distinct from empty form state
 - Pending UI SHOULD prevent accidental duplicate interaction
 - Async submission SHOULD use toast.promise for loading feedback via Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`

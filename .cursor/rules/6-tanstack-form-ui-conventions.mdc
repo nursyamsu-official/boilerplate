@@ -210,15 +210,19 @@ Guidelines:
 
 ---
 
-# 10. Pending and Disabled States
+# 10. Pending and Disabled States (STRICT)
 
-Pending state MUST be communicated clearly.
+Pending state MUST be strictly bound to TanStack Form state.
 
 Rules:
 
-- Submit buttons MUST be disabled during submission
-- Disabled state MUST use the actual `disabled` attribute, not visual styling only
-- Submit button label MUST change during pending state
+- Submit button MUST use:
+  `disabled={form.state.isSubmitting}`
+- Disabled state MUST use real HTML attribute (not class-only)
+- Submit label MUST be derived from submission state:
+  `form.state.isSubmitting ? "Saving..." : "Save"`
+- The label MUST update immediately on submit trigger
+- A spinner or loading indicator SHOULD be shown
 
 Required label patterns:
 
@@ -227,8 +231,58 @@ Required label patterns:
 - Submit → Submitting...
 - Update → Updating...
 
-- Submit buttons SHOULD include a loading indicator or spinner
-- Pending state MUST persist until success or error response is received
+---
+
+# 10A. Anti-Patterns (FORBIDDEN)
+
+❌ Do NOT:
+
+- Use local useState for loading
+- Use external loading flags not tied to TanStack Form
+- Rely on toast state to control UI
+- Delay UI state change until async completes
+
+---
+
+# 10B. Required Pattern
+
+Example:
+
+````tsx
+<Button
+  type="submit"
+  disabled={form.state.isSubmitting}
+>
+  {form.state.isSubmitting ? "Saving..." : "Save"}
+</Button>
+
+---
+
+10C. Click Safety
+
+Rules:
+
+Multiple rapid clicks MUST NOT trigger multiple submissions
+Disabled state MUST activate synchronously on first submit
+
+
+---
+
+# ✅ 3. OPTIONAL (HIGHLY RECOMMENDED)
+
+Add **one more guard at code level** (defensive programming):
+
+```ts
+onSubmit: async ({ value }) => {
+  if (form.state.isSubmitting) return
+
+  const submitPromise = doSubmit(value)
+
+  toast.promise(submitPromise, {...})
+
+  await submitPromise
+}
+````
 
 ---
 
@@ -398,3 +452,7 @@ All form UIs SHOULD be:
 - predictable
 - aligned with the design system
 - comfortable for repeated operational use
+
+```
+
+```
