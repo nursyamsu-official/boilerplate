@@ -40,27 +40,28 @@ export function SignInForm() {
 
       setFieldErrors({})
 
-      await toast.promise(
-        (async () => {
-          const result = await signIn.email({
-            email: parsedValue.data.email,
-            password: parsedValue.data.password,
-            callbackURL: "/dashboard",
-          })
+      const submitPromise = (async () => {
+        const result = await signIn.email({
+          email: parsedValue.data.email,
+          password: parsedValue.data.password,
+          callbackURL: "/dashboard",
+        })
 
-          if (result.error) {
-            throw new Error("Failed to sign in")
-          }
-
-          router.push("/dashboard")
-          router.refresh()
-        })(),
-        {
-          loading: "Signing in...",
-          success: "Login successful",
-          error: "Failed to sign in",
+        if (result.error) {
+          throw new Error("Failed to sign in")
         }
-      )
+
+        router.push("/dashboard")
+        router.refresh()
+      })()
+
+      toast.promise(submitPromise, {
+        loading: "Signing in...",
+        success: "Login successful",
+        error: "Failed to sign in",
+      })
+
+      await submitPromise
     },
   })
 
