@@ -164,6 +164,7 @@ Rules:
 - Must call **services**
 - Must NOT access database directly
 - Must NOT contain UI logic
+- Must follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 Examples:
 

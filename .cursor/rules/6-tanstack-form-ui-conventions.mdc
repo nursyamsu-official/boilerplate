@@ -216,17 +216,19 @@ Pending state MUST be communicated clearly.
 
 Rules:
 
-- Submit buttons MUST reflect pending state
-- Buttons MAY be disabled during submission when appropriate
-- Inputs MAY be disabled during submission if interaction should pause
-- Pending UI SHOULD not remove important context
-- Disabled controls SHOULD remain understandable and visually consistent
+- Submit buttons MUST be disabled during submission
+- Disabled state MUST use the actual `disabled` attribute, not visual styling only
+- Submit button label MUST change during pending state
 
-Examples:
+Required label patterns:
 
-- `Save` → `Saving...`
-- disabled submit while request is in flight
-- spinner or subtle loading indicator inside the submit button
+- Save → Saving...
+- Create → Creating...
+- Submit → Submitting...
+- Update → Updating...
+
+- Submit buttons SHOULD include a loading indicator or spinner
+- Pending state MUST persist until success or error response is received
 
 ---
 

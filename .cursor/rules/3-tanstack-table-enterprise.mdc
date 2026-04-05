@@ -415,6 +415,7 @@ Rules:
 - Actions MUST be relevant to the row’s domain state
 - Row-action columns MUST disable sorting
 - Row-action columns SHOULD disable hiding unless there is a strong reason not to
+- All table actions MUST follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 Common actions:
 
@@ -449,6 +450,7 @@ Rules:
 - Feature-specific bulk-action logic MUST live in `features/[feature-name]/table/` for example `features/materials/table/MaterialBulkActions.tsx`
 - Bulk actions MUST be explicitly supported by the feature’s permissions and business rules
 - Bulk operations SHOULD clearly communicate scope and affected rows
+- Bulk actions MUST follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 
 ---
 
