@@ -54,7 +54,12 @@ export default function RootLayout({
             <AppNavbar />
             <main className="flex-1">{children}</main>
           </TooltipProvider>
-          <Toaster position="top-right" richColors duration={4000} />
+          <Toaster
+            position="top-right"
+            richColors
+            duration={4000}
+            closeButton
+          />
         </ThemeProvider>
       </body>
     </html>
