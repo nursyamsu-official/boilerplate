@@ -42,27 +42,28 @@ export function ChangePasswordForm() {
 
       setFieldErrors({})
 
-      await toast.promise(
-        (async () => {
-          const result = await authClient.changePassword({
-            currentPassword: parsedValue.data.currentPassword,
-            newPassword: parsedValue.data.newPassword,
-            revokeOtherSessions: true,
-          })
+      const submitPromise = (async () => {
+        const result = await authClient.changePassword({
+          currentPassword: parsedValue.data.currentPassword,
+          newPassword: parsedValue.data.newPassword,
+          revokeOtherSessions: true,
+        })
 
-          if (result.error) {
-            throw new Error("Failed to change password")
-          }
-
-          router.push("/dashboard/settings/security/password-changed")
-          router.refresh()
-        })(),
-        {
-          loading: "Saving...",
-          success: "Updated successfully",
-          error: "Failed to save",
+        if (result.error) {
+          throw new Error("Failed to change password")
         }
-      )
+
+        router.push("/dashboard/settings/security/password-changed")
+        router.refresh()
+      })()
+
+      toast.promise(submitPromise, {
+        loading: "Saving...",
+        success: "Updated successfully",
+        error: "Failed to save",
+      })
+
+      await submitPromise
     },
   })
 
