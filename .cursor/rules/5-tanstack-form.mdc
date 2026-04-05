@@ -320,11 +320,15 @@ Form submission MUST remain explicit and feature-owned.
 
 Rules:
 
+- Form submission MUST be idempotent at UI level (prevent double submit)
+- Submit buttons MUST be disabled while submission is pending
+- Submission MUST use TanStack Form submission state (isSubmitting or equivalent)
+- UI MUST prevent multiple clicks during async submission
+- Duplicate submissions MUST be prevented by disabling the submit button during pending state
 - Forms MAY submit through server actions, mutation hooks, or other approved feature entry points
 - Submission handlers MUST remain in the owning feature
 - Shared input primitives MUST NOT own submission behavior
 - Submission state MUST be reflected in the UI
-- Prevent duplicate submissions while a submit is pending
 - Success and failure handling SHOULD be explicit
 - All form submissions MUST follow Toast Integration System rules defined in `.cursor/rules/toast-integration-system.mdc`
 

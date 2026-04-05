@@ -2,17 +2,19 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { type FormEvent, useRef, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { LoaderCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { toast } from "@/components/ui/sonner"
 import { signIn } from "@/lib/auth-client"
 import { AuthFormAlert } from "@/features/auth/components/AuthFormAlert"
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell"
 import { AuthTextField } from "@/features/auth/components/AuthTextField"
 import { GoogleSignInButton } from "@/features/auth/components/GoogleSignInButton"
+import { assertAuthClientSuccess } from "@/features/auth/lib/auth-client-result"
 import { getAuthErrorMessage } from "@/features/auth/lib/auth-error"
 import { getFieldErrorMessages } from "@/features/auth/lib/form-error"
 import { authRoutes } from "@/features/auth/lib/auth-routes"
@@ -24,6 +26,8 @@ export function SignInForm() {
   const getRedirectUrl = useAuthRedirectUrl()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isGooglePending, setIsGooglePending] = useState(false)
+  const submitLockRef = useRef(false)
+  const googlePendingRef = useRef(false)
 
   const form = useForm({
     defaultValues: {
@@ -36,35 +40,78 @@ export function SignInForm() {
     onSubmit: async ({ value }) => {
       setErrorMessage(null)
 
-      const { error } = await signIn.email({
-        email: value.email,
-        password: value.password,
-        callbackURL: getRedirectUrl(authRoutes.dashboard),
-      })
+      try {
+        await toast.promise(
+          (async () => {
+            await assertAuthClientSuccess(
+              signIn.email({
+                email: value.email,
+                password: value.password,
+                callbackURL: getRedirectUrl(authRoutes.dashboard),
+              })
+            )
 
-      if (error) {
+            router.push(authRoutes.dashboard)
+            router.refresh()
+          })(),
+          {
+            loading: "Signing in...",
+            success: "Signed in successfully",
+            error: "Failed to sign in",
+          }
+        )
+      } catch (error) {
         setErrorMessage(getAuthErrorMessage(error))
-        return
       }
-
-      router.push(authRoutes.dashboard)
-      router.refresh()
     },
   })
 
-  const handleGoogleSignIn = async () => {
+  const isPending = form.state.isSubmitting || isGooglePending
+
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (submitLockRef.current || googlePendingRef.current || form.state.isSubmitting) {
+      return
+    }
+
+    submitLockRef.current = true
+
     try {
+      await form.handleSubmit()
+    } finally {
+      submitLockRef.current = false
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    if (submitLockRef.current || googlePendingRef.current || form.state.isSubmitting) {
+      return
+    }
+
+    setErrorMessage(null)
+
+    try {
+      googlePendingRef.current = true
       setIsGooglePending(true)
 
-      const { error } = await signIn.social({
-        provider: "google",
-        callbackURL: getRedirectUrl(authRoutes.dashboard),
-      })
-
-      if (error) {
-        setErrorMessage(getAuthErrorMessage(error))
-      }
+      await toast.promise(
+        assertAuthClientSuccess(
+          signIn.social({
+            provider: "google",
+            callbackURL: getRedirectUrl(authRoutes.dashboard),
+          })
+        ),
+        {
+          loading: "Signing in...",
+          success: "Signed in successfully",
+          error: "Failed to sign in",
+        }
+      )
+    } catch (error) {
+      setErrorMessage(getAuthErrorMessage(error))
     } finally {
+      googlePendingRef.current = false
       setIsGooglePending(false)
     }
   }
@@ -91,7 +138,8 @@ export function SignInForm() {
           />
         ) : null}
 
-        <GoogleSignInButton isPending={isGooglePending} onClick={handleGoogleSignIn} />
+        <GoogleSignInButton isPending={isGooglePending} disabled={isPending} onClick={handleGoogleSignIn} />
+
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
@@ -99,13 +147,7 @@ export function SignInForm() {
           <Separator className="flex-1" />
         </div>
 
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
+        <form className="space-y-4" aria-busy={isPending} onSubmit={(event) => void handleFormSubmit(event)}>
           <form.Field name="email">
             {(field) => (
               <AuthTextField
@@ -113,6 +155,7 @@ export function SignInForm() {
                 label="Email"
                 type="email"
                 autoComplete="email"
+                disabled={isPending}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -129,6 +172,7 @@ export function SignInForm() {
                 label="Password"
                 type="password"
                 autoComplete="current-password"
+                disabled={isPending}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -147,9 +191,9 @@ export function SignInForm() {
             </Link>
           </div>
 
-          <Button type="submit" className="w-full" disabled={!form.state.canSubmit || form.state.isSubmitting}>
+          <Button type="submit" className="w-full" disabled={!form.state.canSubmit || isPending}>
             {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            Sign in
+            {form.state.isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </div>

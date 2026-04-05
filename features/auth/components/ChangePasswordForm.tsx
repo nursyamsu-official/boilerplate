@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { type FormEvent, useRef } from "react"
 import { useForm } from "@tanstack/react-form"
 import { LoaderCircle } from "lucide-react"
 
@@ -14,16 +14,15 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldContent, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/sonner"
 import { changePassword } from "@/lib/auth-client"
-import { AuthFormAlert } from "@/features/auth/components/AuthFormAlert"
 import { AuthTextField } from "@/features/auth/components/AuthTextField"
-import { getAuthErrorMessage } from "@/features/auth/lib/auth-error"
+import { assertAuthClientSuccess } from "@/features/auth/lib/auth-client-result"
 import { getFieldErrorMessages } from "@/features/auth/lib/form-error"
 import { changePasswordSchema } from "@/features/auth/schemas/change-password.schema"
 
 export function ChangePasswordForm() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const submitLockRef = useRef(false)
 
   const form = useForm({
     defaultValues: {
@@ -36,23 +35,40 @@ export function ChangePasswordForm() {
       onChange: changePasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      setErrorMessage(null)
-      setSuccessMessage(null)
-
-      const { error } = await changePassword({
-        currentPassword: value.currentPassword,
-        newPassword: value.newPassword,
-        revokeOtherSessions: value.revokeOtherSessions,
-      })
-
-      if (error) {
-        setErrorMessage(getAuthErrorMessage(error))
-        return
-      }
-
-      setSuccessMessage("Your password has been updated successfully.")
+      return toast.promise(
+        assertAuthClientSuccess(
+          changePassword({
+            currentPassword: value.currentPassword,
+            newPassword: value.newPassword,
+            revokeOtherSessions: value.revokeOtherSessions,
+          })
+        ),
+        {
+          loading: "Saving...",
+          success: "Your password has been updated successfully",
+          error: "Failed to save",
+        }
+      )
     },
   })
+
+  const isPending = form.state.isSubmitting
+
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (submitLockRef.current || form.state.isSubmitting) {
+      return
+    }
+
+    submitLockRef.current = true
+
+    try {
+      await form.handleSubmit()
+    } finally {
+      submitLockRef.current = false
+    }
+  }
 
   return (
     <Card className="max-w-2xl">
@@ -63,25 +79,7 @@ export function ChangePasswordForm() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {errorMessage ? (
-          <AuthFormAlert
-            title="Unable to change password"
-            description={errorMessage}
-            variant="destructive"
-          />
-        ) : null}
-
-        {successMessage ? (
-          <AuthFormAlert title="Password updated" description={successMessage} />
-        ) : null}
-
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
+        <form className="space-y-4" aria-busy={isPending} onSubmit={(event) => void handleFormSubmit(event)}>
           <form.Field name="currentPassword">
             {(field) => (
               <AuthTextField
@@ -89,6 +87,7 @@ export function ChangePasswordForm() {
                 label="Current password"
                 type="password"
                 autoComplete="current-password"
+                disabled={isPending}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -105,6 +104,7 @@ export function ChangePasswordForm() {
                 label="New password"
                 type="password"
                 autoComplete="new-password"
+                disabled={isPending}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -121,6 +121,7 @@ export function ChangePasswordForm() {
                 label="Confirm new password"
                 type="password"
                 autoComplete="new-password"
+                disabled={isPending}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -135,6 +136,7 @@ export function ChangePasswordForm() {
               <Field orientation="horizontal">
                 <Checkbox
                   id={field.name}
+                  disabled={isPending}
                   checked={field.state.value}
                   onBlur={field.handleBlur}
                   onCheckedChange={(checked) => field.handleChange(checked === true)}
@@ -149,9 +151,9 @@ export function ChangePasswordForm() {
             )}
           </form.Field>
 
-          <Button type="submit" disabled={!form.state.canSubmit || form.state.isSubmitting}>
+          <Button type="submit" disabled={!form.state.canSubmit || isPending}>
             {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            Save password
+            {form.state.isSubmitting ? "Saving..." : "Save password"}
           </Button>
         </form>
       </CardContent>

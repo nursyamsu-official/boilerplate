@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button"
 
 type GoogleSignInButtonProps = {
   isPending?: boolean
+  disabled?: boolean
   onClick: () => void | Promise<void>
 }
 
 export function GoogleSignInButton({
   isPending,
+  disabled,
   onClick,
 }: GoogleSignInButtonProps) {
   return (
@@ -19,7 +21,7 @@ export function GoogleSignInButton({
       variant="outline"
       className="w-full"
       onClick={() => void onClick()}
-      disabled={isPending}
+      disabled={disabled || isPending}
     >
       {isPending ? <LoaderCircle className="animate-spin" /> : null}
       Continue with Google

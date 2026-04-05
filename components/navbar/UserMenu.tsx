@@ -14,8 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { toast } from "@/components/ui/sonner"
 import { signOut } from "@/lib/auth-client"
 import type { User } from "@/lib/auth"
+import { assertAuthClientSuccess } from "@/features/auth/lib/auth-client-result"
 import { authRoutes } from "@/features/auth/lib/auth-routes"
 
 type UserMenuProps = {
@@ -38,9 +40,19 @@ export function UserMenu({ user }: UserMenuProps) {
   const handleSignOut = async () => {
     try {
       setIsPending(true)
-      await signOut()
-      router.push(authRoutes.home)
-      router.refresh()
+
+      await toast.promise(
+        (async () => {
+          await assertAuthClientSuccess(signOut())
+          router.push(authRoutes.home)
+          router.refresh()
+        })(),
+        {
+          loading: "Signing out...",
+          success: "Signed out successfully",
+          error: "Failed to sign out",
+        }
+      )
     } finally {
       setIsPending(false)
     }

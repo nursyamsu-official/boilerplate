@@ -1,15 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { type FormEvent, useRef, useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { LoaderCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { toast } from "@/components/ui/sonner"
 import { resetPassword } from "@/lib/auth-client"
 import { AuthFormAlert } from "@/features/auth/components/AuthFormAlert"
 import { AuthPageShell } from "@/features/auth/components/AuthPageShell"
 import { AuthTextField } from "@/features/auth/components/AuthTextField"
+import { assertAuthClientSuccess } from "@/features/auth/lib/auth-client-result"
 import { getAuthErrorMessage } from "@/features/auth/lib/auth-error"
 import { getFieldErrorMessages } from "@/features/auth/lib/form-error"
 import { authRoutes } from "@/features/auth/lib/auth-routes"
@@ -22,6 +24,7 @@ type ResetPasswordFormProps = {
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const submitLockRef = useRef(false)
 
   const form = useForm({
     defaultValues: {
@@ -33,26 +36,54 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     },
     onSubmit: async ({ value }) => {
       if (!token) {
-        setErrorMessage("This reset link is invalid or has expired.")
+        const message = "This reset link is invalid or has expired."
+        setErrorMessage(message)
+        toast.error(message)
         return
       }
 
       setErrorMessage(null)
       setSuccessMessage(null)
 
-      const { error } = await resetPassword({
-        newPassword: value.password,
-        token,
-      })
+      try {
+        await toast.promise(
+          assertAuthClientSuccess(
+            resetPassword({
+              newPassword: value.password,
+              token,
+            })
+          ),
+          {
+            loading: "Saving...",
+            success: "Updated successfully",
+            error: "Failed to save",
+          }
+        )
 
-      if (error) {
+        setSuccessMessage("Your password has been updated. You can now sign in with your new password.")
+      } catch (error) {
         setErrorMessage(getAuthErrorMessage(error))
-        return
       }
-
-      setSuccessMessage("Your password has been updated. You can now sign in with your new password.")
     },
   })
+
+  const isPending = form.state.isSubmitting
+
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    if (submitLockRef.current || form.state.isSubmitting || !token) {
+      return
+    }
+
+    submitLockRef.current = true
+
+    try {
+      await form.handleSubmit()
+    } finally {
+      submitLockRef.current = false
+    }
+  }
 
   return (
     <AuthPageShell
@@ -88,13 +119,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <AuthFormAlert title="Password updated" description={successMessage} />
         ) : null}
 
-        <form
-          className="space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
+        <form className="space-y-4" aria-busy={isPending} onSubmit={(event) => void handleFormSubmit(event)}>
           <form.Field name="password">
             {(field) => (
               <AuthTextField
@@ -102,6 +127,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 label="New password"
                 type="password"
                 autoComplete="new-password"
+                disabled={isPending || !token}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -118,6 +144,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
                 label="Confirm new password"
                 type="password"
                 autoComplete="new-password"
+                disabled={isPending || !token}
                 value={field.state.value}
                 invalid={field.state.meta.isTouched && field.state.meta.errors.length > 0}
                 errors={getFieldErrorMessages(field.state.meta.errors)}
@@ -130,10 +157,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <Button
             type="submit"
             className="w-full"
-            disabled={!token || !form.state.canSubmit || form.state.isSubmitting}
+            disabled={!token || !form.state.canSubmit || isPending}
           >
             {form.state.isSubmitting ? <LoaderCircle className="animate-spin" /> : null}
-            Save new password
+            {form.state.isSubmitting ? "Saving..." : "Save new password"}
           </Button>
         </form>
       </div>

@@ -7,6 +7,7 @@ type AuthTextFieldProps = {
   type?: string
   autoComplete?: string
   value: string
+  disabled?: boolean
   invalid?: boolean
   errors?: string[]
   placeholder?: string
@@ -20,6 +21,7 @@ export function AuthTextField({
   type = "text",
   autoComplete,
   value,
+  disabled,
   invalid,
   errors,
   placeholder,
@@ -35,6 +37,7 @@ export function AuthTextField({
           type={type}
           autoComplete={autoComplete}
           aria-invalid={invalid}
+          disabled={disabled}
           value={value}
           placeholder={placeholder}
           onBlur={onBlur}
