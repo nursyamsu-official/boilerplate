@@ -1,0 +1,12 @@
+import type { Metadata } from "next";
+import { appConfig } from "@/config/app.config";
+import { VerifyEmailInfo } from "@/features/auth";
+
+export const metadata: Metadata = {
+  title: `Verify Email | ${appConfig.appName}`,
+  description: `Please verify your email address | ${appConfig.description}`,
+};
+
+export default function VerifyEmailInfoPage() {
+  return <VerifyEmailInfo />;
+}

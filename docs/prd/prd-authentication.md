@@ -1,54 +1,137 @@
-# PRD — Product Requirements Document
+# PRD — Project Requirements Document
 
 ## 1. Overview
 
-Aplikasi ini adalah fondasi sistem autentikasi dan antarmuka navigasi (Navbar) modern untuk sebuah platform web. Masalah yang sering terjadi adalah membangun sistem login yang aman dan tampilan navigasi yang dapat menyesuaikan secara otomatis (dinamis) antara pengunjung biasa dan pengguna yang sudah masuk. Tujuan utama dari proyek ini adalah menyediakan komponen Header/Navbar yang responsif dengan integrasi autentikasi lengkap (Email, Google, Lupa Password).
+This application is the foundation of a modern authentication and navigation (Navbar) system for a web platform. The problem that often occurs is building a secure login system and a navigation interface that can automatically (dynamically) adjust between regular visitors and logged-in users. The main goal of this project is to provide a responsive Header/Navbar component with complete authentication integration (Email, Google, Forgot Password, Email Verification), using strict UX standards using _inline message_.
 
 ## 2. Requirements
 
-- **Tampilan Responsif:** Wajib responsif untuk semua ukuran layar (Mobile-first). Navigasi pada perangkat seluler (Handphone) harus menggunakan _Hamburger Menu_.
-- **Sistem Autentikasi:** Mendukung pendaftaran/masuk menggunakan Email & Password serta integrasi Google Login.
-- **Tujuan Redirect:** Pengguna yang berhasil login harus diarahkan secara otomatis ke halaman `/dashboard`.
-- **Infrastruktur:** Aplikasi akan dijalankan di atas Virtual Private Server (VPS) pribadi menggunakan basis data PostgreSQL.
+- **Responsive Design:** Must be responsive for all screen sizes (Mobile-first). Navigation on mobile devices (Smartphone) must use _Hamburger Menu_.
+- **Authentication System:** Supports registration/login using Email & Password and Google Login integration.
+- **Redirect Destination:** Users who successfully login must be automatically redirected to the `/dashboard` page.
+- **Infrastructure:** The application will run on a private Virtual Private Server (VPS) using PostgreSQL as the database.
+- **UX Messaging:** All success/failure/error messages using _Inline Message_ (without toaster/sonner).
 
 ## 3. Core Features
 
 - **Navbar Dinamis:**
-  - Jika belum login: Menampilkan tombol "Sign Up" dan "Sign In".
-  - Jika sudah login: Menampilkan avatar pengguna, nama pengguna, menu pengguna (dropdown) dan tombol "Sign Out".
-- **Menu Navigasi Mobile:**
-  - Integrasi icon _Hamburger_ yang saat diklik akan memunculkan menu _dropdown_ atau _sidebar_ berisi tombol aksi navigasi.
-- **Modul Autentikasi (Better Auth):**
-  - **Daftar & Masuk (Sign Up / Sign In):** Menggunakan kombinasi Email dan Kata Sandi.
-  - **Social Login (OAuth):** Masuk dengan satu ketukan menggunakan akun Google.
-  - **Lupa Kata Sandi (Forgot Password):** Fitur pemulihan akun melalui tautan yang dikirimkan ke email untuk mereset kata sandi.
+  - If not logged in: Display "Sign Up" / "Login" buttons.
+  - If logged in: Display user menu and "Sign Out" button.
+- **Mobile Navigation Menu:**
+  - Integration of _Hamburger_ icon that when clicked will display a _dropdown_ or _sidebar_ menu containing action navigation buttons.
+- **Authentication Module (Better Auth):**
+  - **Sign Up / Sign In:** Using Email & Password combination.
+  - **Social Login (OAuth):** Login with one click using Google account.
+  - **Forgot Password:** Feature to recover account via link sent to email.
+  - **Email Verification:** Email verification flow after sign-up and _Resend Verification Email_ option.
+  - **Change Password:** Feature for logged-in users to change password in the settings page.
+  - **Remember Me:** Option to extend login session duration.
 
 ## 4. User Flow
 
-1. **Alur Pengunjung Baru (Guest):**
-   - Pengunjung membuka website dan melihat Navbar.
-   - Mengklik tombol "Sign Up" yang ada pada Navbar (atau dari dalam _Hamburger Menu_ jika dari HP).
-   - Pengguna memilih metode pendaftaran: Mendaftar dengan Email/Password atau via Google. (Mendaftar dengan Email/Password harus melalui verifikasi email)
-   - Setelah pendaftaran atau login berhasil, tampilkan toast notification "Registration successful" dan sistem mengarahkan pengguna ke halaman `/dashboard`.
-2. **Alur Pengguna Terdaftar:**
-   - Masuk ke aplikasi, mengklik tombol "Sign In"/
-   - Pengguna memilih metode login: Login dengan Email/Password sehingga sistem memverifikasi kredensial atau via Google.
-   - Setelah login berhasil, tampilkan toast notification "Login successful" dan sistem mengarahkan pengguna ke halaman `/dashboard`.
-   - Navbar berubah, tombol "Sign Up" hilang berganti menjadi avatar pengguna, nama pengguna, menu pengguna (dropdown) dan tombol "Sign Out".
-   - Jika pengguna mengklik "Sign Out", akses diakhiri, kembali menjadi pengunjung biasa.
-3. **Alur Lupa Kata Sandi:**
-   - Pengguna di halaman login mengklik "Forgot Password".
-   - Memasukkan alamat email yang terdaftar.
-   - Setelah di submit, maka berpindah ke halaman page baru berisi pesan "Check your email" dan tombol "Back to Login".
-   - Menerima email berisi tautan pemulihan -> Mengklik tautan dari email -> Mengisi kata sandi baru -> Login kembali.
-4. **Alur Ganti Kata Sandi Setelah Login**
-   - Pengguna setelah login, mengklik menu "Settings"->"Security"->"Change Password".
-   - Memasukkan kata sandi lama dan kata sandi baru dan konfirmasi kata sandi baru.
-   - Setelah di submit, maka berpindah ke halaman page baru berisi pesan "Password changed successfully" dan tombol "Back to Dashboard".
+### 1. Proses Sign-Up
 
-## 5. Architecture
+- **Path:** `/auth/sign-up`
+- **Input:** Name, Email, Password, Confirm Password.
+- **Action:** Click "Sign Up" button.
+- **UX Best Practice:**
+  - Disable button when loading.
+  - Change button label: "Sign Up" → "Signing up...".
+- **Flow:**
+  1. User fills the form and submits.
+  2. System creates an account with pending verification status.
+  3. Redirect to `/auth/verify-email-info`.
+  4. User opens email and clicks verification link (`/auth/verify-email?token=xxx`).
+  5. Redirect to `/auth/verify-success`.
+  6. **CTA:** Button "Go to Sign In" redirects to `/auth/sign-in`.
 
-bagian _Frontend_ dan _Backend_ akan disatukan dalam satu kerangka kerja Next.js (Fullstack). _Better Auth_ akan dikonfigurasi menggunakan **Prisma Adapter**, sehingga semua operasi autentikasi (membaca/menulis user, session, dll) tidak mengakses PostgreSQL secara langsung, melainkan melalui lapisan ORM Prisma. Ini memastikan _type-safety_, keamanan, dan kemudahan manajemen skema database.
+### 2. Proses Sign-In
+
+- **Path:** `/auth/sign-in`
+- **Options:** Email + Password, Google Login, Checkbox "Remember Me".
+- **Backend Validation:**
+  - Check: user exists? password match? account active?
+- **If Success:**
+  - Create session.
+  - Redirect to `/dashboard`.
+  - UX: Disable button, change label: "Sign In" → "Signing in...".
+- **⚠️ Inline Error Message:**
+  - ❌ Invalid email or password → "Invalid email or password."
+  - ❌ Account not yet verified → "Your account is not yet verified, please check your email to activate."
+  - ❌ Account not found → "Account not found."
+
+### 3. Forgot Password
+
+- **Path:** `/auth/forgot-password`
+- **Input:** Email.
+- **Action:** Click "Send Reset Link" button.
+- **Backend:**
+  - Check email exist.
+  - Generate reset token (expiry: 30 minutes).
+  - Send email.
+- **Redirect to:** `/auth/forgot-password/success`.
+- **⚠️ UX & Security:**
+  - Do not show if email exists or not for security reasons.
+  - Always show message: "Reset password link has been sent to your email."
+
+### 4. Reset Password
+
+- **Path:** `/auth/reset-password?token=xxx`
+- **Flow:**
+  1. Validate token (valid? not expired?).
+  2. Display form: New Password, Confirm Password.
+  3. Submit: Hash new password, Update user password, Invalidate token.
+  4. Redirect: `/auth/reset-password/success`.
+- **⚠️ Error Case:**
+  - Token invalid → "Token is invalid or expired."
+
+### 5. Change Password (Authenticated)
+
+- **Path:** `/settings/change-password`
+- **Flow:**
+  1. User input: Current Password, New Password, Confirm Password.
+  2. Submit.
+  3. Backend Validation: Validate current password.
+  4. Update password.
+- **Messaging:**
+  - Success: "Your password has been changed successfully."
+  - Error: "Invalid current password."
+- **Form Behavior:**
+  - Disable button when submitting.
+  - Show loading state.
+  - Inline error (not toaster/sonner).
+
+### 6. Additional Features
+
+- **Resend Verification Email:** Available at `/auth/verify-email-info` if email is not received.
+- **Remember Me:** Checkbox on Sign-In page to extend session duration.
+
+## 5. UI/UX & Messaging Standards
+
+- **Inline Messages Only:**
+  - Forbidden to use pop-up notification library like `sonner`, `toast`, or `alert`.
+  - All success, failure, or error messages must be displayed directly below the form input or in the relevant content area (_inline_).
+- **Button Loading States:**
+  - When the process is ongoing (loading), the button must be in `disabled` state.
+  - Change button label to provide visual feedback:
+    - "Sign Up" → "Signing up..."
+    - "Sign In" → "Signing in..."
+    - "Send Reset Link" → "Sending...".
+- **Security Best Practices:**
+  - **Enumeration Prevention:** Do not provide hints about whether the email exists or not in the Forgot Password feature. Use generic messages.
+  - **Messaging Style:** Messages must be clear, not too technical, and not expose sensitive system information.
+  - **Token Expiry:** Verification token and reset password token have a clear expiry time.
+
+## 6. Architecture & Tech Stack
+
+The _Frontend_ and _Backend_ will be combined in a Next.js (Fullstack) framework. _Better Auth_ will be configured using **Prisma Adapter**, so all authentication operations (reading/writing user, session, etc.) do not access PostgreSQL directly, but through the Prisma ORM layer. This ensures _type-safety_, security, and ease of managing database schema.
+
+- **Frontend & Backend Framework:** **Next.js (App Router)** — Full-stack framework for UI and API unification.
+- **Styling & UI Component:** **Tailwind CSS** combined with **shadcn/ui** — For aesthetic Navbar, login form, and responsiveness.
+- **Authentication:** **Better Auth** — Modern authentication library via **Prisma Adapter**.
+- **Database:** **PostgreSQL** — Relational database that is reliable.
+- **ORM:** **Prisma ORM** — Required adapter for Better Auth, defining strong database schema.
+- **Deployment:** **VPS** (DigitalOcean / Niagahoster) using **Docker** or Node.js manager (PM2/Nginx).
 
 ```mermaid
 sequenceDiagram
@@ -58,106 +141,101 @@ sequenceDiagram
     participant P as ORM Layer (Prisma)
     participant DB as Database (PostgreSQL)
 
-    U->>F: Klik "Sign In with Google" / Email
-    F->>A: Kirim permintaan Auth
+    U->>F: Click "Sign In with Google" / Email
+    F->>A: Send authentication request
     A->>P: Query via Prisma Adapter
-    P->>DB: Eksekusi SQL (Cek/Simpan data)
+    P->>DB: Execute SQL (Check/Save data)
     DB-->>P: Return data User/Session
-    P-->>A: Data Terolah (Type-safe)
-    A-->>F: Login Berhasil & Set Cookie
-    F-->>U: Ubah state Navbar & Redirect ke /dashboard
+    P-->>A: Processed data (Type-safe)
+    A-->>F: Login successful & Set Cookie
+    F-->>U: Change navbar state & Redirect to /dashboard
 ```
 
-## 6. Database Schema
+## 7. Database Schema
 
-Untuk mendukung sistem autentikasi dari _Better Auth_ melalui Prisma ORM, kita memerlukan struktur tabel yang detail sesuai standar Prisma Schema untuk menyimpan data pengguna, sesi aktif, akun pihak ketiga, dan token verifikasi.
+To support the authentication system from _Better Auth_ through Prisma ORM, we need a detailed table structure according to the Prisma Schema standard to store user data, active session, third-party account, and verification token.
 
-**Tabel Utama:**
+```prisma
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
 
-- **User (Pengguna):** Menyimpan profil dasar pengguna dan status verifikasi.
-  - `id` (String) - ID unik pengguna.
-  - `name` (String) - Nama lengkap.
-  - `email` (String) - Alamat email pengguna (Unique).
-  - `emailVerified` (Boolean) - Status verifikasi email.
-  - `image` (String) - URL foto profil (nullable).
-  - `createdAt` & `updatedAt` (DateTime) - Waktu pembuatan dan pembaruan data.
-- **Session (Sesi):** Menyimpan status login dan metadata perangkat.
-  - `id` (String) - ID unik sesi.
-  - `token` (String) - Token sesi unik untuk cookie.
-  - `userId` (String) - ID pengguna yang bersangkutan.
-  - `expiresAt` (DateTime) - Kapan sesi berakhir/kedaluwarsa.
-  - `ipAddress` & `userAgent` (String) - Metadata keamanan perangkat (nullable).
-  - `createdAt` & `updatedAt` (DateTime) - Waktu pembuatan dan pembaruan sesi.
-- **Account (Akun Pihak Ketiga):** Menyimpan data OAuth (Google) dan kredensial terhubung.
-  - `id` (String) - ID unik riwayat koneksi.
-  - `userId` (String) - ID pengguna pemilik.
-  - `providerId` & `accountId` (String) - Identitas penyedia dan akun eksternal.
-  - `accessToken`, `refreshToken`, `idToken` (String) - Token otorisasi (nullable).
-  - `accessTokenExpiresAt`, `refreshTokenExpiresAt` (DateTime) - Masa berlaku token.
-  - `password` (String) - Hash kata sandi jika terhubung via kredensial (nullable).
-- **Verification (Verifikasi):** Menyimpan token sementara untuk verifikasi email atau reset password.
-  - `id` (String) - ID unik record verifikasi.
-  - `identifier` (String) - Identitas target (misal: email).
-  - `value` (String) - Token verifikasi rahasia.
-  - `expiresAt` (DateTime) - Waktu kedaluwarsa token.
+  @@unique([email])
+  @@map("user")
+}
 
-```mermaid
-erDiagram
-    USER ||--o{ SESSION : has
-    USER ||--o{ ACCOUNT : linked_to
-    VERIFICATION {
-        string id PK
-        string identifier
-        string value
-        datetime expiresAt
-        datetime createdAt
-        datetime updatedAt
-    }
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    USER {
-        string id PK
-        string name
-        string email
-        boolean emailVerified
-        string image
-        datetime createdAt
-        datetime updatedAt
-    }
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
 
-    SESSION {
-        string id PK
-        string token
-        datetime expiresAt
-        string userId FK
-        string ipAddress
-        string userAgent
-        datetime createdAt
-        datetime updatedAt
-    }
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
-    ACCOUNT {
-        string id PK
-        string userId FK
-        string providerId
-        string accountId
-        string accessToken
-        string refreshToken
-        string idToken
-        datetime accessTokenExpiresAt
-        datetime refreshTokenExpiresAt
-        string password
-        datetime createdAt
-        datetime updatedAt
-    }
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
 ```
 
-## 7. Tech Stack
+## 8. Application Structure
 
-Berikut adalah susunan teknologi yang digunakan berdasarkan permintaan dan rekomendasi praktik terbaik (best practices) agar aplikasi aman, memiliki UI menarik, dan stabil:
+The Next.js application folder structure is arranged to separate public (authentication) and protected routes.
 
-- **Frontend & Backend Framework:** **Next.js (App Router)** — Digunakan sebagai fondasi Full-stack yang memungkinkan UI dan API menyatu di satu tempat untuk proses pengembangan yang cepat.
-- **Styling & UI Component:** **Tailwind CSS** dipadukan dengan **shadcn/ui** — Memungkinkan pembuatan Navbar yang estetik, tombol Sign up, form login, serta responsivitas (Hamburger menu) yang cepat dan mudah dikonfigurasi.
-- **Autentikasi:** **Better Auth** — Library autentikasi modern yang diintegrasikan menggunakan **Prisma Adapter** resmi. Ini memastikan semua logika auth (OAuth, Email, Session) terhubung aman ke database melalui ORM.
-- **Database:** **PostgreSQL** — Basis data relasional (SQL) yang sangat handal untuk menyimpan data pengguna secara terstruktur.
-- **ORM (Penghubung Database):** **Prisma ORM** — Digunakan sebagai adapter wajib untuk Better Auth. Mendefinisikan skema database yang kuat (type-safe) dan menjadi perantara tunggal antara aplikasi dan PostgreSQL.
-- **Deployment:** **VPS** (seperti DigitalOcean / Niagahoster) menggunakan Node.js manager (PM2/Nginx) agar sistem berjalan mandiri dengan kontrol teknis secara penuh.
+```text
+/app
+  /auth/
+    sign-in/
+    sign-up/
+    forgot-password/
+    reset-password/
+    verify-email/
+    verify-success/
+  /(protected)/
+    dashboard/
+    settings/
+      change-password/
+
+```
