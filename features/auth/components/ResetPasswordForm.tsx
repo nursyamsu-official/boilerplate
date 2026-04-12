@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPassword } from "@/lib/auth-client";
-import { resetPasswordSchema, type ResetPasswordInput } from "@/features/auth/schemas/reset-password.schema";
+import {
+  resetPasswordSchema,
+  type ResetPasswordInput,
+} from "@/features/auth/schemas/reset-password.schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +17,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import Link from "next/link";
+import { XCircle } from "lucide-react";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -22,14 +27,31 @@ export function ResetPasswordForm() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof ResetPasswordInput, string>>>({});
+  const [fieldErrors, setFieldErrors] = useState<
+    Partial<Record<keyof ResetPasswordInput, string>>
+  >({});
 
   if (!token) {
     return (
       <Card className="w-full max-w-md">
-        <CardContent className="pt-6">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-2 flex size-10 items-center justify-center rounded-full">
+            <XCircle className="size-5 text-destructive" />
+          </div>
+          <CardTitle className="text-lg">Reset Password Failed.</CardTitle>
+          {/* <CardDescription>Please try again.</CardDescription> */}
+        </CardHeader>
+        <CardContent className="text-center">
           <div className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
             Token is invalid or expired.
+          </div>
+          <div className="mt-4">
+            <Link
+              href="/auth/sign-in"
+              className="text-xs text-primary underline underline-offset-4 hover:text-primary/80"
+            >
+              Back to Sign In
+            </Link>
           </div>
         </CardContent>
       </Card>
@@ -117,11 +139,18 @@ export function ResetPasswordForm() {
               disabled={isLoading}
             />
             {fieldErrors.confirmPassword && (
-              <p className="text-xs text-destructive">{fieldErrors.confirmPassword}</p>
+              <p className="text-xs text-destructive">
+                {fieldErrors.confirmPassword}
+              </p>
             )}
           </div>
 
-          <Button type="submit" size="lg" className="mt-1 w-full" disabled={isLoading}>
+          <Button
+            type="submit"
+            size="lg"
+            className="mt-1 w-full"
+            disabled={isLoading}
+          >
             {isLoading ? "Resetting..." : "Reset Password"}
           </Button>
         </form>
