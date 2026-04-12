@@ -35,7 +35,9 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: false,
-    sendVerificationEmail: async ({ user, url }) => {
+    sendVerificationEmail: async ({ user, token }) => {
+      const verificationUrl = `${process.env.BETTER_AUTH_URL}/auth/verify-email?token=${token}`;
+
       await sendEmail({
         to: user.email,
         subject: "Verify your email address",
@@ -43,7 +45,7 @@ export const auth = betterAuth({
           <h2>Verify Your Email</h2>
           <p>Hi ${user.name},</p>
           <p>Thank you for signing up. Please verify your email address by clicking the link below:</p>
-          <p><a href="${url}">Verify Email</a></p>
+          <p><a href="${verificationUrl}">Verify Email</a></p>
           <p>If you didn't create an account, you can safely ignore this email.</p>
         `,
       });
