@@ -1,9 +1,9 @@
 // import { getBaseUrl } from "@/lib/utils"; //NOT USE TEMPORARY
 
 export const appConfig = {
-  appName: "SALAM AlBayyinah",
-  appNameFull: "SALAM | Sistem Administrasi dan Layanan Akademik AlBayyinah",
-  description: `SALAM adalah sistem administrasi dan layanan akademik AlBayyinah.`,
+  appName: "Master Hub",
+  appNameFull: "Master Hub | Standardize Your Master Data",
+  description: `Master Hub adalah sistem untuk mengelola data master secara efisien dan terstruktur.`,
   // baseUrl: getBaseUrl(), // NOT USE TEMPORARY
   // Contact information (displayed on contact page)
   contact: {
