@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { twoFactor } from "@/lib/auth-client";
 import { otpSchema, backupCodeSchema } from "@/features/auth/schemas/two-factor.schema";
@@ -50,7 +50,11 @@ export function TwoFactorVerifyForm() {
     setCooldown(RESEND_COOLDOWN_SECONDS);
   }, []);
 
+  const hasSentRef = useRef(false);
+
   useEffect(() => {
+    if (hasSentRef.current) return;
+    hasSentRef.current = true;
     sendOtp();
   }, [sendOtp]);
 
