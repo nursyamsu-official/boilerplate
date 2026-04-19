@@ -4,37 +4,37 @@ overview: Add Two-Factor Authentication to the project using Better Auth's twoFa
 todos:
   - id: server-plugin
     content: Add twoFactor plugin to lib/auth.ts with OTP email config using existing sendEmail utility
-    status: pending
+    status: completed
   - id: client-plugin
     content: Add twoFactorClient plugin to lib/auth-client.ts with onTwoFactorRedirect and export twoFactor
-    status: pending
+    status: completed
   - id: prisma-schema
     content: "Update prisma/schema.prisma: add twoFactorEnabled to User, add TwoFactor model, run migration"
-    status: pending
+    status: completed
   - id: two-factor-schema
     content: Create features/auth/schemas/two-factor.schema.ts with OTP and backup code validation
-    status: pending
+    status: completed
   - id: verify-form
     content: Create TwoFactorVerifyForm component with OTP input, resend, and backup code fallback
-    status: pending
+    status: completed
   - id: verify-page
     content: Create app/auth/two-factor/page.tsx route page
-    status: pending
+    status: completed
   - id: backup-codes
     content: Create BackupCodesDisplay component with copy-all functionality
-    status: pending
+    status: completed
   - id: settings-component
     content: Create TwoFactorSettings component to enable/disable 2FA and regenerate backup codes
-    status: pending
+    status: completed
   - id: settings-page
     content: Create app/(protected)/settings/two-factor/page.tsx route page
-    status: pending
+    status: completed
   - id: update-exports
     content: Update features/auth/index.ts with new component and schema exports
-    status: pending
+    status: completed
   - id: update-usermenu
     content: Add Two-Factor Auth link to UserMenu dropdown
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -124,9 +124,7 @@ Add `twoFactorClient` plugin. Since `onTwoFactorRedirect` runs outside of React 
 import { twoFactorClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
-  plugins: [
-    twoFactorClient(),
-  ],
+  plugins: [twoFactorClient()],
 });
 ```
 
@@ -153,7 +151,7 @@ const { error: authError } = await signIn.email(
       }
       router.push("/dashboard");
     },
-  }
+  },
 );
 ```
 
@@ -259,18 +257,18 @@ Add a "Two-Factor Auth" menu item linking to `/settings/two-factor` (with a `Shi
 
 ## Files Summary
 
-| Action | File                                                                                      |
-| ------ | ----------------------------------------------------------------------------------------- |
-| Modify | `lib/auth.ts`                                                                             |
-| Modify | `lib/auth-client.ts`                                                                      |
-| Modify | `prisma/schema.prisma`                                                                    |
+| Action | File                                                                                     |
+| ------ | ---------------------------------------------------------------------------------------- |
+| Modify | `lib/auth.ts`                                                                            |
+| Modify | `lib/auth-client.ts`                                                                     |
+| Modify | `prisma/schema.prisma`                                                                   |
 | Modify | `features/auth/components/SignInForm.tsx` (handle `twoFactorRedirect` via `router.push`) |
-| Modify | `features/auth/index.ts`                                                                  |
-| Modify | `components/navbar/UserMenu.tsx`                                                          |
-| Create | `app/auth/two-factor/page.tsx`                                                            |
-| Create | `app/(protected)/settings/two-factor/page.tsx`                                            |
-| Create | `features/auth/components/TwoFactorVerifyForm.tsx`                                        |
-| Create | `features/auth/components/TwoFactorSettings.tsx`                                          |
-| Create | `features/auth/components/BackupCodesDisplay.tsx`                                         |
-| Create | `features/auth/schemas/two-factor.schema.ts`                                              |
-| Run    | `npx prisma migrate dev --name add-two-factor`                                            |
+| Modify | `features/auth/index.ts`                                                                 |
+| Modify | `components/navbar/UserMenu.tsx`                                                         |
+| Create | `app/auth/two-factor/page.tsx`                                                           |
+| Create | `app/(protected)/settings/two-factor/page.tsx`                                           |
+| Create | `features/auth/components/TwoFactorVerifyForm.tsx`                                       |
+| Create | `features/auth/components/TwoFactorSettings.tsx`                                         |
+| Create | `features/auth/components/BackupCodesDisplay.tsx`                                        |
+| Create | `features/auth/schemas/two-factor.schema.ts`                                             |
+| Run    | `npx prisma migrate dev --name add-two-factor`                                           |

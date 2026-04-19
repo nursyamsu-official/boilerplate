@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { twoFactor } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
@@ -61,7 +62,36 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    twoFactor({
+      otpOptions: {
+        async sendOTP({ user, otp }) {
+          await sendEmail({
+            to: user.email,
+            subject: "Your verification code",
+            html: `
+              <h2>Two-Factor Authentication</h2>
+              <p>Hi ${user.name},</p>
+              <p>Your verification code is: <strong>${otp}</strong></p>
+              <p>This code will expire in 5 minutes.</p>
+              <p>If you didn't request this code, please ignore this email.</p>
+            `,
+          });
+        },
+        period: 5,
+        digits: 6,
+        allowedAttempts: 5,
+        storeOTP: "encrypted",
+      },
+      backupCodeOptions: {
+        amount: 10,
+        length: 10,
+        storeBackupCodes: "encrypted",
+      },
+      skipVerificationOnEnable: true,
+    }),
+  ],
 });
 
 export type Session = typeof auth.$Infer.Session;

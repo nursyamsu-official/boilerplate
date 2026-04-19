@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { KeyRound, LogOut, LayoutDashboard } from "lucide-react";
+import { KeyRound, LogOut, LayoutDashboard, ShieldCheck } from "lucide-react";
 
 interface UserMenuProps {
   user: {
@@ -59,6 +59,10 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuItem onClick={() => router.push("/settings/change-password")}>
           <KeyRound />
           Change Password
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push("/settings/two-factor")}>
+          <ShieldCheck />
+          Two-Factor Auth
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={handleSignOut}>

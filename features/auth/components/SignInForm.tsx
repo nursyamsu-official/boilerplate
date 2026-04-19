@@ -52,11 +52,22 @@ export function SignInForm() {
     }
 
     setIsLoading(true);
-    const { error: authError } = await signIn.email({
-      email: result.data.email,
-      password: result.data.password,
-      rememberMe: result.data.rememberMe,
-    });
+    const { error: authError } = await signIn.email(
+      {
+        email: result.data.email,
+        password: result.data.password,
+        rememberMe: result.data.rememberMe,
+      },
+      {
+        onSuccess(context) {
+          if (context.data.twoFactorRedirect) {
+            router.push("/auth/two-factor");
+            return;
+          }
+          router.push("/dashboard");
+        },
+      },
+    );
 
     if (authError) {
       setIsLoading(false);
@@ -67,8 +78,6 @@ export function SignInForm() {
       }
       return;
     }
-
-    router.push("/dashboard");
   };
 
   return (
