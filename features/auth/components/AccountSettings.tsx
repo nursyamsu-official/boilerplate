@@ -3,9 +3,9 @@
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ProfileTab } from "./ProfileTab";
-import { SecurityTab } from "./SecurityTab";
-import { SessionsTab } from "./SessionsTab";
+import { ProfileTab } from "@/features/auth/components/ProfileTab";
+import { SecurityTab } from "@/features/auth/components/SecurityTab";
+import { SessionsTab } from "@/features/auth/components/SessionsTab";
 
 const VALID_TABS = ["profile", "security", "sessions"] as const;
 type SettingsTab = (typeof VALID_TABS)[number];
