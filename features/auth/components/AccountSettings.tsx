@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfileTab } from "@/features/auth/components/ProfileTab";
 import { SecurityTab } from "@/features/auth/components/SecurityTab";
@@ -10,22 +9,28 @@ import { SessionsTab } from "@/features/auth/components/SessionsTab";
 const VALID_TABS = ["profile", "security", "sessions"] as const;
 type SettingsTab = (typeof VALID_TABS)[number];
 
-function AccountSettingsContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+function getInitialTab(): SettingsTab {
+  if (typeof window === "undefined") return "profile";
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get("tab");
+  if (raw && (VALID_TABS as readonly string[]).includes(raw)) {
+    return raw as SettingsTab;
+  }
+  return "profile";
+}
 
-  const rawTab = searchParams.get("tab");
-  const activeTab: SettingsTab =
-    rawTab && VALID_TABS.includes(rawTab as SettingsTab)
-      ? (rawTab as SettingsTab)
-      : "profile";
+export function AccountSettings() {
+  const [activeTab, setActiveTab] = useState<SettingsTab>(getInitialTab);
 
   const handleTabChange = (value: string) => {
-    if (value === "profile") {
-      router.replace("/dashboard/settings");
-    } else {
-      router.replace(`/dashboard/settings?tab=${value}`);
-    }
+    const tab = value as SettingsTab;
+    setActiveTab(tab);
+
+    const url =
+      tab === "profile"
+        ? "/dashboard/settings"
+        : `/dashboard/settings?tab=${tab}`;
+    window.history.replaceState(null, "", url);
   };
 
   return (
@@ -52,21 +57,5 @@ function AccountSettingsContent() {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-export function AccountSettings() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex flex-col gap-6">
-          <h1 className="text-2xl font-bold">Account Settings</h1>
-          <div className="h-8 w-48 animate-pulse rounded bg-muted" />
-          <div className="h-64 animate-pulse rounded bg-muted" />
-        </div>
-      }
-    >
-      <AccountSettingsContent />
-    </Suspense>
   );
 }
