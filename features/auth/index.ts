@@ -9,6 +9,7 @@ export { GoogleSignInButton } from "./components/GoogleSignInButton";
 export { TwoFactorVerifyForm } from "./components/TwoFactorVerifyForm";
 export { TwoFactorSettings } from "./components/TwoFactorSettings";
 export { BackupCodesDisplay } from "./components/BackupCodesDisplay";
+export { AccountSettings } from "./components/AccountSettings";
 
 export { signUpSchema, type SignUpInput } from "./schemas/sign-up.schema";
 export { signInSchema, type SignInInput } from "./schemas/sign-in.schema";

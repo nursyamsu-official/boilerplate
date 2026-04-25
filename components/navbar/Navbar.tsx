@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { UserMenu } from "./UserMenu";
-import { Menu, LayoutDashboard, KeyRound, LogOut } from "lucide-react";
+import { Menu, LayoutDashboard, Settings, LogOut } from "lucide-react";
 
 const publicLinks = [
   { href: "/", label: "Home" },
@@ -122,11 +122,11 @@ export function Navbar() {
                       className="justify-start"
                       onClick={() => {
                         setMobileOpen(false);
-                        router.push("/settings/change-password");
+                        router.push("/dashboard/settings");
                       }}
                     >
-                      <KeyRound />
-                      Change Password
+                      <Settings />
+                      Settings
                     </Button>
                     <div className="my-1 border-b" />
                     <Button

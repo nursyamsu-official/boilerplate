@@ -14,9 +14,9 @@ alwaysApply: true
 
 All user-triggered actions MUST automatically trigger toast notifications using:
 
-import { toast } from "@/components/ui/sonner"
+<!-- import { Toaster } from "@/components/ui/sonner" -->
 
----
+import { toast } from "sonner"
 
 # Global Setup
 

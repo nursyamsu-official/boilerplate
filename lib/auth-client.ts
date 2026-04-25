@@ -16,4 +16,13 @@ export const {
   changePassword,
   sendVerificationEmail,
   twoFactor,
+  updateUser,
+  changeEmail,
+  deleteUser,
+  listSessions,
+  revokeSession,
+  revokeOtherSessions,
+  listAccounts,
+  unlinkAccount,
+  linkSocial,
 } = authClient;
