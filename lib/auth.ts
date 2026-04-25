@@ -5,6 +5,8 @@ import { twoFactor } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import { securityConfig } from "@/config/security.config";
+import { formatDurationCombined } from "@/lib/utils";
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -17,7 +19,8 @@ export const auth = betterAuth({
     autoSignIn: false,
     minPasswordLength: 8,
     maxPasswordLength: 128,
-    resetPasswordTokenExpiresIn: 1800,
+    resetPasswordTokenExpiresIn:
+      securityConfig.duration.resetPasswordTokenExpiresInSec,
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
@@ -36,10 +39,12 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: false,
-    // expiresIn: 60 * 60 * 24, // 24 hours
-    expiresIn: 60 * 60, // 1 hour
+    expiresIn: securityConfig.duration.emailVerificationExpiresInSec,
     sendVerificationEmail: async ({ user, token }) => {
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/auth/verify-email?token=${token}`;
+      const expiryLabel = formatDurationCombined(
+        securityConfig.duration.emailVerificationExpiresInSec,
+      );
 
       await sendEmail({
         to: user.email,
@@ -50,13 +55,14 @@ export const auth = betterAuth({
           <p>Thank you for signing up. Please verify your email address by clicking the link below:</p>
           <p><a href="${verificationUrl}">Verify Email</a></p>
           <p>If you didn't create an account, you can safely ignore this email.</p>
+          <p>This link will expire in ${expiryLabel}.</p>
         `,
       });
     },
   },
   session: {
-    expiresIn: 60 * 60 * 24 * 7,
-    updateAge: 60 * 60 * 24,
+    expiresIn: securityConfig.duration.sessionExpiresInSec,
+    updateAge: securityConfig.duration.updateAgeInSec,
   },
   socialProviders: {
     google: {
