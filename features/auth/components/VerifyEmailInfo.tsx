@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { sendVerificationEmail } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -15,17 +18,26 @@ import {
 import { Mail } from "lucide-react";
 
 export function VerifyEmailInfo() {
+  const searchParams = useSearchParams();
+  const emailFromUrl = searchParams.get("email") ?? "";
+
+  const [email, setEmail] = useState(emailFromUrl);
   const [isResending, setIsResending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleResend = async () => {
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
+
     setIsResending(true);
     setMessage(null);
     setError(null);
 
     const { error: resendError } = await sendVerificationEmail({
-      email: "",
+      email: email.trim(),
       callbackURL: "/auth/verify-email",
     });
 
@@ -63,6 +75,20 @@ export function VerifyEmailInfo() {
           </div>
         )}
 
+        {!emailFromUrl && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="resend-email">Email</Label>
+            <Input
+              id="resend-email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isResending}
+            />
+          </div>
+        )}
+
         <p className="text-center text-xs text-muted-foreground">
           Didn&apos;t receive the email? Check your spam folder or click below to resend.
         </p>
@@ -72,7 +98,7 @@ export function VerifyEmailInfo() {
           variant="outline"
           size="lg"
           className="w-full"
-          disabled={isResending}
+          disabled={isResending || !email.trim()}
           onClick={handleResend}
         >
           {isResending ? "Resending..." : "Resend Verification Email"}

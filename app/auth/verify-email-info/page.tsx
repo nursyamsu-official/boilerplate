@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { appConfig } from "@/config/app.config";
 import { VerifyEmailInfo } from "@/features/auth";
 
@@ -8,5 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default function VerifyEmailInfoPage() {
-  return <VerifyEmailInfo />;
+  return (
+    <Suspense>
+      <VerifyEmailInfo />
+    </Suspense>
+  );
 }

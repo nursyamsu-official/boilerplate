@@ -36,6 +36,8 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: false,
+    // expiresIn: 60 * 60 * 24, // 24 hours
+    expiresIn: 60 * 60, // 1 hour
     sendVerificationEmail: async ({ user, token }) => {
       const verificationUrl = `${process.env.BETTER_AUTH_URL}/auth/verify-email?token=${token}`;
 

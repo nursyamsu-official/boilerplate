@@ -72,10 +72,16 @@ export function VerifyEmail() {
         </CardDescription>
       </CardHeader>
       {state === "error" && (
-        <CardContent className="text-center">
+        <CardContent className="flex flex-col items-center gap-2">
+          <a
+            href="/auth/verify-email-info"
+            className="text-xs text-primary underline underline-offset-4 hover:text-primary/80"
+          >
+            Request a new verification email
+          </a>
           <a
             href="/auth/sign-in"
-            className="text-xs text-primary underline underline-offset-4 hover:text-primary/80"
+            className="text-xs text-muted-foreground underline underline-offset-4 hover:text-muted-foreground/80"
           >
             Back to Sign In
           </a>

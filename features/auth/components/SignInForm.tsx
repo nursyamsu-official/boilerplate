@@ -25,11 +25,13 @@ export function SignInForm() {
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof SignInInput, string>>>({});
   const [rememberMe, setRememberMe] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setFieldErrors({});
+    setUnverifiedEmail(null);
 
     const formData = new FormData(e.currentTarget);
     const values = {
@@ -73,6 +75,7 @@ export function SignInForm() {
       setIsLoading(false);
       if (authError.status === 403) {
         setError("Your account is not yet verified. Please check your email to activate.");
+        setUnverifiedEmail(result.data.email);
       } else {
         setError("Invalid email or password.");
       }
@@ -90,7 +93,15 @@ export function SignInForm() {
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {error && (
             <div className="rounded-md bg-destructive/10 px-3 py-2 text-xs text-destructive">
-              {error}
+              <p>{error}</p>
+              {unverifiedEmail && (
+                <Link
+                  href={`/auth/verify-email-info?email=${encodeURIComponent(unverifiedEmail)}`}
+                  className="mt-1 inline-block underline underline-offset-4 hover:text-destructive/80"
+                >
+                  Resend verification email
+                </Link>
+              )}
             </div>
           )}
 

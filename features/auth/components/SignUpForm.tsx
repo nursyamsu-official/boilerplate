@@ -63,7 +63,7 @@ export function SignUpForm() {
       return;
     }
 
-    router.push("/auth/verify-email-info");
+    router.push(`/auth/verify-email-info?email=${encodeURIComponent(result.data.email)}`);
   };
 
   return (
