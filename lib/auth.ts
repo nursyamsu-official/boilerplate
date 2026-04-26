@@ -17,6 +17,23 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
     },
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Confirm your email change",
+          html: `
+            <h2>Email Change Request</h2>
+            <p>Hi ${user.name},</p>
+            <p>We received a request to change your email address to <strong>${newEmail}</strong>.</p>
+            <p>Click the link below to approve this change:</p>
+            <p><a href="${url}">Approve Email Change</a></p>
+            <p>If you didn't request this, you can safely ignore this email.</p>
+          `,
+        });
+      },
+    },
   },
   emailAndPassword: {
     enabled: true,
@@ -73,6 +90,35 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
+  databaseHooks: {
+    user: {
+      update: {
+        before: async (userData, ctx) => {
+          if (userData.email) {
+            const userId = ctx?.context?.user?.id;
+            if (userId) {
+              const existingUser = await prisma.user.findUnique({
+                where: { id: userId },
+                select: { email: true },
+              });
+              (ctx as Record<string, unknown>)._previousEmail =
+                existingUser?.email;
+            }
+          }
+          return { data: userData };
+        },
+        after: async (user, ctx) => {
+          const previousEmail = (ctx as Record<string, unknown>)
+            ?._previousEmail as string | undefined;
+          if (previousEmail && previousEmail !== user.email) {
+            await prisma.session.deleteMany({
+              where: { userId: user.id },
+            });
+          }
+        },
+      },
     },
   },
   advanced: {

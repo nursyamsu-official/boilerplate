@@ -81,15 +81,15 @@ export function ProfileTab() {
     toast.promise(
       changeEmail({
         newEmail: trimmed,
-        callbackURL: "/dashboard/settings",
+        callbackURL: "/auth/sign-in",
       }).then((res) => {
         if (res.error)
           throw new Error(res.error.message ?? "Failed to update email");
         setNewEmail("");
       }),
       {
-        loading: "Updating...",
-        success: "Verification email sent to your new address",
+        loading: "Sending confirmation...",
+        success: "Confirmation email sent to your current address",
         error: "Failed to update email",
       },
     );
@@ -149,7 +149,10 @@ export function ProfileTab() {
         <CardHeader>
           <CardTitle>Update your Email</CardTitle>
           <CardDescription>
-            Update your email address you use to login to your account.
+            A confirmation email will be sent to your current address first.
+            After you approve, a verification email will be sent to the new
+            address. You will need to sign in again after the change is
+            complete.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -10,4 +10,4 @@ These is the historical of plans (sorted by oldest to newest creation date):
 4. **[fix_expired_email_verification_b5e063f7.plan.md](.cursor/plans/fix_expired_email_verification_b5e063f7.plan.md)** -- On token expiry, shows only a "Back to Sign In" link. No resend option.
 5. **[unified_security_config_74558192.plan.md](.cursor/plans/unified_security_config_74558192.plan.md)** -- Unified security config for all security-related configurations.
 6. **[delete_account_confirmation_input_100bbab1.plan.md](.cursor/plans/delete_account_confirmation_input_100bbab1.plan.md)** -- Add a confirmation input email to the delete account form.
-
+7. **[Change Email Feature with Better Auth](.cursor/plans/change_email_feature_94b63f04.plan.md)** -- Change Email Feature with Better Auth.
