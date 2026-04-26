@@ -42,6 +42,15 @@ export function ProfileTab() {
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
 
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState("");
+
+  const isEmailMatch = confirmEmail.trim() === (session?.user?.email ?? "");
+
+  const handleDeleteDialogChange = (open: boolean) => {
+    setDeleteDialogOpen(open);
+    if (!open) setConfirmEmail("");
+  };
 
   const handleUpdateName = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -193,7 +202,10 @@ export function ProfileTab() {
             </p>
           </div>
           <div>
-            <AlertDialog>
+            <AlertDialog
+              open={deleteDialogOpen}
+              onOpenChange={handleDeleteDialogChange}
+            >
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" disabled={isDeleting}>
                   {isDeleting ? "Deleting..." : "Delete your Account"}
@@ -207,10 +219,27 @@ export function ProfileTab() {
                     your account and remove all of your data.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="confirmAccountEmail">
+                    Type{" "}
+                    <span className="font-semibold text-destructive">
+                      {session?.user?.email}
+                    </span>{" "}
+                    to confirm
+                  </Label>
+                  <Input
+                    id="confirmAccountEmail"
+                    value={confirmEmail}
+                    onChange={(e) => setConfirmEmail(e.target.value)}
+                    placeholder="Type your email account"
+                    autoComplete="off"
+                  />
+                </div>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={handleDeleteAccount}
+                    disabled={!isEmailMatch || isDeleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                   >
                     Delete Account
