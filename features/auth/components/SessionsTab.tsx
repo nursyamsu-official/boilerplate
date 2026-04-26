@@ -100,7 +100,7 @@ export function SessionsTab() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="shrink-0"
+                    className="shrink-0 cursor-pointer"
                     onClick={() => handleRevoke(session.token, session.id)}
                     disabled={revokingId === session.id}
                   >

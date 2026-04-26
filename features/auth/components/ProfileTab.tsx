@@ -137,7 +137,11 @@ export function ProfileTab() {
               />
             </div>
             <div>
-              <Button type="submit" disabled={isUpdatingName || !name.trim()}>
+              <Button
+                type="submit"
+                disabled={isUpdatingName || !name.trim()}
+                className="cursor-pointer"
+              >
                 {isUpdatingName ? "Updating..." : "Update Profile"}
               </Button>
             </div>
@@ -180,6 +184,7 @@ export function ProfileTab() {
               <Button
                 type="submit"
                 disabled={isUpdatingEmail || !newEmail.trim()}
+                className="cursor-pointer"
               >
                 {isUpdatingEmail ? "Updating..." : "Update Email Address"}
               </Button>
@@ -210,7 +215,11 @@ export function ProfileTab() {
               onOpenChange={handleDeleteDialogChange}
             >
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" disabled={isDeleting}>
+                <Button
+                  variant="destructive"
+                  disabled={isDeleting}
+                  className="cursor-pointer"
+                >
                   {isDeleting ? "Deleting..." : "Delete your Account"}
                 </Button>
               </AlertDialogTrigger>

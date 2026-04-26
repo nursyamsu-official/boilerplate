@@ -48,20 +48,34 @@ export function UserMenu({ user }: UserMenuProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
         <DropdownMenuLabel className="flex flex-col gap-0.5">
-          <span className="text-xs font-medium text-foreground">{user.name}</span>
-          <span className="text-[0.625rem] font-normal text-muted-foreground">{user.email}</span>
+          <span className="text-xs font-medium text-foreground">
+            {user.name}
+          </span>
+          <span className="text-[0.625rem] font-normal text-muted-foreground">
+            {user.email}
+          </span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+        <DropdownMenuItem
+          onClick={() => router.push("/dashboard")}
+          className="cursor-pointer"
+        >
           <LayoutDashboard />
           Dashboard
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
+        <DropdownMenuItem
+          onClick={() => router.push("/dashboard/settings")}
+          className="cursor-pointer"
+        >
           <Settings />
           Settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={handleSignOut}
+          className="cursor-pointer"
+        >
           <LogOut />
           Sign Out
         </DropdownMenuItem>

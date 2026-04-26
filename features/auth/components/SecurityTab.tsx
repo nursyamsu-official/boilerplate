@@ -222,7 +222,8 @@ function SetPasswordCard() {
     setIsSending(true);
     toast.promise(
       requestPasswordReset({ email: session.user.email }).then((res) => {
-        if (res.error) throw new Error(res.error.message ?? "Failed to send email");
+        if (res.error)
+          throw new Error(res.error.message ?? "Failed to send email");
       }),
       {
         loading: "Sending...",
@@ -244,7 +245,12 @@ function SetPasswordCard() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Button variant="outline" onClick={handleSetPassword} disabled={isSending}>
+        <Button
+          variant="outline"
+          onClick={handleSetPassword}
+          disabled={isSending}
+          className="cursor-pointer"
+        >
           {isSending ? "Sending..." : "Set password"}
         </Button>
       </CardContent>
@@ -261,7 +267,8 @@ function ConnectedAccountsSection({ accounts }: { accounts: Account[] }) {
     setIsLoading(providerId);
     toast.promise(
       unlinkAccount({ providerId }).then((res) => {
-        if (res.error) throw new Error(res.error.message ?? "Failed to disconnect");
+        if (res.error)
+          throw new Error(res.error.message ?? "Failed to disconnect");
       }),
       {
         loading: "Disconnecting...",
@@ -327,6 +334,7 @@ function ConnectedAccountsSection({ accounts }: { accounts: Account[] }) {
               size="sm"
               onClick={() => handleConnect("google")}
               disabled={isLoading === "google"}
+              className="cursor-pointer"
             >
               {isLoading === "google" ? "Connecting..." : "Connect"}
             </Button>

@@ -51,7 +51,9 @@ export function TwoFactorSettings() {
     setIsLoading(false);
 
     if (enableError) {
-      setError("Failed to enable 2FA. Please check your password and try again.");
+      setError(
+        "Failed to enable 2FA. Please check your password and try again.",
+      );
       return;
     }
 
@@ -82,7 +84,9 @@ export function TwoFactorSettings() {
     setIsLoading(false);
 
     if (disableError) {
-      setError("Failed to disable 2FA. Please check your password and try again.");
+      setError(
+        "Failed to disable 2FA. Please check your password and try again.",
+      );
       return;
     }
 
@@ -107,7 +111,9 @@ export function TwoFactorSettings() {
     setIsLoading(false);
 
     if (regenError || !data?.backupCodes) {
-      setError("Failed to generate backup codes. Please check your password and try again.");
+      setError(
+        "Failed to generate backup codes. Please check your password and try again.",
+      );
       return;
     }
 
@@ -194,6 +200,7 @@ export function TwoFactorSettings() {
                     resetState();
                     setView("enable");
                   }}
+                  className="cursor-pointer"
                 >
                   Enable 2FA
                 </Button>

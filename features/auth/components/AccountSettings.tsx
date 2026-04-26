@@ -39,9 +39,15 @@ export function AccountSettings() {
 
       <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList variant="line">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="security">Security</TabsTrigger>
-          <TabsTrigger value="sessions">Sessions</TabsTrigger>
+          <TabsTrigger value="profile" className="cursor-pointer">
+            Profile
+          </TabsTrigger>
+          <TabsTrigger value="security" className="cursor-pointer">
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="sessions" className="cursor-pointer">
+            Sessions
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile">
