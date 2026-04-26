@@ -8,6 +8,7 @@ import {
   changeEmail,
   deleteUser,
 } from "@/lib/auth-client";
+import { assertNewEmailAvailableForChange } from "../actions/assert-new-email-for-change.action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,22 +79,33 @@ export function ProfileTab() {
     if (!trimmed) return;
 
     setIsUpdatingEmail(true);
-    toast.promise(
-      changeEmail({
-        newEmail: trimmed,
-        callbackURL: "/auth/sign-in",
-      }).then((res) => {
-        if (res.error)
-          throw new Error(res.error.message ?? "Failed to update email");
-        setNewEmail("");
-      }),
-      {
-        loading: "Sending confirmation...",
-        success: "Confirmation email sent to your current address",
-        error: "Failed to update email",
-      },
-    );
-    setIsUpdatingEmail(false);
+    const precheck = await assertNewEmailAvailableForChange({
+      newEmail: trimmed,
+    });
+    if (!precheck.ok) {
+      toast.error(precheck.message);
+      setIsUpdatingEmail(false);
+      return;
+    }
+    try {
+      await toast.promise(
+        changeEmail({
+          newEmail: trimmed,
+          callbackURL: "/auth/sign-in",
+        }).then((res) => {
+          if (res.error)
+            throw new Error(res.error.message ?? "Failed to update email");
+          setNewEmail("");
+        }),
+        {
+          loading: "Sending confirmation...",
+          success: "Confirmation email sent to your current address",
+          error: "Failed to update email",
+        },
+      );
+    } finally {
+      setIsUpdatingEmail(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
