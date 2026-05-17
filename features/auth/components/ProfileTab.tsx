@@ -5,10 +5,9 @@ import { useRouter } from "next/navigation";
 import {
   useSession,
   updateUser,
-  changeEmail,
   deleteUser,
 } from "@/lib/auth-client";
-import { assertNewEmailAvailableForChange } from "../actions/assert-new-email-for-change.action";
+import { requestEmailChange } from "../actions/request-email-change.action";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,28 +78,16 @@ export function ProfileTab() {
     if (!trimmed) return;
 
     setIsUpdatingEmail(true);
-    const precheck = await assertNewEmailAvailableForChange({
-      newEmail: trimmed,
-    });
-    if (!precheck.ok) {
-      toast.error(precheck.message);
-      setIsUpdatingEmail(false);
-      return;
-    }
     try {
       await toast.promise(
-        changeEmail({
-          newEmail: trimmed,
-          callbackURL: "/auth/sign-in",
-        }).then((res) => {
-          if (res.error)
-            throw new Error(res.error.message ?? "Failed to update email");
+        requestEmailChange({ newEmail: trimmed }).then((result) => {
+          if (!result.ok) throw new Error(result.message);
           setNewEmail("");
         }),
         {
-          loading: "Sending confirmation...",
-          success: "Confirmation email sent to your current address",
-          error: "Failed to update email",
+          loading: "Sending verification...",
+          success: "Verification email sent to your new address",
+          error: (err: Error) => err.message ?? "Failed to send verification email",
         },
       );
     } finally {
@@ -165,10 +152,9 @@ export function ProfileTab() {
         <CardHeader>
           <CardTitle>Update your Email</CardTitle>
           <CardDescription>
-            A confirmation email will be sent to your current address first.
-            After you approve, a verification email will be sent to the new
-            address. You will need to sign in again after the change is
-            complete.
+            A verification email will be sent to your new address. After you
+            verify, your email will be updated and all sessions will be
+            signed out.
           </CardDescription>
         </CardHeader>
         <CardContent>

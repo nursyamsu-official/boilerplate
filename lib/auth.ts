@@ -17,23 +17,6 @@ export const auth = betterAuth({
     deleteUser: {
       enabled: true,
     },
-    changeEmail: {
-      enabled: true,
-      sendChangeEmailConfirmation: async ({ user, newEmail, url }) => {
-        await sendEmail({
-          to: user.email,
-          subject: "Confirm your email change",
-          html: `
-            <h2>Email Change Request</h2>
-            <p>Hi ${user.name},</p>
-            <p>We received a request to change your email address to <strong>${newEmail}</strong>.</p>
-            <p>Click the link below to approve this change:</p>
-            <p><a href="${url}">Approve Email Change</a></p>
-            <p>If you didn't request this, you can safely ignore this email.</p>
-          `,
-        });
-      },
-    },
   },
   emailAndPassword: {
     enabled: true,

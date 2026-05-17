@@ -10,6 +10,7 @@ export { TwoFactorVerifyForm } from "./components/TwoFactorVerifyForm";
 export { TwoFactorSettings } from "./components/TwoFactorSettings";
 export { BackupCodesDisplay } from "./components/BackupCodesDisplay";
 export { AccountSettings } from "./components/AccountSettings";
+export { VerifyEmailChange } from "./components/VerifyEmailChange";
 
 export { signUpSchema, type SignUpInput } from "./schemas/sign-up.schema";
 export { signInSchema, type SignInInput } from "./schemas/sign-in.schema";
@@ -37,3 +38,7 @@ export {
   newEmailForChangeSchema,
   type NewEmailForChangeInput,
 } from "./schemas/new-email-for-change.schema";
+export {
+  requestEmailChangeSchema,
+  type RequestEmailChangeInput,
+} from "./schemas/request-email-change.schema";

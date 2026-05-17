@@ -17,7 +17,6 @@ export const {
   sendVerificationEmail,
   twoFactor,
   updateUser,
-  changeEmail,
   deleteUser,
   listSessions,
   revokeSession,

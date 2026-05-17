@@ -12,3 +12,4 @@ These is the historical of plans (sorted by oldest to newest creation date):
 6. **[delete_account_confirmation_input_100bbab1.plan.md](.cursor/plans/delete_account_confirmation_input_100bbab1.plan.md)** -- Add a confirmation input email to the delete account form.
 7. **[Change Email Feature with Better Auth](.cursor/plans/change_email_feature_94b63f04.plan.md)** -- Change Email Feature with Better Auth.
 8. **[Fix Duplicate Email Change UX](.cursor/plans/fix_duplicate_email_change_ux_2f5dc1b8.plan.md)** -- Fix Duplicate Email Change UX Toast and No Email.
+9. **[Custom Token-Based Email Change Flow](.cursor/plans/custom_email_change_flow_4fd6c241.plan.md)** -- Custom Token-Based Email Change Flow.
