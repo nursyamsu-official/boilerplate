@@ -29,8 +29,8 @@ import { Eye, EyeOff } from "lucide-react";
 
 type Account = {
   id: string;
-  provider: string;
-  providerId?: string;
+  providerId: string;
+  accountId?: string;
 };
 
 function PasswordVisibilityInput({
@@ -221,7 +221,10 @@ function SetPasswordCard() {
     if (!session?.user?.email) return;
     setIsSending(true);
     toast.promise(
-      requestPasswordReset({ email: session.user.email }).then((res) => {
+      requestPasswordReset({
+        email: session.user.email,
+        redirectTo: "/auth/reset-password",
+      }).then((res) => {
         if (res.error)
           throw new Error(res.error.message ?? "Failed to send email");
       }),
@@ -261,7 +264,7 @@ function SetPasswordCard() {
 function ConnectedAccountsSection({ accounts }: { accounts: Account[] }) {
   const [isLoading, setIsLoading] = useState<string | null>(null);
 
-  const googleAccount = accounts.find((a) => a.provider === "google");
+  const googleAccount = accounts.find((a) => a.providerId === "google");
 
   const handleDisconnect = async (providerId: string) => {
     setIsLoading(providerId);
@@ -359,7 +362,7 @@ export function SecurityTab() {
   }, []);
 
   const hasCredentialAccount = accounts.some(
-    (a) => a.provider === "credential",
+    (a) => a.providerId === "credential",
   );
 
   if (isLoadingAccounts) {
