@@ -40,6 +40,24 @@ export const auth = betterAuth({
         `,
       });
     },
+    onExistingUserSignUp: async ({ user }) => {
+      const baseUrl = process.env.BETTER_AUTH_URL;
+      const signInUrl = `${baseUrl}/auth/sign-in`;
+      const resetUrl = `${baseUrl}/auth/forgot-password`;
+
+      await sendEmail({
+        to: user.email,
+        subject: "Sign-up attempt with your email",
+        html: `
+          <h2>Someone tried to sign up using your email</h2>
+          <p>Hi ${user.name ?? ""},</p>
+          <p>We received a new sign-up request using this email address, but you already have an account with us.</p>
+          <p>If this was you, please <a href="${signInUrl}">sign in here</a>.</p>
+          <p>If you forgot your password, you can <a href="${resetUrl}">reset it</a>.</p>
+          <p>If this wasn't you, no action is needed &mdash; your account is safe.</p>
+        `,
+      });
+    },
   },
   emailVerification: {
     sendOnSignUp: true,

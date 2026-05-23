@@ -60,7 +60,7 @@ export function VerifyEmailInfo() {
         <CardTitle className="text-lg">Check your email</CardTitle>
         <CardDescription>
           We&apos;ve sent a verification link to your email address. Please click the link to
-          verify your account.
+          verify your account. If you already have an account, sign in instead.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
@@ -104,13 +104,16 @@ export function VerifyEmailInfo() {
           {isResending ? "Resending..." : "Resend Verification Email"}
         </Button>
       </CardContent>
-      <CardFooter className="justify-center">
-        <Link
-          href="/auth/sign-in"
-          className="text-xs text-primary underline underline-offset-4 hover:text-primary/80"
-        >
-          Back to Sign In
-        </Link>
+      <CardFooter className="flex flex-col items-center gap-1">
+        <p className="text-xs text-muted-foreground">
+          Already have an account?{" "}
+          <Link
+            href="/auth/sign-in"
+            className="text-primary underline underline-offset-4 hover:text-primary/80"
+          >
+            Sign in instead
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );
