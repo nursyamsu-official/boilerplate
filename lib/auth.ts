@@ -27,6 +27,10 @@ export const auth = betterAuth({
     resetPasswordTokenExpiresIn:
       securityConfig.duration.resetPasswordTokenExpiresInSec,
     sendResetPassword: async ({ user, url }) => {
+      const expiryLabel = formatDurationCombined(
+        securityConfig.duration.resetPasswordTokenExpiresInSec,
+      );
+
       await sendEmail({
         to: user.email,
         subject: "Reset your password",
@@ -35,7 +39,7 @@ export const auth = betterAuth({
           <p>Hi ${user.name},</p>
           <p>You requested to reset your password. Click the link below to set a new password:</p>
           <p><a href="${url}">Reset Password</a></p>
-          <p>This link will expire in 30 minutes.</p>
+          <p>This link will expire in ${expiryLabel}.</p>
           <p>If you didn't request this, you can safely ignore this email.</p>
         `,
       });
