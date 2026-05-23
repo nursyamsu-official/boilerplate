@@ -3,7 +3,7 @@ export const securityConfig = {
     emailVerificationExpiresInSec: 60 * 60, // 1 hour
     sessionExpiresInSec: 60 * 60 * 24 * 7, // 7 days
     updateAgeInSec: 60 * 60 * 24, // 24 hours
-    resetPasswordTokenExpiresInSec: 60 * 30, // 30 minutes
+    resetPasswordTokenExpiresInSec: 60 * 60, // 1 hour
     emailChangeTokenExpiresInSec: 60 * 60, // 1 hour
   },
 } satisfies SecurityConfig;
