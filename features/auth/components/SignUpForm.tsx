@@ -8,6 +8,7 @@ import { signUpSchema, type SignUpInput } from "@/features/auth/schemas/sign-up.
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordInput } from "@/components/ui/password-input";
 import {
   Card,
   CardContent,
@@ -114,10 +115,9 @@ export function SignUpForm() {
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="password">Password</Label>
-            <Input
+            <PasswordInput
               id="password"
               name="password"
-              type="password"
               placeholder="At least 8 characters"
               autoComplete="new-password"
               aria-invalid={!!fieldErrors.password}
@@ -130,10 +130,9 @@ export function SignUpForm() {
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
+            <PasswordInput
               id="confirmPassword"
               name="confirmPassword"
-              type="password"
               placeholder="Re-enter your password"
               autoComplete="new-password"
               aria-invalid={!!fieldErrors.confirmPassword}
