@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sheet";
 import { UserMenu } from "./UserMenu";
 import { Menu, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { ModeToggle } from "@/components/ui/toggle-theme";
 
 const publicLinks = [
   { href: "/", label: "Home" },
@@ -38,8 +39,13 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="mx-auto flex h-12 max-w-7xl items-center justify-between px-4">
-        <Link href={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2">
-          <span className="font-heading text-sm font-semibold">{appConfig.appName}</span>
+        <Link
+          href={isAuthenticated ? "/dashboard" : "/"}
+          className="flex items-center gap-2"
+        >
+          <span className="font-heading text-sm font-semibold">
+            {appConfig.appName}
+          </span>
         </Link>
 
         {/* Desktop navigation */}
@@ -54,6 +60,7 @@ export function Navbar() {
 
         {/* Desktop auth actions */}
         <div className="hidden items-center gap-2 md:flex">
+          <ModeToggle />
           {isPending ? (
             <div className="h-6 w-16 animate-pulse rounded bg-muted" />
           ) : isAuthenticated ? (
@@ -72,6 +79,7 @@ export function Navbar() {
 
         {/* Mobile hamburger */}
         <div className="md:hidden">
+          <ModeToggle />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -102,7 +110,9 @@ export function Navbar() {
                   <>
                     <div className="mb-2 border-b px-2 pb-2">
                       <p className="text-xs font-medium">{session.user.name}</p>
-                      <p className="text-[0.625rem] text-muted-foreground">{session.user.email}</p>
+                      <p className="text-[0.625rem] text-muted-foreground">
+                        {session.user.email}
+                      </p>
                     </div>
                     <Button
                       variant="ghost"
