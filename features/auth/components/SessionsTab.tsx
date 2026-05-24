@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import { listSessions, revokeSession, useSession } from "@/lib/auth-client";
 import { toast } from "sonner";
 import {
@@ -18,6 +20,16 @@ type SessionItem = {
   token: string;
   userAgent?: string | null;
   ipAddress?: string | null;
+  createdAt?: Date | string | null;
+  updatedAt?: Date | string | null;
+  expiresAt?: Date | string | null;
+};
+
+const formatDateTime = (value?: Date | string | null) => {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return format(date, "dd MMM yyyy, HH.mm", { locale: idLocale });
 };
 
 export function SessionsTab() {
@@ -83,7 +95,7 @@ export function SessionsTab() {
                 key={session.id}
                 className="flex items-start justify-between rounded-lg border p-4"
               >
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-1.5">
                   <p className="text-sm font-medium">
                     {isCurrent ? "Current session" : "Other session"}
                   </p>
@@ -95,6 +107,14 @@ export function SessionsTab() {
                       {session.ipAddress}
                     </p>
                   )}
+                  <div className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                    <span className="font-medium">Login at</span>
+                    <span>{formatDateTime(session.createdAt)}</span>
+                    <span className="font-medium">Last active</span>
+                    <span>{formatDateTime(session.updatedAt)}</span>
+                    <span className="font-medium">Expires</span>
+                    <span>{formatDateTime(session.expiresAt)}</span>
+                  </div>
                 </div>
                 {!isCurrent && (
                   <Button
