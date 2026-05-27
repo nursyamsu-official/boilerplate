@@ -5,6 +5,7 @@ export const securityConfig = {
     updateAgeInSec: 60 * 60 * 24, // 24 hours
     resetPasswordTokenExpiresInSec: 60 * 60, // 1 hour
     emailChangeTokenExpiresInSec: 60 * 60, // 1 hour
+    twoFactorOtpExpiresInSec: 60 * 5, // 5 minutes
   },
 } satisfies SecurityConfig;
 
@@ -15,5 +16,6 @@ export type SecurityConfig = {
     updateAgeInSec: number;
     resetPasswordTokenExpiresInSec: number;
     emailChangeTokenExpiresInSec: number;
+    twoFactorOtpExpiresInSec: number;
   };
 };

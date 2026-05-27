@@ -136,6 +136,10 @@ export const auth = betterAuth({
     twoFactor({
       otpOptions: {
         async sendOTP({ user, otp }) {
+          const expiryLabel = formatDurationCombined(
+            securityConfig.duration.twoFactorOtpExpiresInSec,
+          );
+
           await sendEmail({
             to: user.email,
             subject: "Your verification code",
@@ -143,12 +147,14 @@ export const auth = betterAuth({
               <h2>Two-Factor Authentication</h2>
               <p>Hi ${user.name},</p>
               <p>Your verification code is: <strong>${otp}</strong></p>
-              <p>This code will expire in 5 minutes.</p>
+              <p>This code will expire in ${expiryLabel}.</p>
               <p>If you didn't request this code, please ignore this email.</p>
             `,
           });
         },
-        period: 5,
+        period: Math.floor(
+          securityConfig.duration.twoFactorOtpExpiresInSec / 60,
+        ),
         digits: 6,
         allowedAttempts: 5,
         storeOTP: "encrypted",
