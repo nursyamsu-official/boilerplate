@@ -134,10 +134,12 @@ export const auth = betterAuth({
   plugins: [
     nextCookies(),
     twoFactor({
+      twoFactorCookieMaxAge:
+        securityConfig.duration.twoFactorChallengeExpiresInSec,
       otpOptions: {
         async sendOTP({ user, otp }) {
           const expiryLabel = formatDurationCombined(
-            securityConfig.duration.twoFactorOtpExpiresInSec,
+            securityConfig.duration.twoFactorOtpExpiresInMin * 60,
           );
 
           await sendEmail({
@@ -152,9 +154,7 @@ export const auth = betterAuth({
             `,
           });
         },
-        period: Math.floor(
-          securityConfig.duration.twoFactorOtpExpiresInSec / 60,
-        ),
+        period: securityConfig.duration.twoFactorOtpExpiresInMin,
         digits: 6,
         allowedAttempts: 5,
         storeOTP: "encrypted",
