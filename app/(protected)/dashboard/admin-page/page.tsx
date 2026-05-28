@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function SettingsPage() {
   return (
     <div>
-      <h1>Admin Page</h1>
+      <h1>Admin Page New</h1>
     </div>
   );
 }
