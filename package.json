@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "db:seed": "pnpm dlx tsx prisma/seeders/index.ts",
-    "db:seed:md_uom": "pnpm dlx tsx prisma/seeders/run-md-uom.ts"
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
     "@base-ui/react": "^1.3.0",
