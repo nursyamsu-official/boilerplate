@@ -7,6 +7,10 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================================
+//  CONTENT
+// ============================================================
+
 model News {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug        String   @unique @map("slug")
@@ -19,37 +23,72 @@ model News {
   @@map("news")
 }
 
+// ============================================================
+//  USER & ACCESS MANAGEMENT
+// ============================================================
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
 model User {
-  id               String      @id
-  name             String
-  email            String
-  emailVerified    Boolean     @default(false)
-  image            String?
-  twoFactorEnabled Boolean?
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  id                String     @id
+  name              String
+  email             String
+  username          String?    @unique
+  phoneNumber       String?
+  emailVerified     Boolean    @default(false)
+  image             String?
+  twoFactorEnabled  Boolean?
+  status            UserStatus @default(ACTIVE)
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  passwordChangedAt DateTime?
+  lockedUntil       DateTime?
+  createdBy         String?
+  deactivatedAt     DateTime?
+  deactivatedBy     String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
   sessions            Session[]
   accounts            Account[]
   twoFactors          TwoFactor[]
   emailChangeRequests EmailChangeRequest[]
+  userRoles           UserRole[]
+  loginHistories      LoginHistory[]
+  apiKeys             ApiKey[]
+  apiUsageLogs        ApiUsageLog[]
+  webhooks            Webhook[]
+  ssoLinks            SsoUserLink[]
+  auditLogs           AuditLog[]
 
   @@unique([email])
+  @@index([status])
+  @@index([username])
+  @@index([createdAt])
   @@map("user")
 }
 
 model Session {
-  id        String   @id
-  expiresAt DateTime
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String    @id
+  expiresAt     DateTime
+  token         String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  ipAddress     String?
+  userAgent     String?
+  userId        String
+  revokedAt     DateTime?
+  revokedBy     String?
+  revokedReason String?
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
   @@index([userId])
+  @@index([expiresAt])
   @@map("session")
 }
 
@@ -110,4 +149,473 @@ model EmailChangeRequest {
 
   @@index([userId])
   @@map("email_change_request")
+}
+
+model Role {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isSystem    Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+  roleMenus       RoleMenu[]
+
+  @@index([isActive])
+  @@map("role")
+}
+
+model UserRole {
+  userId     String
+  roleId     String    @db.Uuid
+  assignedBy String?
+  assignedAt DateTime  @default(now())
+  expiresAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@index([expiresAt])
+  @@map("user_role")
+}
+
+model PermissionModule {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  icon        String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions Permission[]
+
+  @@index([isActive])
+  @@map("permission_module")
+}
+
+model Permission {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  moduleId    String?  @db.Uuid
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  module          PermissionModule? @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  rolePermissions RolePermission[]
+
+  @@index([moduleId])
+  @@map("permission")
+}
+
+model RolePermission {
+  roleId       String   @db.Uuid
+  permissionId String   @db.Uuid
+  granted      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permission")
+}
+
+model Menu {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code      String   @unique
+  label     String
+  path      String?
+  icon      String?
+  parentId  String?  @db.Uuid
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  parent    Menu?      @relation("MenuToMenu", fields: [parentId], references: [id], onDelete: SetNull)
+  children  Menu[]     @relation("MenuToMenu")
+  roleMenus RoleMenu[]
+
+  @@index([parentId])
+  @@index([isActive])
+  @@map("menu")
+}
+
+model RoleMenu {
+  roleId    String  @db.Uuid
+  menuId    String  @db.Uuid
+  canView   Boolean @default(true)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu Menu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, menuId])
+  @@index([roleId])
+  @@index([menuId])
+  @@map("role_menu")
+}
+
+enum LoginStatus {
+  SUCCESS
+  FAILED
+}
+
+model LoginHistory {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String?
+  email         String
+  status        LoginStatus
+  failureReason String?
+  ipAddress     String?
+  userAgent     String?
+  deviceInfo    String?
+  location      String?
+  sessionId     String?
+  createdAt     DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([email])
+  @@index([status])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@map("login_history")
+}
+
+// ============================================================
+//  EMAILS
+// ============================================================
+
+enum EmailProvider {
+  SMTP
+  SENDGRID
+  MAILGUN
+  SES
+  RESEND
+  POSTMARK
+}
+
+model EmailSetting {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  provider  EmailProvider @default(SMTP)
+  host      String?
+  port      Int?
+  username  String?
+  password  String?
+  apiKey    String?
+  fromEmail String
+  fromName  String?
+  replyTo   String?
+  useTls    Boolean       @default(true)
+  isActive  Boolean       @default(true)
+  isDefault Boolean       @default(false)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([isActive])
+  @@index([isDefault])
+  @@map("email_setting")
+}
+
+model EmailTemplate {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  subject     String
+  bodyHtml    String
+  bodyText    String?
+  variables   String?
+  description String?
+  isActive    Boolean  @default(true)
+  isSystem    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  emailLogs EmailLog[]
+
+  @@map("email_template")
+}
+
+enum EmailStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+model EmailLog {
+  id         String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  templateId String?     @db.Uuid
+  toEmail    String
+  ccEmail    String?
+  bccEmail   String?
+  subject    String
+  bodyHtml   String?
+  status     EmailStatus @default(PENDING)
+  error      String?
+  attempts   Int         @default(0)
+  sentAt     DateTime?
+  createdAt  DateTime    @default(now())
+
+  template EmailTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+
+  @@index([templateId])
+  @@index([toEmail])
+  @@index([status])
+  @@index([createdAt])
+  @@map("email_log")
+}
+
+// ============================================================
+//  API & INTEGRATION
+// ============================================================
+
+model ApiKey {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String
+  name        String
+  description String?
+  prefix      String
+  hashedKey   String    @unique
+  scopes      String?
+  isActive    Boolean   @default(true)
+  lastUsedAt  DateTime?
+  lastUsedIp  String?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  revokedBy   String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usageLogs ApiUsageLog[]
+
+  @@index([userId])
+  @@index([prefix])
+  @@index([revokedAt])
+  @@index([expiresAt])
+  @@map("api_key")
+}
+
+model ApiUsageLog {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  apiKeyId     String?  @db.Uuid
+  userId       String?
+  endpoint     String
+  method       String
+  statusCode   Int
+  ipAddress    String?
+  userAgent    String?
+  requestSize  Int?
+  responseSize Int?
+  durationMs   Int?
+  error        String?
+  createdAt    DateTime @default(now())
+
+  apiKey ApiKey? @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([apiKeyId])
+  @@index([userId])
+  @@index([statusCode])
+  @@index([createdAt])
+  @@map("api_usage_log")
+}
+
+model Webhook {
+  id                 String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId             String?
+  name               String
+  url                String
+  events             String
+  secret             String?
+  description        String?
+  headers            String?
+  isActive           Boolean                @default(true)
+  maxRetries         Int                    @default(3)
+  timeoutMs          Int                    @default(10000)
+  failureCount       Int                    @default(0)
+  lastDeliveryStatus WebhookDeliveryStatus?
+  lastDeliveryAt     DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  user User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  logs WebhookLog[]
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("webhook")
+}
+
+enum WebhookDeliveryStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  RETRYING
+}
+
+model WebhookLog {
+  id             String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  webhookId      String                @db.Uuid
+  event          String
+  payload        String
+  requestHeaders String?
+  responseStatus Int?
+  responseBody   String?
+  status         WebhookDeliveryStatus @default(PENDING)
+  attempts       Int                   @default(0)
+  error          String?
+  nextRetryAt    DateTime?
+  deliveredAt    DateTime?
+  createdAt      DateTime              @default(now())
+
+  webhook Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([status])
+  @@index([event])
+  @@index([createdAt])
+  @@map("webhook_log")
+}
+
+enum SsoProtocol {
+  OIDC
+  SAML
+  OAUTH2
+}
+
+model SsoProvider {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String      @unique
+  name          String
+  protocol      SsoProtocol
+  clientId      String?
+  clientSecret  String?
+  issuerUrl     String?
+  authUrl       String?
+  tokenUrl      String?
+  userinfoUrl   String?
+  callbackUrl   String?
+  scopes        String?
+  metadata      String?
+  isActive      Boolean     @default(true)
+  autoProvision Boolean     @default(false)
+  defaultRoleId String?     @db.Uuid
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  userLinks SsoUserLink[]
+
+  @@index([isActive])
+  @@index([protocol])
+  @@map("sso_provider")
+}
+
+model SsoUserLink {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String
+  providerId      String    @db.Uuid
+  externalId      String
+  emailAtProvider String?
+  displayName     String?
+  rawProfile      String?
+  lastLoginAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider SsoProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, externalId])
+  @@index([userId])
+  @@index([providerId])
+  @@map("sso_user_link")
+}
+
+// ============================================================
+//  AUDIT & SYSTEM
+// ============================================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  ASSIGN
+  REVOKE
+  OTHER
+}
+
+model AuditLog {
+  id        String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorId   String?
+  action    AuditAction
+  entity    String
+  entityId  String?
+  summary   String?
+  oldValues String?
+  newValues String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([entity])
+  @@index([entity, entityId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_log")
+}
+
+enum SystemSettingType {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+  SECRET
+}
+
+model SystemSetting {
+  id          String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  key         String            @unique
+  value       String
+  type        SystemSettingType @default(STRING)
+  category    String?
+  description String?
+  isPublic    Boolean           @default(false)
+  isEditable  Boolean           @default(true)
+  updatedBy   String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([category])
+  @@index([isPublic])
+  @@map("system_setting")
 }
