@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { AnyFieldApi } from "@tanstack/react-form";
 
 import {
@@ -45,6 +45,14 @@ export function IconComboboxField({
   emptyLabel = "No icon",
 }: IconComboboxFieldProps) {
   const fieldId = field.name;
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    null,
+  );
+  const setFieldRef = useCallback((node: HTMLDivElement | null) => {
+    setPortalContainer(
+      node?.closest<HTMLElement>('[data-slot="dialog-content"]') ?? null,
+    );
+  }, []);
   const [query, setQuery] = useState("");
   const selectedValue =
     typeof field.state.value === "string" ? field.state.value : null;
@@ -81,7 +89,7 @@ export function IconComboboxField({
           onInputValueChange={setQuery}
           itemToStringLabel={(item) => item}
         >
-          <div className="flex flex-col gap-2">
+          <div ref={setFieldRef} className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               {selectedValue ? (
                 <LucideIconDisplay
@@ -104,7 +112,10 @@ export function IconComboboxField({
               className="w-full"
             />
 
-            <ComboboxContent>
+            <ComboboxContent
+              container={portalContainer ?? undefined}
+              className={portalContainer ? "z-60" : undefined}
+            >
               <ComboboxList>
                 <ComboboxEmpty>
                   {query.trim() ? "No icons found" : "Browse available icons"}
