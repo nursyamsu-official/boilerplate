@@ -5,6 +5,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { LucideIconDisplay } from "@/lib/lucide-icon-display";
 
 import type { MenuTableRow } from "../types/menu.type";
 import { MenuRowActions } from "./MenuRowActions";
@@ -109,12 +110,21 @@ export function createMenuColumns({
       accessorKey: "icon",
       header: "Icon",
       enableSorting: false,
-      cell: ({ row }) =>
-        row.original.icon ? (
-          <Badge variant="outline">{row.original.icon}</Badge>
-        ) : (
-          "—"
-        ),
+      cell: ({ row }) => (
+        <LucideIconDisplay
+          name={row.original.icon}
+          className="size-4"
+          fallback={
+            row.original.icon ? (
+              <span className="text-xs text-muted-foreground" title={row.original.icon}>
+                {row.original.icon}
+              </span>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )
+          }
+        />
+      ),
     },
     {
       accessorKey: "sortOrder",

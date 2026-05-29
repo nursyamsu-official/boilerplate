@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 
 import { NumberField } from "@/components/form/NumberField";
+import { IconComboboxField } from "@/components/form/IconComboboxField";
 import { SelectField } from "@/components/form/SelectField";
 import { SwitchField } from "@/components/form/SwitchField";
 import { TextField } from "@/components/form/TextField";
@@ -10,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
+import { mergeMenuLucideIconOptions } from "../lib/menu-lucide-icon";
 import { menuFormFieldsSchema } from "../schemas/menu-create.schema";
 import type { MenuFormValues, MenuParentOption } from "../types/menu.type";
 
@@ -81,11 +83,13 @@ export function MenuForm({
 
         <form.Field name="icon">
           {(field) => (
-            <TextField
+            <IconComboboxField
               field={field}
+              options={mergeMenuLucideIconOptions(defaultValues.icon)}
               label="Icon"
-              description="Lucide icon name, e.g. LayoutDashboard"
-              placeholder="LayoutDashboard"
+              description="Search and select a Lucide icon."
+              allowEmpty
+              emptyLabel="No icon"
             />
           )}
         </form.Field>

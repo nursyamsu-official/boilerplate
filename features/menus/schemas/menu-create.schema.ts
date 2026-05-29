@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isMenuLucideIconName } from "../lib/menu-lucide-icon";
+
 const menuCodeSchema = z
   .string()
   .trim()
@@ -26,7 +28,11 @@ export const menuFormFieldsSchema = z.object({
     .string()
     .trim()
     .max(100, "Icon must be at most 100 characters")
-    .nullable(),
+    .nullable()
+    .refine(
+      (value) => value === null || isMenuLucideIconName(value),
+      "Invalid Lucide icon",
+    ),
   parentId: z
     .string()
     .uuid("Parent menu is invalid")
