@@ -1,8 +1,10 @@
 // import { prisma } from "../lib/prisma";
 import { prisma } from "@/lib/prisma";
 import {
+  menus,
   modules,
   permissions,
+  roleMenus,
   rolePermissions,
   roles,
 } from "../data/access-management";
@@ -83,9 +85,63 @@ export async function seedAccessManagement() {
     }
   }
 
+  const menuIdByCode = new Map<string, string>();
+  for (const menu of menus) {
+    const parentId = menu.parentCode
+      ? (menuIdByCode.get(menu.parentCode) ?? null)
+      : null;
+
+    if (menu.parentCode && !parentId) {
+      throw new Error(`Missing parent menu for code: ${menu.code}`);
+    }
+
+    const record = await prisma.menu.upsert({
+      where: { code: menu.code },
+      update: {},
+      create: {
+        code: menu.code,
+        label: menu.label,
+        path: menu.path,
+        icon: menu.icon,
+        parentId,
+        sortOrder: menu.sortOrder,
+        isActive: true,
+      },
+    });
+    menuIdByCode.set(menu.code, record.id);
+  }
+
+  let roleMenuCount = 0;
+  for (const assignment of roleMenus) {
+    const roleId = roleIdByCode.get(assignment.roleCode);
+    const menuId = menuIdByCode.get(assignment.menuCode);
+    if (!roleId || !menuId) continue;
+
+    await prisma.roleMenu.upsert({
+      where: { roleId_menuId: { roleId, menuId } },
+      update: {
+        canView: assignment.canView,
+        canCreate: assignment.canCreate,
+        canEdit: assignment.canEdit,
+        canDelete: assignment.canDelete,
+      },
+      create: {
+        roleId,
+        menuId,
+        canView: assignment.canView,
+        canCreate: assignment.canCreate,
+        canEdit: assignment.canEdit,
+        canDelete: assignment.canDelete,
+      },
+    });
+    roleMenuCount += 1;
+  }
+
   console.log("Access management seed complete:");
   console.log(`  roles:            ${roles.length}`);
   console.log(`  modules:          ${modules.length}`);
   console.log(`  permissions:      ${permissions.length}`);
   console.log(`  role-permissions: ${rolePermissionCount}`);
+  console.log(`  menus:            ${menus.length}`);
+  console.log(`  role-menus:       ${roleMenuCount}`);
 }

@@ -23,6 +23,24 @@ export type RolePermissionSeed = {
   permissionCodes: string[];
 };
 
+export type MenuSeed = {
+  code: string;
+  label: string;
+  path: string | null;
+  icon: string | null;
+  parentCode: string | null;
+  sortOrder: number;
+};
+
+export type RoleMenuSeed = {
+  roleCode: string;
+  menuCode: string;
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+};
+
 export const roles: RoleSeed[] = [
   {
     code: "super_admin",
@@ -148,4 +166,164 @@ export const rolePermissions: RolePermissionSeed[] = [
     roleCode: "user",
     permissionCodes: [],
   },
+];
+
+export const menus: MenuSeed[] = [
+  {
+    code: "dashboard",
+    label: "Dashboard",
+    path: "/dashboard",
+    icon: "LayoutDashboard",
+    parentCode: null,
+    sortOrder: 1,
+  },
+  {
+    code: "settings",
+    label: "Account Settings",
+    path: "/dashboard/settings",
+    icon: "Settings",
+    parentCode: null,
+    sortOrder: 2,
+  },
+  {
+    code: "admin",
+    label: "Administration",
+    path: null,
+    icon: "Shield",
+    parentCode: null,
+    sortOrder: 3,
+  },
+  {
+    code: "users",
+    label: "Users",
+    path: "/dashboard/admin-page/users",
+    icon: "Users",
+    parentCode: "admin",
+    sortOrder: 1,
+  },
+  {
+    code: "roles",
+    label: "Roles",
+    path: "/dashboard/admin-page/roles",
+    icon: "ShieldCheck",
+    parentCode: "admin",
+    sortOrder: 2,
+  },
+  {
+    code: "permissions",
+    label: "Permissions",
+    path: "/dashboard/admin-page/permissions",
+    icon: "Lock",
+    parentCode: "admin",
+    sortOrder: 3,
+  },
+  {
+    code: "menus",
+    label: "Menus",
+    path: "/dashboard/admin-page/menus",
+    icon: "Menu",
+    parentCode: "admin",
+    sortOrder: 4,
+  },
+  {
+    code: "email",
+    label: "Email",
+    path: null,
+    icon: "Mail",
+    parentCode: "admin",
+    sortOrder: 5,
+  },
+  {
+    code: "email_settings",
+    label: "Email Settings",
+    path: "/dashboard/admin-page/email/settings",
+    icon: "Settings",
+    parentCode: "email",
+    sortOrder: 1,
+  },
+  {
+    code: "email_templates",
+    label: "Email Templates",
+    path: "/dashboard/admin-page/email/templates",
+    icon: "FileText",
+    parentCode: "email",
+    sortOrder: 2,
+  },
+  {
+    code: "email_logs",
+    label: "Email Logs",
+    path: "/dashboard/admin-page/email/logs",
+    icon: "History",
+    parentCode: "email",
+    sortOrder: 3,
+  },
+  {
+    code: "api_keys",
+    label: "API Keys",
+    path: "/dashboard/admin-page/api-keys",
+    icon: "Key",
+    parentCode: "admin",
+    sortOrder: 6,
+  },
+  {
+    code: "webhooks",
+    label: "Webhooks",
+    path: "/dashboard/admin-page/webhooks",
+    icon: "Webhook",
+    parentCode: "admin",
+    sortOrder: 7,
+  },
+  {
+    code: "system_settings",
+    label: "System Settings",
+    path: "/dashboard/admin-page/system-settings",
+    icon: "Server",
+    parentCode: "admin",
+    sortOrder: 8,
+  },
+];
+
+const allMenuCodes = menus.map((menu) => menu.code);
+
+const menuGroupCodes = new Set(["admin", "email"]);
+const userNavMenuCodes = new Set(["dashboard", "settings"]);
+
+const adminFullCrudMenuCodes = allMenuCodes.filter(
+  (code) => !menuGroupCodes.has(code) && !userNavMenuCodes.has(code),
+);
+
+const adminExcludedMenuCodes = new Set(["permissions", "system_settings"]);
+
+function buildRoleMenuAssignments(
+  roleCode: string,
+  menuCodes: string[],
+): RoleMenuSeed[] {
+  return menuCodes.map((menuCode) => {
+    const isFullCrud = adminFullCrudMenuCodes.includes(menuCode);
+
+    return {
+      roleCode,
+      menuCode,
+      canView: true,
+      canCreate: isFullCrud,
+      canEdit: isFullCrud,
+      canDelete: isFullCrud,
+    };
+  });
+}
+
+export const roleMenus: RoleMenuSeed[] = [
+  ...buildRoleMenuAssignments("super_admin", allMenuCodes),
+  ...buildRoleMenuAssignments(
+    "admin",
+    allMenuCodes.filter((code) => !adminExcludedMenuCodes.has(code)),
+  ),
+  ...buildRoleMenuAssignments("user", ["dashboard", "settings"]).map(
+    (assignment) => ({
+      ...assignment,
+      canCreate: false,
+      canEdit: false,
+      canDelete: false,
+    }),
+  ),
 ];
