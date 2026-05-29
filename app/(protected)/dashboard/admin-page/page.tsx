@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: `Account Settings | ${appConfig.description}`,
 };
 
-export default function SettingsPage() {
+export default function AdminPagePage() {
   return (
     <div>
       <h1>Admin Page New</h1>
