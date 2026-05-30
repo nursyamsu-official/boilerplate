@@ -45,6 +45,21 @@ export type MenuParentOption = {
   parentId: string | null;
 };
 
+export type MenuPreviewItem = {
+  id: string;
+  code: string;
+  label: string;
+  path: string | null;
+  icon: string | null;
+  parentId: string | null;
+  sortOrder: number;
+  isActive: boolean;
+};
+
+export type MenuTreeNode = MenuPreviewItem & {
+  children: MenuTreeNode[];
+};
+
 export type MenuFormValues = {
   code: string;
   label: string;

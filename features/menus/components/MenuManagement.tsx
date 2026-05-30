@@ -15,16 +15,19 @@ import type {
   MenuFormValues,
   MenuListResult,
   MenuParentOption,
+  MenuPreviewItem,
   MenuTableRow,
 } from "../types/menu.type";
 import { MenuTable } from "../table/MenuTable";
 import { MenuCreateDialog } from "./MenuCreateDialog";
 import { MenuEditDialog } from "./MenuEditDialog";
+import { MenuPreviewDialog } from "./MenuPreviewDialog";
 
 type MenuManagementProps = {
   initialData: MenuListResult;
   initialFilters: MenuFilterInput;
   parentOptions: MenuParentOption[];
+  previewItems: MenuPreviewItem[];
 };
 
 type EditDialogState = {
@@ -37,9 +40,11 @@ export function MenuManagement({
   initialData,
   initialFilters,
   parentOptions,
+  previewItems,
 }: MenuManagementProps) {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
@@ -94,7 +99,14 @@ export function MenuManagement({
         onFiltersChange={handleFiltersChange}
         onEdit={handleEdit}
         onCreate={() => setIsCreateOpen(true)}
+        onPreview={() => setIsPreviewOpen(true)}
         onRefresh={handleRefresh}
+      />
+
+      <MenuPreviewDialog
+        open={isPreviewOpen}
+        items={previewItems}
+        onOpenChange={setIsPreviewOpen}
       />
 
       <MenuCreateDialog

@@ -24,7 +24,9 @@ export type {
   MenuTableRow,
   MenuDetail,
   MenuParentOption,
+  MenuPreviewItem,
 } from "./types/menu.type";
 
 export { menuGetListService } from "./services/menu-get-list.service";
+export { menuGetPreviewListService } from "./services/menu-get-preview-list.service";
 export { menuGetParentOptionsService } from "./services/menu-get-by-id.service";

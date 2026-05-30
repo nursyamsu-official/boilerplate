@@ -18,6 +18,7 @@ type MenuTableProps = {
   onFiltersChange: (filters: Partial<MenuFilterInput>) => void;
   onEdit: (menu: MenuTableRow) => void;
   onCreate: () => void;
+  onPreview: () => void;
   onRefresh: () => void;
 };
 
@@ -28,6 +29,7 @@ export function MenuTable({
   onFiltersChange,
   onEdit,
   onCreate,
+  onPreview,
   onRefresh,
 }: MenuTableProps) {
   const sorting: SortingState = useMemo(
@@ -82,6 +84,7 @@ export function MenuTable({
         filters={filters}
         onFiltersChange={onFiltersChange}
         onCreate={onCreate}
+        onPreview={onPreview}
       />
 
       <DataTable

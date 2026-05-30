@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
+import { EyeIcon, PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,12 +20,14 @@ type MenuTableToolbarProps = {
   filters: MenuFilterInput;
   onFiltersChange: (filters: Partial<MenuFilterInput>) => void;
   onCreate: () => void;
+  onPreview: () => void;
 };
 
 export function MenuTableToolbar({
   filters,
   onFiltersChange,
   onCreate,
+  onPreview,
 }: MenuTableToolbarProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
 
@@ -89,6 +91,11 @@ export function MenuTableToolbar({
           </Button>
         ) : null}
       </div>
+
+      <Button type="button" variant="outline" onClick={onPreview}>
+        <EyeIcon className="size-4" />
+        Preview
+      </Button>
 
       <Button type="button" onClick={onCreate}>
         <PlusIcon className="size-4" />

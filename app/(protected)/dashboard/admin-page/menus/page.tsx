@@ -4,8 +4,9 @@ import { appConfig } from "@/config/app.config";
 import {
   MenuManagement,
   menuGetListService,
-  menuGetParentOptionsService,
+  menuGetPreviewListService,
   parseMenuFilter,
+  type MenuParentOption,
 } from "@/features/menus";
 
 export const metadata: Metadata = {
@@ -21,10 +22,19 @@ export default async function MenusPage({ searchParams }: MenusPageProps) {
   const resolvedSearchParams = await searchParams;
   const filters = parseMenuFilter(resolvedSearchParams);
 
-  const [initialData, parentOptions] = await Promise.all([
+  const [initialData, previewItems] = await Promise.all([
     menuGetListService(filters),
-    menuGetParentOptionsService(),
+    menuGetPreviewListService(),
   ]);
+
+  const parentOptions: MenuParentOption[] = previewItems.map(
+    ({ id, code, label, parentId }) => ({
+      id,
+      code,
+      label,
+      parentId,
+    }),
+  );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -32,6 +42,7 @@ export default async function MenusPage({ searchParams }: MenusPageProps) {
         initialData={initialData}
         initialFilters={filters}
         parentOptions={parentOptions}
+        previewItems={previewItems}
       />
     </div>
   );
