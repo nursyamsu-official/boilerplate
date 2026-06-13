@@ -18,7 +18,9 @@ export type {
   UserTableRow,
   UserDetail,
   UserFormValues,
+  UserOption,
 } from "./types/user.type";
 
 export { userGetListService } from "./services/user-get-list.service";
 export { userGetByIdService } from "./services/user-get-by-id.service";
+export { userOptionsService } from "./services/user-options.service";

@@ -3,6 +3,12 @@ import type { userStatusValues } from "../schemas/user-create.schema";
 
 export type UserStatus = (typeof userStatusValues)[number];
 
+export type UserOption = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export type UserTableRow = {
   id: string;
   name: string;

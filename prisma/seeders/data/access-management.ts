@@ -96,6 +96,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage system-wide settings",
     sortOrder: 6,
   },
+  {
+    code: "security_management",
+    name: "Security Management",
+    description: "Manage sessions, 2FA, API keys, and audit logs",
+    sortOrder: 7,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -146,6 +152,12 @@ export const permissions: PermissionSeed[] = [
     name: "Manage System Setting",
     description: "Manage system-wide settings",
     moduleCode: "system_management",
+  },
+  {
+    code: "manage_security",
+    name: "Manage Security",
+    description: "Manage sessions, two-factor auth, API keys, and audit logs",
+    moduleCode: "security_management",
   },
 ];
 
@@ -242,12 +254,52 @@ export const menus: MenuSeed[] = [
     sortOrder: 6,
   },
   {
+    code: "security",
+    label: "Security",
+    path: null,
+    icon: "Shield",
+    parentCode: "admin",
+    sortOrder: 7,
+  },
+  {
+    code: "sessions",
+    label: "Sessions",
+    path: "/dashboard/admin-page/security/sessions",
+    icon: "MonitorSmartphone",
+    parentCode: "security",
+    sortOrder: 1,
+  },
+  {
+    code: "two_factor",
+    label: "Two Factor",
+    path: "/dashboard/admin-page/security/two-factor",
+    icon: "ShieldCheck",
+    parentCode: "security",
+    sortOrder: 2,
+  },
+  {
+    code: "api_keys",
+    label: "API Keys",
+    path: "/dashboard/admin-page/security/api-keys",
+    icon: "Key",
+    parentCode: "security",
+    sortOrder: 3,
+  },
+  {
+    code: "audit_logs",
+    label: "Audit Logs",
+    path: "/dashboard/admin-page/security/audit-logs",
+    icon: "ScrollText",
+    parentCode: "security",
+    sortOrder: 4,
+  },
+  {
     code: "email",
     label: "Email",
     path: null,
     icon: "Mail",
     parentCode: "admin",
-    sortOrder: 7,
+    sortOrder: 8,
   },
   {
     code: "email_settings",
@@ -274,14 +326,6 @@ export const menus: MenuSeed[] = [
     sortOrder: 3,
   },
   {
-    code: "api_keys",
-    label: "API Keys",
-    path: "/dashboard/admin-page/api-keys",
-    icon: "Key",
-    parentCode: "admin",
-    sortOrder: 8,
-  },
-  {
     code: "webhooks",
     label: "Webhooks",
     path: "/dashboard/admin-page/webhooks",
@@ -301,7 +345,7 @@ export const menus: MenuSeed[] = [
 
 const allMenuCodes = menus.map((menu) => menu.code);
 
-const menuGroupCodes = new Set(["admin", "email"]);
+const menuGroupCodes = new Set(["admin", "email", "security"]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
 const adminFullCrudMenuCodes = allMenuCodes.filter(
