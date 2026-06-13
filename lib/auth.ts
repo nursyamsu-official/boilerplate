@@ -1,10 +1,16 @@
 import { betterAuth } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
+import {
+  getRequestIp,
+  getRequestUserAgent,
+  recordLoginHistory,
+} from "@/lib/login-history-recorder";
 import { securityConfig } from "@/config/security.config";
 import { formatDurationCombined } from "@/lib/utils";
 
@@ -125,6 +131,59 @@ export const auth = betterAuth({
         },
       },
     },
+    session: {
+      create: {
+        after: async (session, ctx) => {
+          const user = await prisma.user.findUnique({
+            where: { id: session.userId },
+            select: { email: true },
+          });
+
+          if (!user) {
+            return;
+          }
+
+          const request = ctx?.request as Request | undefined;
+
+          await recordLoginHistory({
+            userId: session.userId,
+            email: user.email,
+            status: "SUCCESS",
+            ipAddress: getRequestIp(request),
+            userAgent: getRequestUserAgent(request),
+            sessionId: session.id,
+          });
+        },
+      },
+    },
+  },
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (!ctx.path.includes("/sign-in/email")) {
+        return;
+      }
+
+      const returned = ctx.context.returned;
+      if (!returned || typeof returned !== "object" || !("error" in returned)) {
+        return;
+      }
+
+      const errorPayload = returned.error as { message?: string } | undefined;
+      const request = ctx.request as Request | undefined;
+      const body = ctx.body as { email?: string } | undefined;
+      const email =
+        typeof body?.email === "string" && body.email.length > 0
+          ? body.email
+          : "unknown";
+
+      await recordLoginHistory({
+        email,
+        status: "FAILED",
+        failureReason: errorPayload?.message ?? "Sign in failed",
+        ipAddress: getRequestIp(request),
+        userAgent: getRequestUserAgent(request),
+      });
+    }),
   },
   advanced: {
     ipAddress: {

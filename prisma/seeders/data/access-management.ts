@@ -196,7 +196,7 @@ export const menus: MenuSeed[] = [
   {
     code: "users",
     label: "Users",
-    path: "/dashboard/admin-page/users",
+    path: "/dashboard/admin-page/user-management/users",
     icon: "Users",
     parentCode: "admin",
     sortOrder: 1,
@@ -204,7 +204,7 @@ export const menus: MenuSeed[] = [
   {
     code: "roles",
     label: "Roles",
-    path: "/dashboard/admin-page/roles",
+    path: "/dashboard/admin-page/user-management/roles",
     icon: "ShieldCheck",
     parentCode: "admin",
     sortOrder: 2,
@@ -212,10 +212,26 @@ export const menus: MenuSeed[] = [
   {
     code: "permissions",
     label: "Permissions",
-    path: "/dashboard/admin-page/permissions",
+    path: "/dashboard/admin-page/user-management/permissions",
     icon: "Lock",
     parentCode: "admin",
     sortOrder: 3,
+  },
+  {
+    code: "permission_modules",
+    label: "Permission Modules",
+    path: "/dashboard/admin-page/user-management/permission-modules",
+    icon: "Layers",
+    parentCode: "admin",
+    sortOrder: 4,
+  },
+  {
+    code: "login_history",
+    label: "Login History",
+    path: "/dashboard/admin-page/user-management/login-history",
+    icon: "History",
+    parentCode: "admin",
+    sortOrder: 5,
   },
   {
     code: "menus",
@@ -223,7 +239,7 @@ export const menus: MenuSeed[] = [
     path: "/dashboard/admin-page/menus",
     icon: "Menu",
     parentCode: "admin",
-    sortOrder: 4,
+    sortOrder: 6,
   },
   {
     code: "email",
@@ -231,7 +247,7 @@ export const menus: MenuSeed[] = [
     path: null,
     icon: "Mail",
     parentCode: "admin",
-    sortOrder: 5,
+    sortOrder: 7,
   },
   {
     code: "email_settings",
@@ -263,7 +279,7 @@ export const menus: MenuSeed[] = [
     path: "/dashboard/admin-page/api-keys",
     icon: "Key",
     parentCode: "admin",
-    sortOrder: 6,
+    sortOrder: 8,
   },
   {
     code: "webhooks",
@@ -271,7 +287,7 @@ export const menus: MenuSeed[] = [
     path: "/dashboard/admin-page/webhooks",
     icon: "Webhook",
     parentCode: "admin",
-    sortOrder: 7,
+    sortOrder: 9,
   },
   {
     code: "system_settings",
@@ -279,7 +295,7 @@ export const menus: MenuSeed[] = [
     path: "/dashboard/admin-page/system-settings",
     icon: "Server",
     parentCode: "admin",
-    sortOrder: 8,
+    sortOrder: 10,
   },
 ];
 

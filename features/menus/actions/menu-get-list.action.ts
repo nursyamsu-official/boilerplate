@@ -1,21 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
-
-import { auth } from "@/lib/auth";
+import { requireSessionUserId } from "@/lib/require-session";
 
 import { menuFilterSchema } from "../schemas/menu-filter.schema";
 import { menuGetListService } from "../services/menu-get-list.service";
 import type { MenuListResult } from "../types/menu.type";
-
-async function requireSessionUserId() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) {
-    throw new Error("Not authenticated");
-  }
-
-  return session.user.id;
-}
 
 export async function menuGetListAction(
   input: unknown,

@@ -24,6 +24,7 @@ type DataTableProps<TData> = {
   data: TData[];
   sorting?: SortingState;
   onSortingChange?: (sorting: SortingState) => void;
+  onRowClick?: (row: TData) => void;
   emptyTitle?: string;
   emptyDescription?: string;
   isFiltered?: boolean;
@@ -34,6 +35,7 @@ export function DataTable<TData>({
   data,
   sorting = [],
   onSortingChange,
+  onRowClick,
   emptyTitle,
   emptyDescription,
   isFiltered = false,
@@ -73,7 +75,12 @@ export function DataTable<TData>({
         <TableBody>
           {table.getRowModel().rows.length > 0 ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className={onRowClick ? "cursor-pointer" : undefined}
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
