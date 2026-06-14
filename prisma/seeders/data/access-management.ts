@@ -91,16 +91,22 @@ export const modules: ModuleSeed[] = [
     sortOrder: 5,
   },
   {
+    code: "sso_management",
+    name: "SSO Management",
+    description: "Manage SSO providers and user links",
+    sortOrder: 6,
+  },
+  {
     code: "system_management",
     name: "System Management",
     description: "Manage system-wide settings",
-    sortOrder: 6,
+    sortOrder: 7,
   },
   {
     code: "security_management",
     name: "Security Management",
     description: "Manage sessions, 2FA, API keys, and audit logs",
-    sortOrder: 7,
+    sortOrder: 8,
   },
 ];
 
@@ -146,6 +152,18 @@ export const permissions: PermissionSeed[] = [
     name: "Manage Webhook",
     description: "Manage webhooks and deliveries",
     moduleCode: "webhook_management",
+  },
+  {
+    code: "manage_sso_provider",
+    name: "Manage SSO Provider",
+    description: "Manage SSO identity providers",
+    moduleCode: "sso_management",
+  },
+  {
+    code: "manage_sso_user",
+    name: "Manage SSO User",
+    description: "Manage SSO user links",
+    moduleCode: "sso_management",
   },
   {
     code: "manage_system_setting",
@@ -326,12 +344,44 @@ export const menus: MenuSeed[] = [
     sortOrder: 3,
   },
   {
-    code: "webhooks",
-    label: "Webhooks",
-    path: "/dashboard/admin-page/webhooks",
-    icon: "Webhook",
+    code: "integration",
+    label: "Integration",
+    path: null,
+    icon: "Link",
     parentCode: "admin",
     sortOrder: 9,
+  },
+  {
+    code: "webhooks",
+    label: "Webhooks",
+    path: "/dashboard/admin-page/integration/webhooks",
+    icon: "Webhook",
+    parentCode: "integration",
+    sortOrder: 1,
+  },
+  {
+    code: "webhook_logs",
+    label: "Webhook Logs",
+    path: "/dashboard/admin-page/integration/webhook-logs",
+    icon: "History",
+    parentCode: "integration",
+    sortOrder: 2,
+  },
+  {
+    code: "sso_providers",
+    label: "SSO Providers",
+    path: "/dashboard/admin-page/integration/sso-providers",
+    icon: "Shield",
+    parentCode: "integration",
+    sortOrder: 3,
+  },
+  {
+    code: "sso_users",
+    label: "SSO Users",
+    path: "/dashboard/admin-page/integration/sso-users",
+    icon: "Users",
+    parentCode: "integration",
+    sortOrder: 4,
   },
   {
     code: "system_settings",
@@ -345,7 +395,7 @@ export const menus: MenuSeed[] = [
 
 const allMenuCodes = menus.map((menu) => menu.code);
 
-const menuGroupCodes = new Set(["admin", "email", "security"]);
+const menuGroupCodes = new Set(["admin", "email", "security", "integration"]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
 const adminFullCrudMenuCodes = allMenuCodes.filter(
