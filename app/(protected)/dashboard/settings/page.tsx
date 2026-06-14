@@ -7,10 +7,20 @@ export const metadata: Metadata = {
   description: `Account Settings | ${appConfig.description}`,
 };
 
-export default function SettingsPage() {
+type SettingsPageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function SettingsPage({
+  searchParams,
+}: SettingsPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const tab = resolvedSearchParams.tab;
+  const initialTab = typeof tab === "string" ? tab : undefined;
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <AccountSettings />
+      <AccountSettings initialTab={initialTab} />
     </div>
   );
 }

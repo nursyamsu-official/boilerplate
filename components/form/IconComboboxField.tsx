@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { AnyFieldApi } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import {
   Field,
   FieldContent,
@@ -57,8 +58,7 @@ export function IconComboboxField({
   const selectedValue =
     typeof field.state.value === "string" ? field.state.value : null;
 
-  const hasError =
-    field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const hasError = hasFieldValidationError(field);
 
   const items = useMemo(
     () => getIconPickerItems(options, query, selectedValue),

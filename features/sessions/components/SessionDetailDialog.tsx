@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDateTimeLong } from "@/lib/format-datetime";
 
 import type { SessionTableRow } from "../types/session.type";
 
@@ -17,13 +18,6 @@ type SessionDetailDialogProps = {
   session: SessionTableRow | null;
   onOpenChange: (open: boolean) => void;
 };
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "long",
-  }).format(value);
-}
 
 function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -80,15 +74,15 @@ export function SessionDetailDialog({
             />
             <DetailField
               label="Created at"
-              value={formatDateTime(session.createdAt)}
+              value={formatDateTimeLong(session.createdAt)}
             />
             <DetailField
               label="Last active"
-              value={formatDateTime(session.updatedAt)}
+              value={formatDateTimeLong(session.updatedAt)}
             />
             <DetailField
               label="Expires at"
-              value={formatDateTime(session.expiresAt)}
+              value={formatDateTimeLong(session.expiresAt)}
             />
           </dl>
         ) : null}

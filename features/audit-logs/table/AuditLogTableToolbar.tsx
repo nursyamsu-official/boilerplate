@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { RotateCcwIcon, SearchIcon } from "lucide-react";
+
+import { useDebouncedFilterValue } from "@/components/data-table/use-debounced-filter-value";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,28 +26,20 @@ export function AuditLogTableToolbar({
   filters,
   onFiltersChange,
 }: AuditLogTableToolbarProps) {
-  const [searchValue, setSearchValue] = useState(filters.search);
-  const [entityValue, setEntityValue] = useState(filters.entity);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (searchValue !== filters.search) {
-        onFiltersChange({ search: searchValue, page: 1 });
-      }
-    }, 400);
-
-    return () => window.clearTimeout(timeout);
-  }, [searchValue, filters.search, onFiltersChange]);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (entityValue !== filters.entity) {
-        onFiltersChange({ entity: entityValue, page: 1 });
-      }
-    }, 400);
-
-    return () => window.clearTimeout(timeout);
-  }, [entityValue, filters.entity, onFiltersChange]);
+  const {
+    value: searchValue,
+    setValue: setSearchValue,
+    clearValue: clearSearch,
+  } = useDebouncedFilterValue(filters.search, (search) =>
+    onFiltersChange({ search, page: 1 }),
+  );
+  const {
+    value: entityValue,
+    setValue: setEntityValue,
+    clearValue: clearEntity,
+  } = useDebouncedFilterValue(filters.entity, (entity) =>
+    onFiltersChange({ entity, page: 1 }),
+  );
 
   const hasActiveFilters =
     filters.search.length > 0 ||
@@ -59,8 +52,7 @@ export function AuditLogTableToolbar({
         <div className="relative w-full max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            key={filters.search}
-            defaultValue={filters.search}
+            value={searchValue}
             placeholder="Search summary, entity, actor..."
             className="pl-8"
             onChange={(event) => setSearchValue(event.target.value)}
@@ -68,8 +60,7 @@ export function AuditLogTableToolbar({
         </div>
 
         <Input
-          key={filters.entity}
-          defaultValue={filters.entity}
+          value={entityValue}
           placeholder="Filter by entity"
           className="w-full sm:w-44"
           onChange={(event) => setEntityValue(event.target.value)}
@@ -107,14 +98,16 @@ export function AuditLogTableToolbar({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() =>
+            onClick={() => {
+              clearSearch();
+              clearEntity();
               onFiltersChange({
                 search: "",
                 entity: "",
                 action: "all",
                 page: 1,
-              })
-            }
+              });
+            }}
           >
             <RotateCcwIcon className="size-4" />
             Reset filters

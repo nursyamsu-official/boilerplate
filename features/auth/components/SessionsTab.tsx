@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
 import { listSessions, revokeSession, useSession } from "@/lib/auth-client";
+import { formatDateTime } from "@/lib/format-datetime";
 import { toast } from "sonner";
 import {
   Card,
@@ -23,13 +22,6 @@ type SessionItem = {
   createdAt?: Date | string | null;
   updatedAt?: Date | string | null;
   expiresAt?: Date | string | null;
-};
-
-const formatDateTime = (value?: Date | string | null) => {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return format(date, "dd MMM yyyy, HH.mm", { locale: idLocale });
 };
 
 export function SessionsTab() {

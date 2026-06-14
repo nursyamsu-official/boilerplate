@@ -2,6 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Field,
@@ -29,8 +30,7 @@ export function TextareaField({
   rows = 4,
 }: TextareaFieldProps) {
   const fieldId = field.name;
-  const hasError =
-    field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const hasError = hasFieldValidationError(field);
 
   return (
     <Field data-invalid={hasError || undefined}>

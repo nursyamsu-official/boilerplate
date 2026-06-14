@@ -5,6 +5,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format-datetime";
 
 import type { EmailTemplateTableRow } from "../types/email-template.type";
 import { EmailTemplateRowActions } from "./EmailTemplateRowActions";
@@ -51,13 +52,6 @@ function SortableHeader({
       ) : null}
     </Button>
   );
-}
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 }
 
 export function createEmailTemplateColumns({

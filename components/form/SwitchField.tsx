@@ -2,6 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import {
   Field,
   FieldContent,
@@ -25,8 +26,7 @@ export function SwitchField({
   disabled = false,
 }: SwitchFieldProps) {
   const fieldId = field.name;
-  const hasError =
-    field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const hasError = hasFieldValidationError(field);
 
   return (
     <Field

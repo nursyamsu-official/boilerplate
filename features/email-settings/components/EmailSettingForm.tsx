@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
+
 import {
   emailSettingFormFieldsSchema,
   emailSettingUpdateFormFieldsSchema,
@@ -48,16 +50,22 @@ export function EmailSettingForm({
 }: EmailSettingFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const schema = isEdit
-        ? emailSettingUpdateFormFieldsSchema
-        : emailSettingFormFieldsSchema;
-      const parsed = schema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const schema = isEdit
+          ? emailSettingUpdateFormFieldsSchema
+          : emailSettingFormFieldsSchema;
+        const parsed = schema.safeParse(value);
 
-      await onSubmit(parsed.data as EmailSettingFormValues);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 

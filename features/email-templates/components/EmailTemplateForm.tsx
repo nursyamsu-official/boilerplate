@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
+
 import { emailTemplateFormFieldsSchema } from "../schemas/email-template-create.schema";
 import type { EmailTemplateFormValues } from "../types/email-template.type";
 
@@ -31,18 +33,19 @@ export function EmailTemplateForm({
 }: EmailTemplateFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = emailTemplateFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = emailTemplateFormFieldsSchema.safeParse(value);
 
-      await onSubmit({
-        ...parsed.data,
-        bodyText: parsed.data.bodyText ?? "",
-        variables: parsed.data.variables ?? "",
-        description: parsed.data.description ?? "",
-      });
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 

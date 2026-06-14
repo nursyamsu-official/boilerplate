@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 
+import { useDebouncedFilterValue } from "@/components/data-table/use-debounced-filter-value";
 import { TableToolbar } from "@/components/data-table/TableToolbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,17 +31,13 @@ export function SsoProviderTableToolbar({
   onFiltersChange,
   onCreate,
 }: SsoProviderTableToolbarProps) {
-  const [searchValue, setSearchValue] = useState(filters.search);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (searchValue !== filters.search) {
-        onFiltersChange({ search: searchValue, page: 1 });
-      }
-    }, 400);
-
-    return () => window.clearTimeout(timeout);
-  }, [searchValue, filters.search, onFiltersChange]);
+  const {
+    value: searchValue,
+    setValue: setSearchValue,
+    clearValue: clearSearch,
+  } = useDebouncedFilterValue(filters.search, (search) =>
+    onFiltersChange({ search, page: 1 }),
+  );
 
   const hasActiveFilters =
     filters.search.length > 0 ||
@@ -54,8 +50,7 @@ export function SsoProviderTableToolbar({
         <div className="relative w-full max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            key={filters.search}
-            defaultValue={filters.search}
+            value={searchValue}
             placeholder="Search providers..."
             className="pl-8"
             onChange={(event) => setSearchValue(event.target.value)}
@@ -114,14 +109,15 @@ export function SsoProviderTableToolbar({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() =>
+            onClick={() => {
+              clearSearch();
               onFiltersChange({
                 search: "",
                 status: "all",
                 protocol: "all",
                 page: 1,
-              })
-            }
+              });
+            }}
           >
             <RotateCcwIcon className="size-4" />
             Reset filters

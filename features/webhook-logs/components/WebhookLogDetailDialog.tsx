@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDateTimeLong } from "@/lib/format-datetime";
 
 import type { WebhookLogTableRow } from "../types/webhook-log.type";
 
@@ -18,14 +19,6 @@ type WebhookLogDetailDialogProps = {
   record: WebhookLogTableRow | null;
   onOpenChange: (open: boolean) => void;
 };
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "long",
-  }).format(value);
-}
 
 function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -129,15 +122,15 @@ export function WebhookLogDetailDialog({
             />
             <DetailField
               label="Next retry at"
-              value={formatDateTime(record.nextRetryAt)}
+              value={formatDateTimeLong(record.nextRetryAt)}
             />
             <DetailField
               label="Delivered at"
-              value={formatDateTime(record.deliveredAt)}
+              value={formatDateTimeLong(record.deliveredAt)}
             />
             <DetailField
               label="Created at"
-              value={formatDateTime(record.createdAt)}
+              value={formatDateTimeLong(record.createdAt)}
             />
           </dl>
         ) : null}

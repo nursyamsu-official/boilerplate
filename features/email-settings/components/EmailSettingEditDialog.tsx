@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 
 import { emailSettingUpdateAction } from "../actions/email-setting-update.action";
-import { mapFormValuesToEmailSettingUpdateInput } from "../lib/email-setting-form-mapper";
 import type { EmailSettingFormValues } from "../types/email-setting.type";
 import { EmailSettingForm } from "./EmailSettingForm";
 
@@ -38,9 +37,7 @@ export function EmailSettingEditDialog({
     if (!settingId) return;
 
     await toast.promise(
-      emailSettingUpdateAction(
-        mapFormValuesToEmailSettingUpdateInput(settingId, values),
-      ).then(() => {
+      emailSettingUpdateAction({ id: settingId, ...values }).then(() => {
         onOpenChange(false);
         onSuccess();
       }),

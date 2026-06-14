@@ -20,6 +20,13 @@ export const appConfig = {
     // Maximum allowed page size
     maxLimit: 100,
   },
+
+  formatting: {
+    locale: "id-ID",
+    timeZone: "Asia/Jakarta",
+    dateTime: "dd MMM yyyy, HH.mm",
+    dateTimeLong: "EEEE, d MMMM yyyy, HH.mm",
+  },
 } satisfies AppConfig;
 
 // Type definitions
@@ -35,10 +42,18 @@ export type PaginationConfig = {
   maxLimit: number;
 };
 
+export type FormattingConfig = {
+  locale: string;
+  timeZone: string;
+  dateTime: string;
+  dateTimeLong: string;
+};
+
 export type AppConfig = {
   appName: string;
   appNameFull: string;
   description: string;
   contact: ContactConfig;
   pagination: PaginationConfig;
+  formatting: FormattingConfig;
 };

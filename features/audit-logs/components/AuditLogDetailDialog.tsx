@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDateTimeLong } from "@/lib/format-datetime";
 
 import { formatAuditLogJson } from "../lib/audit-log-filter-url";
 import type { AuditLogTableRow } from "../types/audit-log.type";
@@ -19,13 +20,6 @@ type AuditLogDetailDialogProps = {
   record: AuditLogTableRow | null;
   onOpenChange: (open: boolean) => void;
 };
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "long",
-  }).format(value);
-}
 
 function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -109,7 +103,7 @@ export function AuditLogDetailDialog({
             />
             <DetailField
               label="Created at"
-              value={formatDateTime(record.createdAt)}
+              value={formatDateTimeLong(record.createdAt)}
             />
           </dl>
         ) : null}

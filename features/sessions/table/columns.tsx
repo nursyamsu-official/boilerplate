@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format-datetime";
 
 import type { SessionTableRow } from "../types/session.type";
 import { SessionRowActions } from "./SessionRowActions";
@@ -50,13 +51,6 @@ function SortableHeader({
       ) : null}
     </Button>
   );
-}
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 }
 
 function isExpired(expiresAt: Date) {

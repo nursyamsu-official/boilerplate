@@ -1,17 +1,16 @@
-import type { EmailTemplateCreateInput } from "../schemas/email-template-create.schema";
 import type { EmailTemplateFormValues } from "../types/email-template.type";
 
 export function mapFormValuesToEmailTemplateCreateInput(
   values: EmailTemplateFormValues,
-): EmailTemplateCreateInput {
+): EmailTemplateFormValues {
   return {
     code: values.code,
     name: values.name,
     subject: values.subject,
     bodyHtml: values.bodyHtml,
-    bodyText: values.bodyText || null,
-    variables: values.variables || null,
-    description: values.description || null,
+    bodyText: values.bodyText,
+    variables: values.variables,
+    description: values.description,
     isActive: values.isActive,
   };
 }

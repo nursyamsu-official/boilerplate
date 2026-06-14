@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { formatDateTimeLong } from "@/lib/format-datetime";
 
 import type { EmailLogTableRow } from "../types/email-log.type";
 
@@ -18,13 +19,6 @@ type EmailLogDetailDialogProps = {
   record: EmailLogTableRow | null;
   onOpenChange: (open: boolean) => void;
 };
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "full",
-    timeStyle: "long",
-  }).format(value);
-}
 
 function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -112,11 +106,11 @@ export function EmailLogDetailDialog({
             />
             <DetailField
               label="Sent at"
-              value={record.sentAt ? formatDateTime(record.sentAt) : "—"}
+              value={formatDateTimeLong(record.sentAt)}
             />
             <DetailField
               label="Created at"
-              value={formatDateTime(record.createdAt)}
+              value={formatDateTimeLong(record.createdAt)}
             />
           </dl>
         ) : null}

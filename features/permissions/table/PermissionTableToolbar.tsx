@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
+
+import { useDebouncedFilterValue } from "@/components/data-table/use-debounced-filter-value";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,17 +31,13 @@ export function PermissionTableToolbar({
   onFiltersChange,
   onCreate,
 }: PermissionTableToolbarProps) {
-  const [searchValue, setSearchValue] = useState(filters.search);
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      if (searchValue !== filters.search) {
-        onFiltersChange({ search: searchValue, page: 1 });
-      }
-    }, 400);
-
-    return () => window.clearTimeout(timeout);
-  }, [searchValue, filters.search, onFiltersChange]);
+  const {
+    value: searchValue,
+    setValue: setSearchValue,
+    clearValue: clearSearch,
+  } = useDebouncedFilterValue(filters.search, (search) =>
+    onFiltersChange({ search, page: 1 }),
+  );
 
   const hasActiveFilters =
     filters.search.length > 0 || filters.moduleId !== "all";
@@ -51,8 +48,7 @@ export function PermissionTableToolbar({
         <div className="relative w-full max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            key={filters.search}
-            defaultValue={filters.search}
+            value={searchValue}
             placeholder="Search permissions..."
             className="pl-8"
             onChange={(event) => setSearchValue(event.target.value)}
@@ -86,9 +82,10 @@ export function PermissionTableToolbar({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() =>
-              onFiltersChange({ search: "", moduleId: "all", page: 1 })
-            }
+            onClick={() => {
+              clearSearch();
+              onFiltersChange({ search: "", moduleId: "all", page: 1 });
+            }}
           >
             <RotateCcwIcon className="size-4" />
             Reset filters

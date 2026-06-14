@@ -2,6 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import {
   Field,
   FieldContent,
@@ -44,8 +45,7 @@ export function SelectField({
   emptyLabel = "None",
 }: SelectFieldProps) {
   const fieldId = field.name;
-  const hasError =
-    field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const hasError = hasFieldValidationError(field);
   const rawValue = field.state.value ? String(field.state.value) : "";
   const value = rawValue || (allowEmpty ? "__empty__" : "");
 

@@ -5,6 +5,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format-datetime";
 
 import type { SsoProviderTableRow } from "../types/sso-provider.type";
 import { SsoProviderRowActions } from "./SsoProviderRowActions";
@@ -51,13 +52,6 @@ function SortableHeader({
       ) : null}
     </Button>
   );
-}
-
-function formatDateTime(value: Date) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 }
 
 export function createSsoProviderColumns({

@@ -6,6 +6,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format-datetime";
 
 import type { UserTableRow } from "../types/user.type";
 import { UserRowActions } from "./UserRowActions";
@@ -52,15 +53,6 @@ function SortableHeader({
       ) : null}
     </Button>
   );
-}
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 }
 
 function getStatusBadgeVariant(status: UserStatus) {

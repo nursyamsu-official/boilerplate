@@ -5,6 +5,7 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { formatDateTime } from "@/lib/format-datetime";
 
 import type { ApiKeyTableRow } from "../types/api-key.type";
 import { ApiKeyRowActions } from "./ApiKeyRowActions";
@@ -51,14 +52,6 @@ function SortableHeader({
       ) : null}
     </Button>
   );
-}
-
-function formatDateTime(value: Date | null) {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(value);
 }
 
 function getStatusBadge(apiKey: ApiKeyTableRow) {

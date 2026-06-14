@@ -9,18 +9,21 @@ import { SessionsTab } from "@/features/auth/components/SessionsTab";
 const VALID_TABS = ["profile", "security", "sessions"] as const;
 type SettingsTab = (typeof VALID_TABS)[number];
 
-function getInitialTab(): SettingsTab {
-  if (typeof window === "undefined") return "profile";
-  const params = new URLSearchParams(window.location.search);
-  const raw = params.get("tab");
+type AccountSettingsProps = {
+  initialTab?: string;
+};
+
+function parseTab(raw?: string): SettingsTab {
   if (raw && (VALID_TABS as readonly string[]).includes(raw)) {
     return raw as SettingsTab;
   }
   return "profile";
 }
 
-export function AccountSettings() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>(getInitialTab);
+export function AccountSettings({ initialTab }: AccountSettingsProps) {
+  const [activeTab, setActiveTab] = useState<SettingsTab>(() =>
+    parseTab(initialTab),
+  );
 
   const handleTabChange = (value: string) => {
     const tab = value as SettingsTab;

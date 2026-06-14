@@ -12,7 +12,6 @@ import {
 
 import { emailSettingCreateAction } from "../actions/email-setting-create.action";
 import { defaultEmailSettingFormValues } from "../lib/email-setting-form-defaults";
-import { mapFormValuesToEmailSettingCreateInput } from "../lib/email-setting-form-mapper";
 import type { EmailSettingFormValues } from "../types/email-setting.type";
 import { EmailSettingForm } from "./EmailSettingForm";
 
@@ -29,9 +28,7 @@ export function EmailSettingCreateDialog({
 }: EmailSettingCreateDialogProps) {
   const handleSubmit = async (values: EmailSettingFormValues) => {
     await toast.promise(
-      emailSettingCreateAction(
-        mapFormValuesToEmailSettingCreateInput(values),
-      ).then(() => {
+      emailSettingCreateAction(values).then(() => {
         onOpenChange(false);
         onSuccess();
       }),
