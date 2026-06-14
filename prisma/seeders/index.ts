@@ -1,9 +1,11 @@
 // import { prisma } from "./lib/prisma";
 import { prisma } from "@/lib/prisma";
 import { seedAccessManagement } from "./seeds/access-management.seed";
+import { seedEmail } from "./seeds/email.seed";
 
 async function main() {
   await seedAccessManagement();
+  await seedEmail();
 }
 
 main()
