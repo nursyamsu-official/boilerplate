@@ -15,6 +15,7 @@ type NumberFieldProps = {
   field: AnyFieldApi;
   label: string;
   description?: string;
+  placeholder?: string;
   min?: number;
   disabled?: boolean;
 };
@@ -23,6 +24,7 @@ export function NumberField({
   field,
   label,
   description,
+  placeholder,
   min = 0,
   disabled = false,
 }: NumberFieldProps) {
@@ -40,6 +42,7 @@ export function NumberField({
           type="number"
           min={min}
           value={field.state.value ?? 0}
+          placeholder={placeholder}
           disabled={disabled}
           aria-invalid={hasError || undefined}
           onBlur={field.handleBlur}
