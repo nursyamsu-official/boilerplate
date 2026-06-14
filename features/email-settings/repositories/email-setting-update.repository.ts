@@ -2,11 +2,16 @@ import { prisma } from "@/lib/prisma";
 
 import type { EmailSettingUpdateInput } from "../schemas/email-setting-create.schema";
 
+type EmailSettingUpdatePersistenceInput = Omit<
+  EmailSettingUpdateInput,
+  "password" | "apiKey"
+> & {
+  password?: string | null;
+  apiKey?: string | null;
+};
+
 export async function emailSettingUpdateRepository(
-  input: EmailSettingUpdateInput & {
-    password?: string | null;
-    apiKey?: string | null;
-  },
+  input: EmailSettingUpdatePersistenceInput,
 ) {
   return prisma.emailSetting.update({
     where: { id: input.id },

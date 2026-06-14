@@ -21,24 +21,13 @@ export async function emailSettingUpdateService(
     await emailSettingClearDefaultRepository(input.id);
   }
 
-  const updatePayload: EmailSettingUpdateInput & {
-    password?: string | null;
-    apiKey?: string | null;
-  } = { ...input };
+  const { password, apiKey, ...rest } = input;
 
-  if (input.password) {
-    updatePayload.password = input.password;
-  } else {
-    delete updatePayload.password;
-  }
-
-  if (input.apiKey) {
-    updatePayload.apiKey = input.apiKey;
-  } else {
-    delete updatePayload.apiKey;
-  }
-
-  return emailSettingUpdateRepository(updatePayload);
+  return emailSettingUpdateRepository({
+    ...rest,
+    ...(password ? { password } : {}),
+    ...(apiKey ? { apiKey } : {}),
+  });
 }
 
 export async function emailSettingToggleStatusService(id: string) {

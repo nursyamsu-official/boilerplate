@@ -37,7 +37,12 @@ export function EmailTemplateForm({
         throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
       }
 
-      await onSubmit(parsed.data);
+      await onSubmit({
+        ...parsed.data,
+        bodyText: parsed.data.bodyText ?? "",
+        variables: parsed.data.variables ?? "",
+        description: parsed.data.description ?? "",
+      });
     },
   });
 
