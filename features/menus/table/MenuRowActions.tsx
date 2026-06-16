@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   menuDeleteAction,
@@ -69,20 +73,16 @@ export function MenuRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${menu.label}`}
         onClick={() => onEdit(menu)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={menu.isActive ? "Deactivate" : "Activate"}
         aria-label={
           menu.isActive ? `Deactivate ${menu.label}` : `Activate ${menu.label}`
         }
@@ -93,19 +93,21 @@ export function MenuRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Delete ${menu.label}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Delete ${menu.label}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this menu?</AlertDialogTitle>

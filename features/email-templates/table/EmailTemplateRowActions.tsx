@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   emailTemplateDeleteAction,
@@ -65,20 +69,16 @@ export function EmailTemplateRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${template.name}`}
         onClick={() => onEdit(template)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={template.isActive ? "Deactivate" : "Activate"}
         aria-label={
           template.isActive
             ? `Deactivate ${template.name}`
@@ -91,20 +91,22 @@ export function EmailTemplateRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={template.isSystem}
-            aria-label={`Delete ${template.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              disabled={template.isSystem}
+              aria-label={`Delete ${template.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this template?</AlertDialogTitle>

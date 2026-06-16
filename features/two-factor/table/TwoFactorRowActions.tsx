@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import { twoFactorDisableAction } from "../actions/two-factor-disable.action";
 import type { TwoFactorTableRow } from "../types/two-factor.type";
@@ -49,27 +53,27 @@ export function TwoFactorRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="View"
         aria-label="View two-factor details"
         onClick={() => onView(record)}
       >
         <EyeIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Disable two-factor authentication"
-          >
-            <ShieldOffIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Disable">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Disable two-factor authentication"
+            >
+              <ShieldOffIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Disable two-factor authentication?</AlertDialogTitle>

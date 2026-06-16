@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   permissionModuleDeleteAction,
@@ -65,20 +69,16 @@ export function PermissionModuleRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${module.name}`}
         onClick={() => onEdit(module)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={module.isActive ? "Deactivate" : "Activate"}
         aria-label={
           module.isActive ? `Deactivate ${module.name}` : `Activate ${module.name}`
         }
@@ -89,20 +89,22 @@ export function PermissionModuleRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={module.isSystem}
-            aria-label={`Delete ${module.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              disabled={module.isSystem}
+              aria-label={`Delete ${module.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this module?</AlertDialogTitle>

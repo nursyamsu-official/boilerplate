@@ -24,6 +24,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   sessionRevokeAction,
@@ -75,27 +79,27 @@ export function SessionRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="View"
         aria-label="View session details"
         onClick={() => onView(session)}
       >
         <EyeIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label="Session actions"
-          >
-            <MoreHorizontalIcon className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
+        <TooltipIconTrigger tooltip="More actions">
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Session actions"
+            >
+              <MoreHorizontalIcon className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+        </TooltipIconTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />

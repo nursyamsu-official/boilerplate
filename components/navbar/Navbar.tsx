@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -90,6 +91,9 @@ export function Navbar() {
             <SheetContent side="right" className="w-64">
               <SheetHeader>
                 <SheetTitle>{appConfig.appName}</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Mobile navigation menu
+                </SheetDescription>
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-2 pt-4">
                 {!isAuthenticated &&

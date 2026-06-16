@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   ssoProviderDeleteAction,
@@ -65,20 +69,16 @@ export function SsoProviderRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${provider.name}`}
         onClick={() => onEdit(provider)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={provider.isActive ? "Deactivate" : "Activate"}
         aria-label={
           provider.isActive
             ? `Deactivate ${provider.name}`
@@ -91,19 +91,21 @@ export function SsoProviderRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Delete ${provider.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Delete ${provider.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this provider?</AlertDialogTitle>

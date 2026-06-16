@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   roleDeleteAction,
@@ -65,20 +69,16 @@ export function RoleRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${role.name}`}
         onClick={() => onEdit(role)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={role.isActive ? "Deactivate" : "Activate"}
         aria-label={
           role.isActive ? `Deactivate ${role.name}` : `Activate ${role.name}`
         }
@@ -89,20 +89,22 @@ export function RoleRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={role.isSystem}
-            aria-label={`Delete ${role.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              disabled={role.isSystem}
+              aria-label={`Delete ${role.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this role?</AlertDialogTitle>

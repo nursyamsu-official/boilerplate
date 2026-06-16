@@ -22,6 +22,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   emailSettingDeleteAction,
@@ -85,32 +89,26 @@ export function EmailSettingRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${setting.name}`}
         onClick={() => onEdit(setting)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
       {!setting.isDefault ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
+        <IconTooltipButton
+          tooltip="Set as default"
           aria-label={`Set ${setting.name} as default`}
           onClick={handleSetDefault}
         >
           <StarIcon className="size-4" />
-        </Button>
+        </IconTooltipButton>
       ) : null}
 
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip={setting.isActive ? "Deactivate" : "Activate"}
         aria-label={
           setting.isActive
             ? `Deactivate ${setting.name}`
@@ -123,20 +121,22 @@ export function EmailSettingRowActions({
         ) : (
           <CheckIcon className="size-4" />
         )}
-      </Button>
+      </IconTooltipButton>
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            disabled={setting.isDefault}
-            aria-label={`Delete ${setting.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              disabled={setting.isDefault}
+              aria-label={`Delete ${setting.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this setting?</AlertDialogTitle>

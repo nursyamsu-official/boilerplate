@@ -16,6 +16,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import {
+  IconTooltipButton,
+  TooltipIconTrigger,
+} from "@/components/ui/icon-tooltip-button";
 
 import {
   apiKeyDeleteAction,
@@ -67,29 +71,29 @@ export function ApiKeyRowActions({
 
   return (
     <div className="flex items-center gap-1">
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon-sm"
+      <IconTooltipButton
+        tooltip="Edit"
         aria-label={`Edit ${apiKey.name}`}
         disabled={Boolean(apiKey.revokedAt)}
         onClick={() => onEdit(apiKey)}
       >
         <PencilIcon className="size-4" />
-      </Button>
+      </IconTooltipButton>
 
       {!apiKey.revokedAt ? (
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Revoke ${apiKey.name}`}
-            >
-              <BanIcon className="size-4 text-destructive" />
-            </Button>
-          </AlertDialogTrigger>
+          <TooltipIconTrigger tooltip="Revoke">
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                aria-label={`Revoke ${apiKey.name}`}
+              >
+                <BanIcon className="size-4 text-destructive" />
+              </Button>
+            </AlertDialogTrigger>
+          </TooltipIconTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Revoke this API key?</AlertDialogTitle>
@@ -112,16 +116,18 @@ export function ApiKeyRowActions({
       ) : null}
 
       <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Delete ${apiKey.name}`}
-          >
-            <TrashIcon className="size-4 text-destructive" />
-          </Button>
-        </AlertDialogTrigger>
+        <TooltipIconTrigger tooltip="Delete">
+          <AlertDialogTrigger asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Delete ${apiKey.name}`}
+            >
+              <TrashIcon className="size-4 text-destructive" />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipIconTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this API key?</AlertDialogTitle>
