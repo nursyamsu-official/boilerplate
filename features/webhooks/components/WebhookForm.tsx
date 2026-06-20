@@ -148,13 +148,12 @@ export function WebhookForm({
               field={field}
               label="Owner user"
               description="Optional user who owns this webhook."
-              options={[
-                { value: "", label: "No owner" },
-                ...userOptions.map((user) => ({
-                  value: user.id,
-                  label: `${user.name} (${user.email})`,
-                })),
-              ]}
+              allowEmpty
+              emptyLabel="No owner"
+              options={userOptions.map((user) => ({
+                value: user.id,
+                label: `${user.name} (${user.email})`,
+              }))}
             />
           )}
         </form.Field>

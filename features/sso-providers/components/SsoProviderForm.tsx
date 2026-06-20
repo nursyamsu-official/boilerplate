@@ -227,13 +227,12 @@ export function SsoProviderForm({
               field={field}
               label="Default role"
               description="Assigned to auto-provisioned users."
-              options={[
-                { value: "", label: "No default role" },
-                ...roleOptions.map((role) => ({
-                  value: role.id,
-                  label: role.name,
-                })),
-              ]}
+              allowEmpty
+              emptyLabel="No default role"
+              options={roleOptions.map((role) => ({
+                value: role.id,
+                label: role.name,
+              }))}
             />
           )}
         </form.Field>

@@ -15,7 +15,7 @@ export const defaultSsoProviderFormValues: SsoProviderFormValues = {
   metadata: "",
   isActive: true,
   autoProvision: false,
-  defaultRoleId: "",
+  defaultRoleId: null,
 };
 
 export function mapSsoProviderDetailToFormValues(
@@ -36,6 +36,6 @@ export function mapSsoProviderDetailToFormValues(
     metadata: detail.metadata ?? "",
     isActive: detail.isActive,
     autoProvision: detail.autoProvision,
-    defaultRoleId: detail.defaultRoleId ?? "",
+    defaultRoleId: detail.defaultRoleId,
   };
 }

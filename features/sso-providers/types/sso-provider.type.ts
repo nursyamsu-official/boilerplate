@@ -58,7 +58,7 @@ export type SsoProviderFormValues = {
   metadata: string;
   isActive: boolean;
   autoProvision: boolean;
-  defaultRoleId: string;
+  defaultRoleId: string | null;
 };
 
 export type SsoProviderListFilters = SsoProviderFilterInput;

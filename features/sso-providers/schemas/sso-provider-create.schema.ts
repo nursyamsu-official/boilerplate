@@ -47,7 +47,7 @@ const ssoProviderFormFieldsBase = z.object({
   metadata: z.string().optional().or(z.literal("")),
   isActive: z.boolean(),
   autoProvision: z.boolean(),
-  defaultRoleId: z.string().optional().or(z.literal("")),
+  defaultRoleId: z.string().uuid("Default role is invalid").nullable(),
 });
 
 function refineProtocolRequirements(
@@ -143,9 +143,7 @@ function mapSsoProviderFormValues(
     metadata: parseOptionalJson(values.metadata),
     isActive: values.isActive,
     autoProvision: values.autoProvision,
-    defaultRoleId: values.defaultRoleId?.trim()
-      ? values.defaultRoleId.trim()
-      : null,
+    defaultRoleId: values.defaultRoleId ?? null,
   };
 }
 

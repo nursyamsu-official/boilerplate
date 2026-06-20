@@ -48,7 +48,7 @@ export type WebhookFormValues = {
   secret: string;
   description: string;
   headers: string;
-  userId: string;
+  userId: string | null;
   isActive: boolean;
   maxRetries: number;
   timeoutMs: number;
