@@ -10,6 +10,7 @@ import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { SsoProviderOption } from "@/features/sso-providers";
 import type { UserOption } from "@/features/users";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import { ssoUserFormFieldsSchema } from "../schemas/sso-user-create.schema";
 import type { SsoUserFormValues } from "../types/sso-user.type";
@@ -35,13 +36,19 @@ export function SsoUserForm({
 }: SsoUserFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = ssoUserFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = ssoUserFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data as SsoUserFormValues);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -60,6 +67,7 @@ export function SsoUserForm({
             <SelectField
               field={field}
               label="User"
+              required
               options={userOptions.map((user) => ({
                 value: user.id,
                 label: `${user.name} (${user.email})`,
@@ -73,6 +81,7 @@ export function SsoUserForm({
             <SelectField
               field={field}
               label="SSO provider"
+              required
               options={providerOptions.map((provider) => ({
                 value: provider.id,
                 label: `${provider.name} (${provider.code})`,
@@ -87,6 +96,7 @@ export function SsoUserForm({
               field={field}
               label="External ID"
               placeholder="Provider subject identifier"
+              required
             />
           )}
         </form.Field>

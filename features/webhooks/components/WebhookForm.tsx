@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { UserOption } from "@/features/users";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import {
   webhookFormFieldsSchema,
@@ -41,16 +42,22 @@ export function WebhookForm({
 }: WebhookFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const schema = isEdit
-        ? webhookUpdateFormFieldsSchema
-        : webhookFormFieldsSchema;
-      const parsed = schema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const schema = isEdit
+          ? webhookUpdateFormFieldsSchema
+          : webhookFormFieldsSchema;
+        const parsed = schema.safeParse(value);
 
-      await onSubmit(parsed.data as WebhookFormValues);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -70,6 +77,7 @@ export function WebhookForm({
               field={field}
               label="Name"
               placeholder="Order notifications"
+              required
             />
           )}
         </form.Field>
@@ -80,6 +88,7 @@ export function WebhookForm({
               field={field}
               label="URL"
               placeholder="https://example.com/webhooks"
+              required
             />
           )}
         </form.Field>
@@ -91,6 +100,7 @@ export function WebhookForm({
               label="Events"
               description="Comma-separated events or a JSON array of strings."
               placeholder="order.created, order.updated"
+              required
             />
           )}
         </form.Field>

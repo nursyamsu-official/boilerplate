@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import { SwitchField } from "@/components/form/SwitchField";
 import { TextField } from "@/components/form/TextField";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 
 import type { PermissionOptionGroup } from "@/features/permissions";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import { roleFormFieldsSchema } from "../schemas/role-create.schema";
 import type { RoleFormValues } from "../types/role.type";
@@ -42,13 +44,19 @@ export function RoleForm({
 }: RoleFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = roleFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = roleFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -70,13 +78,19 @@ export function RoleForm({
               description="Lowercase letters, numbers, and underscores only."
               placeholder="admin"
               disabled={isSystem}
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="Administrator" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="Administrator"
+              required
+            />
           )}
         </form.Field>
 
@@ -103,8 +117,7 @@ export function RoleForm({
         <form.Field name="permissionIds">
           {(field) => {
             const selectedIds = field.state.value ?? [];
-            const hasError =
-              field.state.meta.isTouched && field.state.meta.errors.length > 0;
+            const hasError = hasFieldValidationError(field);
 
             const togglePermission = (permissionId: string, checked: boolean) => {
               const nextIds = checked

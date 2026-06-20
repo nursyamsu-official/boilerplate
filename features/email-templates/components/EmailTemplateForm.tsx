@@ -67,13 +67,19 @@ export function EmailTemplateForm({
               description="Lowercase letters, numbers, and underscores only."
               placeholder="password_reset"
               disabled={isSystem}
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="Password Reset" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="Password Reset"
+              required
+            />
           )}
         </form.Field>
 
@@ -83,6 +89,7 @@ export function EmailTemplateForm({
               field={field}
               label="Subject"
               placeholder="Reset your password"
+              required
             />
           )}
         </form.Field>
@@ -95,6 +102,7 @@ export function EmailTemplateForm({
               description="Use placeholders like {{name}} for dynamic values."
               placeholder="<p>Hello {{name}}, ...</p>"
               rows={8}
+              required
             />
           )}
         </form.Field>

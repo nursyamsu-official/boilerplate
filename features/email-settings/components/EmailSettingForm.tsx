@@ -81,7 +81,12 @@ export function EmailSettingForm({
       <FieldGroup>
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="Production SMTP" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="Production SMTP"
+              required
+            />
           )}
         </form.Field>
 
@@ -93,6 +98,7 @@ export function EmailSettingForm({
                   <SelectField
                     field={field}
                     label="Provider"
+                    required
                     options={emailProviderValues.map((value) => ({
                       value,
                       label: value,
@@ -109,13 +115,19 @@ export function EmailSettingForm({
                         field={field}
                         label="Host"
                         placeholder="smtp.example.com"
+                        required
                       />
                     )}
                   </form.Field>
 
                   <form.Field name="port">
                     {(field) => (
-                      <NumberField field={field} label="Port" placeholder="587" />
+                      <NumberField
+                        field={field}
+                        label="Port"
+                        placeholder="587"
+                        required
+                      />
                     )}
                   </form.Field>
 
@@ -162,6 +174,7 @@ export function EmailSettingForm({
                       field={field}
                       label="API key"
                       type="password"
+                      required={!isEdit}
                       description={
                         isEdit && hasApiKey
                           ? "Leave blank to keep the current API key."
@@ -183,6 +196,7 @@ export function EmailSettingForm({
               label="From email"
               type="email"
               placeholder="noreply@example.com"
+              required
             />
           )}
         </form.Field>

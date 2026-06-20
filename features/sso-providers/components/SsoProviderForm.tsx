@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { RoleOption } from "@/features/roles";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import {
   ssoProviderFormFieldsSchema,
@@ -41,16 +42,22 @@ export function SsoProviderForm({
 }: SsoProviderFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const schema = isEdit
-        ? ssoProviderUpdateFormFieldsSchema
-        : ssoProviderFormFieldsSchema;
-      const parsed = schema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const schema = isEdit
+          ? ssoProviderUpdateFormFieldsSchema
+          : ssoProviderFormFieldsSchema;
+        const parsed = schema.safeParse(value);
 
-      await onSubmit(parsed.data as SsoProviderFormValues);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -71,13 +78,19 @@ export function SsoProviderForm({
               label="Code"
               placeholder="google"
               description="Unique identifier used in configuration."
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="Google SSO" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="Google SSO"
+              required
+            />
           )}
         </form.Field>
 
@@ -89,6 +102,7 @@ export function SsoProviderForm({
                   <SelectField
                     field={field}
                     label="Protocol"
+                    required
                     options={ssoProtocolValues.map((value) => ({
                       value,
                       label: value,
@@ -104,6 +118,7 @@ export function SsoProviderForm({
                       field={field}
                       label="Issuer URL"
                       placeholder="https://issuer.example.com"
+                      required
                     />
                   )}
                 </form.Field>
@@ -117,6 +132,7 @@ export function SsoProviderForm({
                         field={field}
                         label="Auth URL"
                         placeholder="https://auth.example.com/authorize"
+                        required={protocol === "OAUTH2"}
                       />
                     )}
                   </form.Field>
@@ -127,6 +143,7 @@ export function SsoProviderForm({
                         field={field}
                         label="Token URL"
                         placeholder="https://auth.example.com/token"
+                        required={protocol === "OAUTH2"}
                       />
                     )}
                   </form.Field>
@@ -145,7 +162,7 @@ export function SsoProviderForm({
 
                   <form.Field name="clientId">
                     {(field) => (
-                      <TextField field={field} label="Client ID" />
+                      <TextField field={field} label="Client ID" required />
                     )}
                   </form.Field>
 

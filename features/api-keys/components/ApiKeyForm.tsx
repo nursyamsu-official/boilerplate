@@ -8,10 +8,11 @@ import { TextField } from "@/components/form/TextField";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import type { UserOption } from "@/features/users";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import { apiKeyFormFieldsSchema } from "../schemas/api-key.schema";
 import type { ApiKeyFormValues } from "../types/api-key.type";
-import type { UserOption } from "@/features/users";
 
 type ApiKeyFormProps = {
   defaultValues: ApiKeyFormValues;
@@ -34,13 +35,19 @@ export function ApiKeyForm({
 }: ApiKeyFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = apiKeyFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = apiKeyFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -60,6 +67,7 @@ export function ApiKeyForm({
               field={field}
               label="User"
               placeholder="Select a user"
+              required
               options={userOptions.map((user) => ({
                 value: user.id,
                 label: `${user.name} (${user.email})`,
@@ -70,7 +78,12 @@ export function ApiKeyForm({
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="Production API key" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="Production API key"
+              required
+            />
           )}
         </form.Field>
 

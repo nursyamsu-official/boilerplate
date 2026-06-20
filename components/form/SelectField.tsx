@@ -2,7 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
-import { hasFieldValidationError } from "@/components/form/field-utils";
+import { hasFieldValidationError, RenderFieldLabel } from "@/components/form/field-utils";
 import {
   Field,
   FieldContent,
@@ -32,6 +32,7 @@ type SelectFieldProps = {
   disabled?: boolean;
   allowEmpty?: boolean;
   emptyLabel?: string;
+  required?: boolean;
 };
 
 export function SelectField({
@@ -43,6 +44,7 @@ export function SelectField({
   disabled = false,
   allowEmpty = false,
   emptyLabel = "None",
+  required = false,
 }: SelectFieldProps) {
   const fieldId = field.name;
   const hasError = hasFieldValidationError(field);
@@ -51,16 +53,23 @@ export function SelectField({
 
   return (
     <Field data-invalid={hasError || undefined}>
-      <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
+      <FieldLabel htmlFor={fieldId}>
+        <RenderFieldLabel label={label} required={required} />
+      </FieldLabel>
       <FieldContent>
         <Select
           value={value}
           disabled={disabled}
+          required={required}
           onValueChange={(nextValue) => {
             field.handleChange(allowEmpty && nextValue === "__empty__" ? null : nextValue);
           }}
         >
-          <SelectTrigger id={fieldId} aria-invalid={hasError || undefined}>
+          <SelectTrigger
+            id={fieldId}
+            aria-invalid={hasError || undefined}
+            aria-required={required || undefined}
+          >
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent>

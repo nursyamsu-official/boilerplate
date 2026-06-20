@@ -2,7 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
-import { hasFieldValidationError } from "@/components/form/field-utils";
+import { hasFieldValidationError, RenderFieldLabel } from "@/components/form/field-utils";
 import { Input } from "@/components/ui/input";
 import {
   Field,
@@ -19,6 +19,7 @@ type NumberFieldProps = {
   placeholder?: string;
   min?: number;
   disabled?: boolean;
+  required?: boolean;
 };
 
 export function NumberField({
@@ -28,13 +29,16 @@ export function NumberField({
   placeholder,
   min = 0,
   disabled = false,
+  required = false,
 }: NumberFieldProps) {
   const fieldId = field.name;
   const hasError = hasFieldValidationError(field);
 
   return (
     <Field data-invalid={hasError || undefined}>
-      <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
+      <FieldLabel htmlFor={fieldId}>
+        <RenderFieldLabel label={label} required={required} />
+      </FieldLabel>
       <FieldContent>
         <Input
           id={fieldId}
@@ -45,6 +49,7 @@ export function NumberField({
           placeholder={placeholder}
           disabled={disabled}
           aria-invalid={hasError || undefined}
+          aria-required={required || undefined}
           onBlur={field.handleBlur}
           onChange={(event) => {
             const nextValue = event.target.value;

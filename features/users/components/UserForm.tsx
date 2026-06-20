@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 
+import { hasFieldValidationError } from "@/components/form/field-utils";
 import { SelectField } from "@/components/form/SelectField";
 import { TextField } from "@/components/form/TextField";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { RoleOption } from "@/features/roles";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import {
   userCreateFormFieldsSchema,
@@ -50,23 +52,28 @@ export function UserForm({
 }: UserFormProps) {
   const form = useForm({
     defaultValues,
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed =
+          mode === "create"
+            ? userCreateFormFieldsSchema.safeParse(value)
+            : userFormFieldsSchema.safeParse(value);
+
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
     onSubmit: async ({ value }) => {
-      const parsed =
-        mode === "create"
-          ? userCreateFormFieldsSchema.safeParse(value)
-          : userFormFieldsSchema.safeParse(value);
-
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
-
       await onSubmit({
-        name: parsed.data.name,
-        email: parsed.data.email,
-        username: parsed.data.username ?? null,
-        phoneNumber: parsed.data.phoneNumber ?? null,
-        status: parsed.data.status,
-        roleIds: parsed.data.roleIds,
+        name: value.name,
+        email: value.email,
+        username: value.username ?? null,
+        phoneNumber: value.phoneNumber ?? null,
+        status: value.status,
+        roleIds: value.roleIds,
         password: mode === "create" ? value.password : undefined,
       });
     },
@@ -84,7 +91,12 @@ export function UserForm({
       <FieldGroup>
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="John Doe" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="John Doe"
+              required
+            />
           )}
         </form.Field>
 
@@ -95,6 +107,7 @@ export function UserForm({
               label="Email"
               placeholder="john@example.com"
               type="email"
+              required
             />
           )}
         </form.Field>
@@ -107,6 +120,7 @@ export function UserForm({
                 label="Password"
                 placeholder="Minimum 8 characters"
                 type="password"
+                required
               />
             )}
           </form.Field>
@@ -139,6 +153,7 @@ export function UserForm({
               field={field}
               label="Status"
               options={statusOptions}
+              required
             />
           )}
         </form.Field>
@@ -146,8 +161,7 @@ export function UserForm({
         <form.Field name="roleIds">
           {(field) => {
             const selectedIds = field.state.value ?? [];
-            const hasError =
-              field.state.meta.isTouched && field.state.meta.errors.length > 0;
+            const hasError = hasFieldValidationError(field);
 
             const toggleRole = (roleId: string, checked: boolean) => {
               const nextIds = checked

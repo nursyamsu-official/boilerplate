@@ -10,6 +10,7 @@ import { TextField } from "@/components/form/TextField";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import { mergeMenuLucideIconOptions } from "../lib/menu-lucide-icon";
 import { menuFormFieldsSchema } from "../schemas/menu-create.schema";
@@ -34,13 +35,19 @@ export function MenuForm({
 }: MenuFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = menuFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = menuFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -61,13 +68,19 @@ export function MenuForm({
               label="Code"
               description="Lowercase letters, numbers, and underscores only."
               placeholder="dashboard_menus"
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="label">
           {(field) => (
-            <TextField field={field} label="Label" placeholder="Menu Management" />
+            <TextField
+              field={field}
+              label="Label"
+              placeholder="Menu Management"
+              required
+            />
           )}
         </form.Field>
 

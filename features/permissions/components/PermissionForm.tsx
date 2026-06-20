@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { PermissionModuleOption } from "@/features/permission-modules";
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
 
 import { permissionFormFieldsSchema } from "../schemas/permission-create.schema";
 import type { PermissionFormValues } from "../types/permission.type";
@@ -33,13 +34,19 @@ export function PermissionForm({
 }: PermissionFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = permissionFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = permissionFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -61,13 +68,19 @@ export function PermissionForm({
               description="Lowercase letters, numbers, and underscores only."
               placeholder="user_view"
               disabled={isSystem}
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="View users" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="View users"
+              required
+            />
           )}
         </form.Field>
 

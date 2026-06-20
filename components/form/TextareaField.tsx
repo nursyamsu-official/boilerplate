@@ -2,7 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
-import { hasFieldValidationError } from "@/components/form/field-utils";
+import { hasFieldValidationError, RenderFieldLabel } from "@/components/form/field-utils";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Field,
@@ -19,6 +19,7 @@ type TextareaFieldProps = {
   placeholder?: string;
   disabled?: boolean;
   rows?: number;
+  required?: boolean;
 };
 
 export function TextareaField({
@@ -28,13 +29,16 @@ export function TextareaField({
   placeholder,
   disabled = false,
   rows = 4,
+  required = false,
 }: TextareaFieldProps) {
   const fieldId = field.name;
   const hasError = hasFieldValidationError(field);
 
   return (
     <Field data-invalid={hasError || undefined}>
-      <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
+      <FieldLabel htmlFor={fieldId}>
+        <RenderFieldLabel label={label} required={required} />
+      </FieldLabel>
       <FieldContent>
         <Textarea
           id={fieldId}
@@ -44,6 +48,7 @@ export function TextareaField({
           disabled={disabled}
           rows={rows}
           aria-invalid={hasError || undefined}
+          aria-required={required || undefined}
           onBlur={field.handleBlur}
           onChange={(event) => field.handleChange(event.target.value)}
         />

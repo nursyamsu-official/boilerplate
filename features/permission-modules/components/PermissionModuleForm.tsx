@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 
+import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
+
 import { permissionModuleFormFieldsSchema } from "../schemas/permission-module-create.schema";
 import type { PermissionModuleFormValues } from "../types/permission-module.type";
 
@@ -31,13 +33,19 @@ export function PermissionModuleForm({
 }: PermissionModuleFormProps) {
   const form = useForm({
     defaultValues,
-    onSubmit: async ({ value }) => {
-      const parsed = permissionModuleFormFieldsSchema.safeParse(value);
-      if (!parsed.success) {
-        throw new Error(parsed.error.issues[0]?.message ?? "Invalid form data");
-      }
+    validators: {
+      onSubmitAsync: async ({ value }) => {
+        const parsed = permissionModuleFormFieldsSchema.safeParse(value);
 
-      await onSubmit(parsed.data);
+        if (parsed.success) {
+          return null;
+        }
+
+        return mapZodErrorToFormFieldErrors(parsed.error);
+      },
+    },
+    onSubmit: async ({ value }) => {
+      await onSubmit(value);
     },
   });
 
@@ -59,13 +67,19 @@ export function PermissionModuleForm({
               description="Lowercase letters, numbers, and underscores only."
               placeholder="user_management"
               disabled={isSystem}
+              required
             />
           )}
         </form.Field>
 
         <form.Field name="name">
           {(field) => (
-            <TextField field={field} label="Name" placeholder="User Management" />
+            <TextField
+              field={field}
+              label="Name"
+              placeholder="User Management"
+              required
+            />
           )}
         </form.Field>
 

@@ -2,7 +2,7 @@
 
 import type { AnyFieldApi } from "@tanstack/react-form";
 
-import { hasFieldValidationError } from "@/components/form/field-utils";
+import { hasFieldValidationError, RenderFieldLabel } from "@/components/form/field-utils";
 import { Input } from "@/components/ui/input";
 import {
   Field,
@@ -19,6 +19,7 @@ type TextFieldProps = {
   type?: React.ComponentProps<"input">["type"];
   placeholder?: string;
   disabled?: boolean;
+  required?: boolean;
 };
 
 export function TextField({
@@ -28,13 +29,16 @@ export function TextField({
   type = "text",
   placeholder,
   disabled = false,
+  required = false,
 }: TextFieldProps) {
   const fieldId = field.name;
   const hasError = hasFieldValidationError(field);
 
   return (
     <Field data-invalid={hasError || undefined}>
-      <FieldLabel htmlFor={fieldId}>{label}</FieldLabel>
+      <FieldLabel htmlFor={fieldId}>
+        <RenderFieldLabel label={label} required={required} />
+      </FieldLabel>
       <FieldContent>
         <Input
           id={fieldId}
@@ -44,6 +48,7 @@ export function TextField({
           placeholder={placeholder}
           disabled={disabled}
           aria-invalid={hasError || undefined}
+          aria-required={required || undefined}
           onBlur={field.handleBlur}
           onChange={(event) => field.handleChange(event.target.value)}
         />
