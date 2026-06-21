@@ -50,7 +50,7 @@ export function ApiKeyCreateDialog({
   const [revealState, setRevealState] = useState<RevealState | null>(null);
   const submittedNameRef = useRef("");
 
-  const submitConfig: FormActionSubmitConfig<ApiKeyFormValues, unknown> = {
+  const submitConfig: FormActionSubmitConfig<ApiKeyFormValues, ApiKeyCreateResult> = {
     schema: apiKeyFormFieldsSchema,
     action: apiKeyCreateAction,
     mapInput: (values) => {

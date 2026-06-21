@@ -18,18 +18,18 @@ import {
 
 import type { ApiKeyFormValues } from "../types/api-key.type";
 
-type ApiKeyFormProps = {
+type ApiKeyFormProps<TResult = unknown> = {
   defaultValues: ApiKeyFormValues;
   userOptions: UserOption[];
   submitLabel: string;
   pendingLabel: string;
   layout?: "default" | "dialog";
   showStatusField?: boolean;
-  submitConfig: FormActionSubmitConfig<ApiKeyFormValues, unknown>;
+  submitConfig: FormActionSubmitConfig<ApiKeyFormValues, TResult>;
   onCancel: () => void;
 };
 
-export function ApiKeyForm({
+export function ApiKeyForm<TResult = unknown>({
   defaultValues,
   userOptions,
   submitLabel,
@@ -38,7 +38,7 @@ export function ApiKeyForm({
   showStatusField = false,
   submitConfig,
   onCancel,
-}: ApiKeyFormProps) {
+}: ApiKeyFormProps<TResult>) {
   const { onSubmitAsync, onSubmit } = useFormActionSubmit(submitConfig);
 
   const form = useForm({
