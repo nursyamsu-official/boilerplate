@@ -51,7 +51,9 @@ export function IconComboboxField({
   );
   const setFieldRef = useCallback((node: HTMLDivElement | null) => {
     setPortalContainer(
-      node?.closest<HTMLElement>('[data-slot="dialog-content"]') ?? null,
+      node?.closest<HTMLElement>(
+        '[data-slot="dialog-content"], [data-slot="dialog-scroll-content"]',
+      ) ?? null,
     );
   }, []);
   const [query, setQuery] = useState("");
