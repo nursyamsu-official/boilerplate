@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -13,7 +11,8 @@ import {
 import { menuCreateAction } from "../actions/menu-create.action";
 import { defaultMenuFormValues } from "../lib/menu-form-defaults";
 import { mapFormValuesToCreateInput } from "../lib/menu-form-mapper";
-import type { MenuFormValues, MenuParentOption } from "../types/menu.type";
+import { menuFormFieldsSchema } from "../schemas/menu-create.schema";
+import type { MenuParentOption } from "../types/menu.type";
 import { MenuForm } from "./MenuForm";
 
 type MenuCreateDialogProps = {
@@ -29,23 +28,9 @@ export function MenuCreateDialog({
   onOpenChange,
   onSuccess,
 }: MenuCreateDialogProps) {
-  const handleSubmit = async (values: MenuFormValues) => {
-    await toast.promise(
-      menuCreateAction(mapFormValuesToCreateInput(values)).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create menu</DialogTitle>
           <DialogDescription>
@@ -58,10 +43,24 @@ export function MenuCreateDialog({
           parentOptions={parentOptions}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: menuFormFieldsSchema,
+            action: menuCreateAction,
+            mapInput: mapFormValuesToCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

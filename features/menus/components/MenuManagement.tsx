@@ -32,7 +32,7 @@ type MenuManagementProps = {
 
 type EditDialogState = {
   menuId: string;
-  defaultValues: MenuFormValues;
+  defaultValues: MenuFormValues | null;
   parentOptions: MenuParentOption[];
 };
 
@@ -48,7 +48,8 @@ export function MenuManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<MenuFilterInput>) => {
@@ -63,7 +64,11 @@ export function MenuManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (menu: MenuTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      menuId: menu.id,
+      defaultValues: null,
+      parentOptions: [],
+    });
 
     try {
       const [menuDetail, options] = await Promise.all([
@@ -78,8 +83,7 @@ export function MenuManagement({
       });
     } catch {
       toast.error("Failed to load menu");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -13,7 +11,7 @@ import {
 import { permissionModuleCreateAction } from "../actions/permission-module-create.action";
 import { defaultPermissionModuleFormValues } from "../lib/permission-module-form-defaults";
 import { mapFormValuesToPermissionModuleCreateInput } from "../lib/permission-module-form-mapper";
-import type { PermissionModuleFormValues } from "../types/permission-module.type";
+import { permissionModuleFormFieldsSchema } from "../schemas/permission-module-create.schema";
 import { PermissionModuleForm } from "./PermissionModuleForm";
 
 type PermissionModuleCreateDialogProps = {
@@ -27,25 +25,9 @@ export function PermissionModuleCreateDialog({
   onOpenChange,
   onSuccess,
 }: PermissionModuleCreateDialogProps) {
-  const handleSubmit = async (values: PermissionModuleFormValues) => {
-    await toast.promise(
-      permissionModuleCreateAction(
-        mapFormValuesToPermissionModuleCreateInput(values),
-      ).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create permission module</DialogTitle>
           <DialogDescription>
@@ -57,10 +39,24 @@ export function PermissionModuleCreateDialog({
           defaultValues={defaultPermissionModuleFormValues}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: permissionModuleFormFieldsSchema,
+            action: permissionModuleCreateAction,
+            mapInput: mapFormValuesToPermissionModuleCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

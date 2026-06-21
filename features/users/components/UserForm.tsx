@@ -2,6 +2,8 @@
 
 import { useForm } from "@tanstack/react-form";
 
+import { FormSubmitError } from "@/components/form/FormSubmitError";
+import { FormShell, getFormClassName } from "@/components/form/form-dialog-layout";
 import { hasFieldValidationError } from "@/components/form/field-utils";
 import { SelectField } from "@/components/form/SelectField";
 import { TextField } from "@/components/form/TextField";
@@ -17,12 +19,11 @@ import {
 } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { RoleOption } from "@/features/roles";
-import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
-
 import {
-  userCreateFormFieldsSchema,
-  userFormFieldsSchema,
-} from "../schemas/user-create.schema";
+  useFormActionSubmit,
+  type FormActionSubmitConfig,
+} from "@/lib/use-form-action-submit";
+
 import type { UserFormValues } from "../types/user.type";
 
 const statusOptions = [
@@ -37,7 +38,8 @@ type UserFormProps = {
   mode: "create" | "edit";
   submitLabel: string;
   pendingLabel: string;
-  onSubmit: (values: UserFormValues) => Promise<void>;
+  layout?: "default" | "dialog";
+  submitConfig: FormActionSubmitConfig<UserFormValues, unknown>;
   onCancel: () => void;
 };
 
@@ -47,48 +49,56 @@ export function UserForm({
   mode,
   submitLabel,
   pendingLabel,
-  onSubmit,
+  layout = "default",
+  submitConfig,
   onCancel,
 }: UserFormProps) {
+  const { onSubmitAsync, onSubmit } = useFormActionSubmit(submitConfig);
+
   const form = useForm({
     defaultValues,
     validators: {
-      onSubmitAsync: async ({ value }) => {
-        const parsed =
-          mode === "create"
-            ? userCreateFormFieldsSchema.safeParse(value)
-            : userFormFieldsSchema.safeParse(value);
-
-        if (parsed.success) {
-          return null;
-        }
-
-        return mapZodErrorToFormFieldErrors(parsed.error);
-      },
+      onSubmitAsync,
     },
-    onSubmit: async ({ value }) => {
-      await onSubmit({
-        name: value.name,
-        email: value.email,
-        username: value.username ?? null,
-        phoneNumber: value.phoneNumber ?? null,
-        status: value.status,
-        roleIds: value.roleIds,
-        password: mode === "create" ? value.password : undefined,
-      });
+    onSubmit: async () => {
+      await onSubmit();
     },
   });
 
+  const formActions = (
+    <>
+      <Button type="button" variant="outline" onClick={onCancel}>
+        Cancel
+      </Button>
+      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+        {([canSubmit, isSubmitting]) => (
+          <Button type="submit" disabled={!canSubmit || isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Spinner className="size-4" />
+                {pendingLabel}
+              </>
+            ) : (
+              submitLabel
+            )}
+          </Button>
+        )}
+      </form.Subscribe>
+    </>
+  );
+
   return (
     <form
-      className="flex flex-col gap-4"
+      className={getFormClassName(layout)}
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
         void form.handleSubmit();
       }}
     >
-      <FieldGroup>
+      <FormShell layout={layout} actions={formActions}>
+        <FieldGroup>
+        <FormSubmitError form={form as never} />
         <form.Field name="name">
           {(field) => (
             <TextField
@@ -224,26 +234,7 @@ export function UserForm({
           }}
         </form.Field>
       </FieldGroup>
-
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Spinner className="size-4" />
-                  {pendingLabel}
-                </>
-              ) : (
-                submitLabel
-              )}
-            </Button>
-          )}
-        </form.Subscribe>
-      </div>
+      </FormShell>
     </form>
   );
 }

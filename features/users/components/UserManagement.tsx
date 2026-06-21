@@ -27,7 +27,7 @@ type UserManagementProps = {
 
 type EditDialogState = {
   userId: string;
-  defaultValues: UserFormValues;
+  defaultValues: UserFormValues | null;
 };
 
 export function UserManagement({
@@ -40,7 +40,8 @@ export function UserManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<UserFilterInput>) => {
@@ -55,7 +56,7 @@ export function UserManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (user: UserTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({ userId: user.id, defaultValues: null });
 
     try {
       const detail = await userGetByIdAction({ id: user.id });
@@ -65,8 +66,7 @@ export function UserManagement({
       });
     } catch {
       toast.error("Failed to load user");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

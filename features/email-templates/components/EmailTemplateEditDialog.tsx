@@ -1,10 +1,9 @@
 "use client";
 
-import { toast } from "sonner";
-
+import { FormDialogSkeleton } from "@/components/form/form-dialog-skeleton";
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -12,6 +11,7 @@ import {
 
 import { emailTemplateUpdateAction } from "../actions/email-template-update.action";
 import { mapFormValuesToEmailTemplateUpdateInput } from "../lib/email-template-form-mapper";
+import { emailTemplateFormFieldsSchema } from "../schemas/email-template-create.schema";
 import type { EmailTemplateFormValues } from "../types/email-template.type";
 import { EmailTemplateForm } from "./EmailTemplateForm";
 
@@ -32,27 +32,9 @@ export function EmailTemplateEditDialog({
   onOpenChange,
   onSuccess,
 }: EmailTemplateEditDialogProps) {
-  const handleSubmit = async (values: EmailTemplateFormValues) => {
-    if (!templateId) return;
-
-    await toast.promise(
-      emailTemplateUpdateAction(
-        mapFormValuesToEmailTemplateUpdateInput(templateId, values),
-      ).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Updating...",
-        success: "Updated successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogScrollContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit email template</DialogTitle>
           <DialogDescription>Update template content and status.</DialogDescription>
@@ -65,13 +47,28 @@ export function EmailTemplateEditDialog({
             isSystem={isSystem}
             submitLabel="Update"
             pendingLabel="Updating..."
+            layout="dialog"
             onCancel={() => onOpenChange(false)}
-            onSubmit={handleSubmit}
+            submitConfig={{
+              schema: emailTemplateFormFieldsSchema,
+              action: emailTemplateUpdateAction,
+              mapInput: (values) =>
+                mapFormValuesToEmailTemplateUpdateInput(templateId, values),
+              toast: {
+                loading: "Updating...",
+                success: "Updated successfully",
+                errorFallback: "Failed to save",
+              },
+              onSuccess: () => {
+                onOpenChange(false);
+                onSuccess();
+              },
+            }}
           />
         ) : (
-          <p className="text-sm text-muted-foreground">Loading form...</p>
+          <FormDialogSkeleton fields={6} />
         )}
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

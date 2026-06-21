@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,16 +10,18 @@ import {
 import { userGetByIdService } from "../services/user-get-by-id.service";
 import { userUpdateService } from "../services/user-update.service";
 
-export async function userUpdateAction(input: unknown) {
+export async function userUpdateAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof userUpdateService>>>> {
   const adminId = await requireSessionUserId();
 
   const parsed = userUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid user data");
+    return { ok: false, message: first ?? "Invalid user data" };
   }
 
-  return userUpdateService(parsed.data, adminId);
+  return runAction(() => userUpdateService(parsed.data, adminId));
 }
 
 export async function userGetByIdAction(input: unknown) {

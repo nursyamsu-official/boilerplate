@@ -24,7 +24,7 @@ type PermissionModuleManagementProps = {
 
 type EditDialogState = {
   moduleId: string;
-  defaultValues: PermissionModuleFormValues;
+  defaultValues: PermissionModuleFormValues | null;
   isSystem: boolean;
 };
 
@@ -37,7 +37,8 @@ export function PermissionModuleManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<PermissionModuleFilterInput>) => {
@@ -52,7 +53,11 @@ export function PermissionModuleManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (module: PermissionModuleTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      moduleId: module.id,
+      defaultValues: null,
+      isSystem: false,
+    });
 
     try {
       const detail = await permissionModuleGetByIdAction({ id: module.id });
@@ -63,8 +68,7 @@ export function PermissionModuleManagement({
       });
     } catch {
       toast.error("Failed to load module");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

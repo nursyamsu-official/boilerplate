@@ -27,7 +27,7 @@ type WebhookManagementProps = {
 
 type EditDialogState = {
   webhookId: string;
-  defaultValues: WebhookFormValues;
+  defaultValues: WebhookFormValues | null;
   hasSecret: boolean;
 };
 
@@ -41,7 +41,8 @@ export function WebhookManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<WebhookFilterInput>) => {
@@ -56,7 +57,11 @@ export function WebhookManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (webhook: WebhookTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      webhookId: webhook.id,
+      defaultValues: null,
+      hasSecret: false,
+    });
 
     try {
       const detail = await webhookGetByIdAction({ id: webhook.id });
@@ -67,8 +72,7 @@ export function WebhookManagement({
       });
     } catch {
       toast.error("Failed to load webhook");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

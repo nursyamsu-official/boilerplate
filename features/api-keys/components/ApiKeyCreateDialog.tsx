@@ -1,23 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { toast } from "sonner";
+import { useRef, useState } from "react";
 
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { UserOption } from "@/features/users";
 
 import { apiKeyCreateAction } from "../actions/api-key.action";
 import {
   defaultApiKeyFormValues,
   mapFormValuesToCreateInput,
 } from "../lib/api-key-form";
+import { apiKeyFormFieldsSchema } from "../schemas/api-key.schema";
 import type { ApiKeyFormValues } from "../types/api-key.type";
-import type { UserOption } from "@/features/users";
+import type { FormActionSubmitConfig } from "@/lib/use-form-action-submit";
 import { ApiKeyForm } from "./ApiKeyForm";
 import { ApiKeyRevealDialog } from "./ApiKeyRevealDialog";
 
@@ -26,6 +27,10 @@ type ApiKeyCreateDialogProps = {
   userOptions: UserOption[];
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+};
+
+type ApiKeyCreateResult = {
+  rawKey: string;
 };
 
 type RevealState = {
@@ -40,26 +45,35 @@ export function ApiKeyCreateDialog({
   onSuccess,
 }: ApiKeyCreateDialogProps) {
   const [revealState, setRevealState] = useState<RevealState | null>(null);
+  const submittedNameRef = useRef("");
 
-  const handleSubmit = async (values: ApiKeyFormValues) => {
-    await toast.promise(
-      apiKeyCreateAction(mapFormValuesToCreateInput(values)).then((result) => {
-        onOpenChange(false);
-        onSuccess();
-        setRevealState({ rawKey: result.rawKey, name: values.name });
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
+  const submitConfig: FormActionSubmitConfig<ApiKeyFormValues, unknown> = {
+    schema: apiKeyFormFieldsSchema,
+    action: apiKeyCreateAction,
+    mapInput: (values) => {
+      submittedNameRef.current = values.name;
+      return mapFormValuesToCreateInput(values);
+    },
+    toast: {
+      loading: "Creating...",
+      success: "Created successfully",
+      errorFallback: "Failed to save",
+    },
+    onSuccess: (data) => {
+      const createResult = data as ApiKeyCreateResult;
+      onOpenChange(false);
+      onSuccess();
+      setRevealState({
+        rawKey: createResult.rawKey,
+        name: submittedNameRef.current,
+      });
+    },
   };
 
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-lg">
+        <DialogScrollContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Create API key</DialogTitle>
             <DialogDescription>
@@ -72,10 +86,11 @@ export function ApiKeyCreateDialog({
             userOptions={userOptions}
             submitLabel="Create"
             pendingLabel="Creating..."
+            layout="dialog"
             onCancel={() => onOpenChange(false)}
-            onSubmit={handleSubmit}
+            submitConfig={submitConfig}
           />
-        </DialogContent>
+        </DialogScrollContent>
       </Dialog>
 
       <ApiKeyRevealDialog

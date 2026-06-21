@@ -24,7 +24,7 @@ type EmailSettingManagementProps = {
 
 type EditDialogState = {
   settingId: string;
-  defaultValues: EmailSettingFormValues;
+  defaultValues: EmailSettingFormValues | null;
   hasPassword: boolean;
   hasApiKey: boolean;
 };
@@ -38,7 +38,8 @@ export function EmailSettingManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<EmailSettingFilterInput>) => {
@@ -53,7 +54,12 @@ export function EmailSettingManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (setting: EmailSettingTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      settingId: setting.id,
+      defaultValues: null,
+      hasPassword: false,
+      hasApiKey: false,
+    });
 
     try {
       const detail = await emailSettingGetByIdAction({ id: setting.id });
@@ -65,8 +71,7 @@ export function EmailSettingManagement({
       });
     } catch {
       toast.error("Failed to load email setting");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

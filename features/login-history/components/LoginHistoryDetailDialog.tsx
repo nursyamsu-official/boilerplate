@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -36,7 +37,7 @@ export function LoginHistoryDetailDialog({
 }: LoginHistoryDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Login attempt details</DialogTitle>
           <DialogDescription>
@@ -44,6 +45,7 @@ export function LoginHistoryDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody>
         {record ? (
           <dl className="grid gap-4">
             <DetailField label="ID" value={record.id} />
@@ -99,7 +101,8 @@ export function LoginHistoryDetailDialog({
             />
           </dl>
         ) : null}
-      </DialogContent>
+        </DialogBody>
+      </DialogScrollContent>
     </Dialog>
   );
 }

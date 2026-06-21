@@ -2,15 +2,19 @@
 
 import { useForm } from "@tanstack/react-form";
 
+import { FormSubmitError } from "@/components/form/FormSubmitError";
+import { FormShell, getFormClassName } from "@/components/form/form-dialog-layout";
 import { SelectField } from "@/components/form/SelectField";
 import { TextField } from "@/components/form/TextField";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { Spinner } from "@/components/ui/spinner";
 import type { PermissionModuleOption } from "@/features/permission-modules";
-import { mapZodErrorToFormFieldErrors } from "@/lib/zod-form-validator";
+import {
+  useFormActionSubmit,
+  type FormActionSubmitConfig,
+} from "@/lib/use-form-action-submit";
 
-import { permissionFormFieldsSchema } from "../schemas/permission-create.schema";
 import type { PermissionFormValues } from "../types/permission.type";
 
 type PermissionFormProps = {
@@ -19,7 +23,8 @@ type PermissionFormProps = {
   isSystem?: boolean;
   submitLabel: string;
   pendingLabel: string;
-  onSubmit: (values: PermissionFormValues) => Promise<void>;
+  layout?: "default" | "dialog";
+  submitConfig: FormActionSubmitConfig<PermissionFormValues, unknown>;
   onCancel: () => void;
 };
 
@@ -29,37 +34,56 @@ export function PermissionForm({
   isSystem = false,
   submitLabel,
   pendingLabel,
-  onSubmit,
+  layout = "default",
+  submitConfig,
   onCancel,
 }: PermissionFormProps) {
+  const { onSubmitAsync, onSubmit } = useFormActionSubmit(submitConfig);
+
   const form = useForm({
     defaultValues,
     validators: {
-      onSubmitAsync: async ({ value }) => {
-        const parsed = permissionFormFieldsSchema.safeParse(value);
-
-        if (parsed.success) {
-          return null;
-        }
-
-        return mapZodErrorToFormFieldErrors(parsed.error);
-      },
+      onSubmitAsync,
     },
-    onSubmit: async ({ value }) => {
-      await onSubmit(value);
+    onSubmit: async () => {
+      await onSubmit();
     },
   });
 
+  const formActions = (
+    <>
+      <Button type="button" variant="outline" onClick={onCancel}>
+        Cancel
+      </Button>
+      <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+        {([canSubmit, isSubmitting]) => (
+          <Button type="submit" disabled={!canSubmit || isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Spinner className="size-4" />
+                {pendingLabel}
+              </>
+            ) : (
+              submitLabel
+            )}
+          </Button>
+        )}
+      </form.Subscribe>
+    </>
+  );
+
   return (
     <form
-      className="flex flex-col gap-4"
+      className={getFormClassName(layout)}
       onSubmit={(event) => {
         event.preventDefault();
         event.stopPropagation();
         void form.handleSubmit();
       }}
     >
-      <FieldGroup>
+      <FormShell layout={layout} actions={formActions}>
+        <FieldGroup>
+        <FormSubmitError form={form as never} />
         <form.Field name="code">
           {(field) => (
             <TextField
@@ -110,26 +134,7 @@ export function PermissionForm({
           )}
         </form.Field>
       </FieldGroup>
-
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
-        </Button>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Button type="submit" disabled={!canSubmit || isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Spinner className="size-4" />
-                  {pendingLabel}
-                </>
-              ) : (
-                submitLabel
-              )}
-            </Button>
-          )}
-        </form.Subscribe>
-      </div>
+      </FormShell>
     </form>
   );
 }

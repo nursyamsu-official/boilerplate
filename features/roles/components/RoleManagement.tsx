@@ -27,7 +27,7 @@ type RoleManagementProps = {
 
 type EditDialogState = {
   roleId: string;
-  defaultValues: RoleFormValues;
+  defaultValues: RoleFormValues | null;
   isSystem: boolean;
 };
 
@@ -41,7 +41,8 @@ export function RoleManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<RoleFilterInput>) => {
@@ -56,7 +57,11 @@ export function RoleManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (role: RoleTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      roleId: role.id,
+      defaultValues: null,
+      isSystem: false,
+    });
 
     try {
       const detail = await roleGetByIdAction({ id: role.id });
@@ -67,8 +72,7 @@ export function RoleManagement({
       });
     } catch {
       toast.error("Failed to load role");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

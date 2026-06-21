@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -8,16 +9,20 @@ import {
 } from "../schemas/permission-module-create.schema";
 import { permissionModuleUpdateService } from "../services/permission-module-update.service";
 
-export async function permissionModuleUpdateAction(input: unknown) {
+export async function permissionModuleUpdateAction(
+  input: unknown,
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof permissionModuleUpdateService>>>
+> {
   await requireSessionUserId();
 
   const parsed = permissionModuleUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid module data");
+    return { ok: false, message: first ?? "Invalid module data" };
   }
 
-  return permissionModuleUpdateService(parsed.data);
+  return runAction(() => permissionModuleUpdateService(parsed.data));
 }
 
 export async function permissionModuleGetByIdAction(input: unknown) {

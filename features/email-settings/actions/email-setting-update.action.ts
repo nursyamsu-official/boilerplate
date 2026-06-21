@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,16 +10,20 @@ import {
 import { emailSettingGetByIdService } from "../services/email-setting-get-by-id.service";
 import { emailSettingUpdateService } from "../services/email-setting-update.service";
 
-export async function emailSettingUpdateAction(input: unknown) {
+export async function emailSettingUpdateAction(
+  input: unknown,
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof emailSettingUpdateService>>>
+> {
   await requireSessionUserId();
 
   const parsed = emailSettingUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid email setting data");
+    return { ok: false, message: first ?? "Invalid email setting data" };
   }
 
-  return emailSettingUpdateService(parsed.data);
+  return runAction(() => emailSettingUpdateService(parsed.data));
 }
 
 export async function emailSettingGetByIdAction(input: unknown) {

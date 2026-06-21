@@ -27,7 +27,7 @@ type SsoProviderManagementProps = {
 
 type EditDialogState = {
   providerId: string;
-  defaultValues: SsoProviderFormValues;
+  defaultValues: SsoProviderFormValues | null;
   hasClientSecret: boolean;
 };
 
@@ -40,7 +40,8 @@ export function SsoProviderManagement({
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editDialogState, setEditDialogState] =
     useState<EditDialogState | null>(null);
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<SsoProviderFilterInput>) => {
@@ -55,7 +56,11 @@ export function SsoProviderManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (provider: SsoProviderTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      providerId: provider.id,
+      defaultValues: null,
+      hasClientSecret: false,
+    });
 
     try {
       const detail = await ssoProviderGetByIdAction({ id: provider.id });
@@ -66,8 +71,7 @@ export function SsoProviderManagement({
       });
     } catch {
       toast.error("Failed to load SSO provider");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

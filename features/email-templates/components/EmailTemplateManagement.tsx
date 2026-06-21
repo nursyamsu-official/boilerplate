@@ -24,7 +24,7 @@ type EmailTemplateManagementProps = {
 
 type EditDialogState = {
   templateId: string;
-  defaultValues: EmailTemplateFormValues;
+  defaultValues: EmailTemplateFormValues | null;
   isSystem: boolean;
 };
 
@@ -37,7 +37,8 @@ export function EmailTemplateManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<EmailTemplateFilterInput>) => {
@@ -52,7 +53,11 @@ export function EmailTemplateManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (template: EmailTemplateTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({
+      templateId: template.id,
+      defaultValues: null,
+      isSystem: false,
+    });
 
     try {
       const detail = await emailTemplateGetByIdAction({ id: template.id });
@@ -63,8 +68,7 @@ export function EmailTemplateManagement({
       });
     } catch {
       toast.error("Failed to load template");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

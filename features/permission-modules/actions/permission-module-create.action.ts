@@ -1,18 +1,23 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import { permissionModuleCreateSchema } from "../schemas/permission-module-create.schema";
 import { permissionModuleCreateService } from "../services/permission-module-create.service";
 
-export async function permissionModuleCreateAction(input: unknown) {
+export async function permissionModuleCreateAction(
+  input: unknown,
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof permissionModuleCreateService>>>
+> {
   await requireSessionUserId();
 
   const parsed = permissionModuleCreateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid module data");
+    return { ok: false, message: first ?? "Invalid module data" };
   }
 
-  return permissionModuleCreateService(parsed.data);
+  return runAction(() => permissionModuleCreateService(parsed.data));
 }

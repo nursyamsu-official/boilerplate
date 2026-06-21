@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -15,7 +13,7 @@ import type { UserOption } from "@/features/users";
 import { ssoUserCreateAction } from "../actions/sso-user-create.action";
 import { defaultSsoUserFormValues } from "../lib/sso-user-form-defaults";
 import { mapFormValuesToSsoUserCreateInput } from "../lib/sso-user-form-mapper";
-import type { SsoUserFormValues } from "../types/sso-user.type";
+import { ssoUserFormFieldsSchema } from "../schemas/sso-user-create.schema";
 import { SsoUserForm } from "./SsoUserForm";
 
 type SsoUserCreateDialogProps = {
@@ -33,23 +31,9 @@ export function SsoUserCreateDialog({
   onOpenChange,
   onSuccess,
 }: SsoUserCreateDialogProps) {
-  const handleSubmit = async (values: SsoUserFormValues) => {
-    await toast.promise(
-      ssoUserCreateAction(mapFormValuesToSsoUserCreateInput(values)).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create SSO user link</DialogTitle>
           <DialogDescription>
@@ -63,10 +47,24 @@ export function SsoUserCreateDialog({
           providerOptions={providerOptions}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: ssoUserFormFieldsSchema,
+            action: ssoUserCreateAction,
+            mapInput: mapFormValuesToSsoUserCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

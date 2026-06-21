@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,16 +10,20 @@ import {
 import { emailTemplateGetByIdService } from "../services/email-template-get-by-id.service";
 import { emailTemplateUpdateService } from "../services/email-template-update.service";
 
-export async function emailTemplateUpdateAction(input: unknown) {
+export async function emailTemplateUpdateAction(
+  input: unknown,
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof emailTemplateUpdateService>>>
+> {
   await requireSessionUserId();
 
   const parsed = emailTemplateUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid template data");
+    return { ok: false, message: first ?? "Invalid template data" };
   }
 
-  return emailTemplateUpdateService(parsed.data);
+  return runAction(() => emailTemplateUpdateService(parsed.data));
 }
 
 export async function emailTemplateGetByIdAction(input: unknown) {

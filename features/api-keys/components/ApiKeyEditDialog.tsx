@@ -1,19 +1,18 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { UserOption } from "@/features/users";
 
 import { apiKeyUpdateAction } from "../actions/api-key.action";
 import { mapFormValuesToUpdateInput } from "../lib/api-key-form";
+import { apiKeyFormFieldsSchema } from "../schemas/api-key.schema";
 import type { ApiKeyFormValues } from "../types/api-key.type";
-import type { UserOption } from "@/features/users";
 import { ApiKeyForm } from "./ApiKeyForm";
 
 type ApiKeyEditDialogProps = {
@@ -33,25 +32,9 @@ export function ApiKeyEditDialog({
   onOpenChange,
   onSuccess,
 }: ApiKeyEditDialogProps) {
-  const handleSubmit = async (values: ApiKeyFormValues) => {
-    await toast.promise(
-      apiKeyUpdateAction(mapFormValuesToUpdateInput(apiKeyId, values)).then(
-        () => {
-          onOpenChange(false);
-          onSuccess();
-        },
-      ),
-      {
-        loading: "Updating...",
-        success: "Updated successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit API key</DialogTitle>
           <DialogDescription>
@@ -64,11 +47,25 @@ export function ApiKeyEditDialog({
           userOptions={userOptions}
           submitLabel="Update"
           pendingLabel="Updating..."
+          layout="dialog"
           showStatusField
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: apiKeyFormFieldsSchema,
+            action: apiKeyUpdateAction,
+            mapInput: (values) => mapFormValuesToUpdateInput(apiKeyId, values),
+            toast: {
+              loading: "Updating...",
+              success: "Updated successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
+  DialogScrollContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -37,7 +38,7 @@ export function ApiKeyRevealDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Save your API key</DialogTitle>
           <DialogDescription>
@@ -46,20 +47,22 @@ export function ApiKeyRevealDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex gap-2">
-          <Input readOnly value={rawKey ?? ""} className="font-mono text-xs" />
-          <Button type="button" variant="outline" onClick={handleCopy}>
-            <CopyIcon className="size-4" />
-            Copy
-          </Button>
-        </div>
+        <DialogBody>
+          <div className="flex gap-2">
+            <Input readOnly value={rawKey ?? ""} className="font-mono text-xs" />
+            <Button type="button" variant="outline" onClick={handleCopy}>
+              <CopyIcon className="size-4" />
+              Copy
+            </Button>
+          </div>
+        </DialogBody>
 
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t pt-4">
           <Button type="button" onClick={() => onOpenChange(false)}>
             Done
           </Button>
         </DialogFooter>
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

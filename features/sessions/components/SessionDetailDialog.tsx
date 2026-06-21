@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -35,7 +36,7 @@ export function SessionDetailDialog({
 }: SessionDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Session details</DialogTitle>
           <DialogDescription>
@@ -43,6 +44,7 @@ export function SessionDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody>
         {session ? (
           <dl className="grid gap-4">
             <DetailField label="Session ID" value={session.id} />
@@ -86,7 +88,8 @@ export function SessionDetailDialog({
             />
           </dl>
         ) : null}
-      </DialogContent>
+        </DialogBody>
+      </DialogScrollContent>
     </Dialog>
   );
 }

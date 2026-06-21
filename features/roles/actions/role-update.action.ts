@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -8,16 +9,18 @@ import {
 } from "../schemas/role-create.schema";
 import { roleUpdateService } from "../services/role-update.service";
 
-export async function roleUpdateAction(input: unknown) {
+export async function roleUpdateAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof roleUpdateService>>>> {
   await requireSessionUserId();
 
   const parsed = roleUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid role data");
+    return { ok: false, message: first ?? "Invalid role data" };
   }
 
-  return roleUpdateService(parsed.data);
+  return runAction(() => roleUpdateService(parsed.data));
 }
 
 export async function roleGetByIdAction(input: unknown) {

@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -14,7 +12,7 @@ import type { PermissionOptionGroup } from "@/features/permissions";
 import { roleCreateAction } from "../actions/role-create.action";
 import { defaultRoleFormValues } from "../lib/role-form-defaults";
 import { mapFormValuesToRoleCreateInput } from "../lib/role-form-mapper";
-import type { RoleFormValues } from "../types/role.type";
+import { roleFormFieldsSchema } from "../schemas/role-create.schema";
 import { RoleForm } from "./RoleForm";
 
 type RoleCreateDialogProps = {
@@ -30,23 +28,9 @@ export function RoleCreateDialog({
   onOpenChange,
   onSuccess,
 }: RoleCreateDialogProps) {
-  const handleSubmit = async (values: RoleFormValues) => {
-    await toast.promise(
-      roleCreateAction(mapFormValuesToRoleCreateInput(values)).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogScrollContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Create role</DialogTitle>
           <DialogDescription>
@@ -59,10 +43,24 @@ export function RoleCreateDialog({
           permissionOptionGroups={permissionOptionGroups}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: roleFormFieldsSchema,
+            action: roleCreateAction,
+            mapInput: mapFormValuesToRoleCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

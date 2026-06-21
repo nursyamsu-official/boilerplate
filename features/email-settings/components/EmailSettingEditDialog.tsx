@@ -1,78 +1,80 @@
-"use client";
-
-import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-
-import { emailSettingUpdateAction } from "../actions/email-setting-update.action";
-import type { EmailSettingFormValues } from "../types/email-setting.type";
-import { EmailSettingForm } from "./EmailSettingForm";
-
-type EmailSettingEditDialogProps = {
-  open: boolean;
-  settingId: string | null;
-  defaultValues: EmailSettingFormValues | null;
-  hasPassword?: boolean;
-  hasApiKey?: boolean;
-  onOpenChange: (open: boolean) => void;
-  onSuccess: () => void;
-};
-
-export function EmailSettingEditDialog({
-  open,
-  settingId,
-  defaultValues,
-  hasPassword = false,
-  hasApiKey = false,
-  onOpenChange,
-  onSuccess,
-}: EmailSettingEditDialogProps) {
-  const handleSubmit = async (values: EmailSettingFormValues) => {
-    if (!settingId) return;
-
-    await toast.promise(
-      emailSettingUpdateAction({ id: settingId, ...values }).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Updating...",
-        success: "Updated successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Edit email setting</DialogTitle>
-          <DialogDescription>Update provider configuration and status.</DialogDescription>
-        </DialogHeader>
-
-        {defaultValues && settingId ? (
-          <EmailSettingForm
-            key={settingId}
-            defaultValues={defaultValues}
-            isEdit
-            hasPassword={hasPassword}
-            hasApiKey={hasApiKey}
-            submitLabel="Update"
-            pendingLabel="Updating..."
-            onCancel={() => onOpenChange(false)}
-            onSubmit={handleSubmit}
-          />
-        ) : (
-          <p className="text-sm text-muted-foreground">Loading form...</p>
-        )}
-      </DialogContent>
-    </Dialog>
-  );
-}
+"use client";
+
+import { FormDialogSkeleton } from "@/components/form/form-dialog-skeleton";
+import {
+  Dialog,
+  DialogScrollContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+import { emailSettingUpdateAction } from "../actions/email-setting-update.action";
+import {
+  emailSettingUpdateFormFieldsSchema,
+  emailSettingUpdateSchema,
+} from "../schemas/email-setting-create.schema";
+import type { EmailSettingFormValues } from "../types/email-setting.type";
+import { EmailSettingForm } from "./EmailSettingForm";
+
+type EmailSettingEditDialogProps = {
+  open: boolean;
+  settingId: string | null;
+  defaultValues: EmailSettingFormValues | null;
+  hasPassword?: boolean;
+  hasApiKey?: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess: () => void;
+};
+
+export function EmailSettingEditDialog({
+  open,
+  settingId,
+  defaultValues,
+  hasPassword = false,
+  hasApiKey = false,
+  onOpenChange,
+  onSuccess,
+}: EmailSettingEditDialogProps) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogScrollContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Edit email setting</DialogTitle>
+          <DialogDescription>Update provider configuration and status.</DialogDescription>
+        </DialogHeader>
+
+        {defaultValues && settingId ? (
+          <EmailSettingForm
+            key={settingId}
+            defaultValues={defaultValues}
+            isEdit
+            hasPassword={hasPassword}
+            hasApiKey={hasApiKey}
+            submitLabel="Update"
+            pendingLabel="Updating..."
+            layout="dialog"
+            onCancel={() => onOpenChange(false)}
+            submitConfig={{
+              schema: emailSettingUpdateFormFieldsSchema,
+              action: emailSettingUpdateAction,
+              mapInput: (values) =>
+                emailSettingUpdateSchema.parse({ id: settingId, ...values }),
+              toast: {
+                loading: "Updating...",
+                success: "Updated successfully",
+                errorFallback: "Failed to save",
+              },
+              onSuccess: () => {
+                onOpenChange(false);
+                onSuccess();
+              },
+            }}
+          />
+        ) : (
+          <FormDialogSkeleton fields={7} />
+        )}
+      </DialogScrollContent>
+    </Dialog>
+  );
+}

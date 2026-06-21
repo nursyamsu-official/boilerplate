@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -14,7 +12,7 @@ import type { RoleOption } from "@/features/roles";
 import { ssoProviderCreateAction } from "../actions/sso-provider-create.action";
 import { defaultSsoProviderFormValues } from "../lib/sso-provider-form-defaults";
 import { mapFormValuesToSsoProviderCreateInput } from "../lib/sso-provider-form-mapper";
-import type { SsoProviderFormValues } from "../types/sso-provider.type";
+import { ssoProviderFormFieldsSchema } from "../schemas/sso-provider-create.schema";
 import { SsoProviderForm } from "./SsoProviderForm";
 
 type SsoProviderCreateDialogProps = {
@@ -30,25 +28,9 @@ export function SsoProviderCreateDialog({
   onOpenChange,
   onSuccess,
 }: SsoProviderCreateDialogProps) {
-  const handleSubmit = async (values: SsoProviderFormValues) => {
-    await toast.promise(
-      ssoProviderCreateAction(
-        mapFormValuesToSsoProviderCreateInput(values),
-      ).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create SSO provider</DialogTitle>
           <DialogDescription>
@@ -61,10 +43,24 @@ export function SsoProviderCreateDialog({
           roleOptions={roleOptions}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: ssoProviderFormFieldsSchema,
+            action: ssoProviderCreateAction,
+            mapInput: mapFormValuesToSsoProviderCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

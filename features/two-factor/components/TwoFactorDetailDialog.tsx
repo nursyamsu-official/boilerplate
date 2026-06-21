@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -35,7 +36,7 @@ export function TwoFactorDetailDialog({
 }: TwoFactorDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Two-factor details</DialogTitle>
           <DialogDescription>
@@ -43,6 +44,7 @@ export function TwoFactorDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody>
         {record ? (
           <dl className="grid gap-4">
             <DetailField label="Record ID" value={record.id} />
@@ -72,7 +74,8 @@ export function TwoFactorDetailDialog({
             />
           </dl>
         ) : null}
-      </DialogContent>
+        </DialogBody>
+      </DialogScrollContent>
     </Dialog>
   );
 }

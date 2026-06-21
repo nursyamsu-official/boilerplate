@@ -5,7 +5,8 @@ import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -47,7 +48,7 @@ export function WebhookLogDetailDialog({
 }: WebhookLogDetailDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+      <DialogScrollContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Webhook log details</DialogTitle>
           <DialogDescription>
@@ -55,6 +56,7 @@ export function WebhookLogDetailDialog({
           </DialogDescription>
         </DialogHeader>
 
+        <DialogBody>
         {record ? (
           <dl className="grid gap-4">
             <DetailField label="ID" value={record.id} />
@@ -134,7 +136,8 @@ export function WebhookLogDetailDialog({
             />
           </dl>
         ) : null}
-      </DialogContent>
+        </DialogBody>
+      </DialogScrollContent>
     </Dialog>
   );
 }

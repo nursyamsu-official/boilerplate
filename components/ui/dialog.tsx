@@ -85,11 +85,37 @@ function DialogContent({
   )
 }
 
+function DialogScrollContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof DialogContent>) {
+  return (
+    <DialogContent
+      data-slot="dialog-scroll-content"
+      className={cn(
+        "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-lg",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-body"
+      className={cn("min-h-0 flex-1 overflow-y-auto pr-1", className)}
+      {...props}
+    />
+  )
+}
+
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1", className)}
+      className={cn("flex shrink-0 flex-col gap-1", className)}
       {...props}
     />
   )
@@ -153,6 +179,7 @@ function DialogDescription({
 
 export {
   Dialog,
+  DialogBody,
   DialogClose,
   DialogContent,
   DialogDescription,
@@ -160,6 +187,7 @@ export {
   DialogHeader,
   DialogOverlay,
   DialogPortal,
+  DialogScrollContent,
   DialogTitle,
   DialogTrigger,
 }

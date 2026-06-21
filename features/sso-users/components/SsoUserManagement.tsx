@@ -29,7 +29,7 @@ type SsoUserManagementProps = {
 
 type EditDialogState = {
   linkId: string;
-  defaultValues: SsoUserFormValues;
+  defaultValues: SsoUserFormValues | null;
 };
 
 export function SsoUserManagement({
@@ -43,7 +43,8 @@ export function SsoUserManagement({
   const [editDialogState, setEditDialogState] = useState<EditDialogState | null>(
     null,
   );
-  const [isEditLoading, setIsEditLoading] = useState(false);
+  const isEditLoading =
+    editDialogState !== null && editDialogState.defaultValues === null;
 
   const handleFiltersChange = useCallback(
     (partial: Partial<SsoUserFilterInput>) => {
@@ -58,7 +59,7 @@ export function SsoUserManagement({
   }, [router]);
 
   const handleEdit = useCallback(async (link: SsoUserTableRow) => {
-    setIsEditLoading(true);
+    setEditDialogState({ linkId: link.id, defaultValues: null });
 
     try {
       const detail = await ssoUserGetByIdAction({ id: link.id });
@@ -68,8 +69,7 @@ export function SsoUserManagement({
       });
     } catch {
       toast.error("Failed to load SSO user link");
-    } finally {
-      setIsEditLoading(false);
+      setEditDialogState(null);
     }
   }, []);
 

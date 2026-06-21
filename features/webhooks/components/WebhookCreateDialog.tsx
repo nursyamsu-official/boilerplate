@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -14,7 +12,7 @@ import type { UserOption } from "@/features/users";
 import { webhookCreateAction } from "../actions/webhook-create.action";
 import { defaultWebhookFormValues } from "../lib/webhook-form-defaults";
 import { mapFormValuesToWebhookCreateInput } from "../lib/webhook-form-mapper";
-import type { WebhookFormValues } from "../types/webhook.type";
+import { webhookFormFieldsSchema } from "../schemas/webhook-create.schema";
 import { WebhookForm } from "./WebhookForm";
 
 type WebhookCreateDialogProps = {
@@ -30,23 +28,9 @@ export function WebhookCreateDialog({
   onOpenChange,
   onSuccess,
 }: WebhookCreateDialogProps) {
-  const handleSubmit = async (values: WebhookFormValues) => {
-    await toast.promise(
-      webhookCreateAction(mapFormValuesToWebhookCreateInput(values)).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogScrollContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Create webhook</DialogTitle>
           <DialogDescription>
@@ -59,10 +43,24 @@ export function WebhookCreateDialog({
           userOptions={userOptions}
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: webhookFormFieldsSchema,
+            action: webhookCreateAction,
+            mapInput: mapFormValuesToWebhookCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

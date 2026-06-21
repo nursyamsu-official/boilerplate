@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,16 +10,18 @@ import {
 import { webhookGetByIdService } from "../services/webhook-get-by-id.service";
 import { webhookUpdateService } from "../services/webhook-update.service";
 
-export async function webhookUpdateAction(input: unknown) {
+export async function webhookUpdateAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof webhookUpdateService>>>> {
   await requireSessionUserId();
 
   const parsed = webhookUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid webhook data");
+    return { ok: false, message: first ?? "Invalid webhook data" };
   }
 
-  return webhookUpdateService(parsed.data);
+  return runAction(() => webhookUpdateService(parsed.data));
 }
 
 export async function webhookGetByIdAction(input: unknown) {

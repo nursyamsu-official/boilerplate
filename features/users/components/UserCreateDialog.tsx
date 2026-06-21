@@ -1,10 +1,8 @@
 "use client";
 
-import { toast } from "sonner";
-
 import {
   Dialog,
-  DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
@@ -14,7 +12,7 @@ import type { RoleOption } from "@/features/roles";
 import { userCreateAction } from "../actions/user-create.action";
 import { defaultUserCreateFormValues } from "../lib/user-form-defaults";
 import { mapFormValuesToUserCreateInput } from "../lib/user-form-mapper";
-import type { UserFormValues } from "../types/user.type";
+import { userCreateFormFieldsSchema } from "../schemas/user-create.schema";
 import { UserForm } from "./UserForm";
 
 type UserCreateDialogProps = {
@@ -30,23 +28,9 @@ export function UserCreateDialog({
   onOpenChange,
   onSuccess,
 }: UserCreateDialogProps) {
-  const handleSubmit = async (values: UserFormValues) => {
-    await toast.promise(
-      userCreateAction(mapFormValuesToUserCreateInput(values)).then(() => {
-        onOpenChange(false);
-        onSuccess();
-      }),
-      {
-        loading: "Creating...",
-        success: "Created successfully",
-        error: "Failed to save",
-      },
-    );
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogScrollContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Create user</DialogTitle>
           <DialogDescription>
@@ -60,10 +44,24 @@ export function UserCreateDialog({
           mode="create"
           submitLabel="Create"
           pendingLabel="Creating..."
+          layout="dialog"
           onCancel={() => onOpenChange(false)}
-          onSubmit={handleSubmit}
+          submitConfig={{
+            schema: userCreateFormFieldsSchema,
+            action: userCreateAction,
+            mapInput: mapFormValuesToUserCreateInput,
+            toast: {
+              loading: "Creating...",
+              success: "Created successfully",
+              errorFallback: "Failed to save",
+            },
+            onSuccess: () => {
+              onOpenChange(false);
+              onSuccess();
+            },
+          }}
         />
-      </DialogContent>
+      </DialogScrollContent>
     </Dialog>
   );
 }

@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,16 +10,18 @@ import {
 import { ssoUserGetByIdService } from "../services/sso-user-get-by-id.service";
 import { ssoUserUpdateService } from "../services/sso-user-update.service";
 
-export async function ssoUserUpdateAction(input: unknown) {
+export async function ssoUserUpdateAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof ssoUserUpdateService>>>> {
   await requireSessionUserId();
 
   const parsed = ssoUserUpdateSchema.safeParse(input);
   if (!parsed.success) {
     const first = parsed.error.issues[0]?.message;
-    throw new Error(first ?? "Invalid SSO user data");
+    return { ok: false, message: first ?? "Invalid SSO user data" };
   }
 
-  return ssoUserUpdateService(parsed.data);
+  return runAction(() => ssoUserUpdateService(parsed.data));
 }
 
 export async function ssoUserGetByIdAction(input: unknown) {
