@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -9,15 +10,17 @@ import {
 import { userDeleteService } from "../services/user-delete.service";
 import { userSetStatusService } from "../services/user-set-status.service";
 
-export async function userDeleteAction(input: unknown) {
+export async function userDeleteAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof userDeleteService>>>> {
   await requireSessionUserId();
 
   const parsed = userDeleteSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Error("Invalid user id");
+    return { ok: false, message: "Invalid user id" };
   }
 
-  return userDeleteService(parsed.data.id);
+  return runAction(() => userDeleteService(parsed.data.id));
 }
 
 export async function userSetStatusAction(input: unknown) {

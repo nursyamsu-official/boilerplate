@@ -56,15 +56,17 @@ export async function apiKeyRevokeAction(input: unknown) {
   return apiKeyRevokeService(parsed.data.id, actorId);
 }
 
-export async function apiKeyDeleteAction(input: unknown) {
+export async function apiKeyDeleteAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof apiKeyDeleteService>>>> {
   const actorId = await requireSessionUserId();
 
   const parsed = apiKeyDeleteSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Error("Invalid API key id");
+    return { ok: false, message: "Invalid API key id" };
   }
 
-  return apiKeyDeleteService(parsed.data.id, actorId);
+  return runAction(() => apiKeyDeleteService(parsed.data.id, actorId));
 }
 
 export async function apiKeyGetByIdAction(input: unknown) {

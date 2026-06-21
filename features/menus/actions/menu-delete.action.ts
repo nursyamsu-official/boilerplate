@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import {
@@ -15,15 +16,17 @@ import {
 import { menuToggleStatusService } from "../services/menu-update.service";
 import type { MenuDetail, MenuParentOption } from "../types/menu.type";
 
-export async function menuDeleteAction(input: unknown) {
+export async function menuDeleteAction(
+  input: unknown,
+): Promise<ActionResult<Awaited<ReturnType<typeof menuDeleteService>>>> {
   await requireSessionUserId();
 
   const parsed = menuDeleteSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Error("Invalid menu id");
+    return { ok: false, message: "Invalid menu id" };
   }
 
-  return menuDeleteService(parsed.data.id);
+  return runAction(() => menuDeleteService(parsed.data.id));
 }
 
 export async function menuToggleStatusAction(input: unknown) {

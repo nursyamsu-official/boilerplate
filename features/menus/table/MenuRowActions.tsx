@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import {
   menuDeleteAction,
   menuToggleStatusAction,
@@ -54,21 +56,16 @@ export function MenuRowActions({
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      menuDeleteAction({ id: menu.id })
-        .then(() => {
-          onRefresh();
-        })
-        .finally(() => {
-          setIsDeleting(false);
-        }),
-      {
+    runRowActionWithToast({
+      action: () => menuDeleteAction({ id: menu.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

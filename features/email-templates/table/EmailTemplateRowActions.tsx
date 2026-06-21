@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import {
   emailTemplateDeleteAction,
   emailTemplateToggleStatusAction,
@@ -54,17 +56,16 @@ export function EmailTemplateRowActions({
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      emailTemplateDeleteAction({ id: template.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => emailTemplateDeleteAction({ id: template.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

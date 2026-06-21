@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import {
   webhookDeleteAction,
   webhookToggleStatusAction,
@@ -54,17 +56,16 @@ export function WebhookRowActions({
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      webhookDeleteAction({ id: webhook.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => webhookDeleteAction({ id: webhook.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

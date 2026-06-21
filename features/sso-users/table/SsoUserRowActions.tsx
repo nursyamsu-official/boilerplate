@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import { ssoUserDeleteAction } from "../actions/sso-user-delete.action";
 import type { SsoUserTableRow } from "../types/sso-user.type";
 
@@ -38,17 +40,16 @@ export function SsoUserRowActions({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      ssoUserDeleteAction({ id: link.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => ssoUserDeleteAction({ id: link.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

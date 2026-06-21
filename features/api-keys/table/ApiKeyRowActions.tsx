@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import {
   apiKeyDeleteAction,
   apiKeyRevokeAction,
@@ -56,17 +58,16 @@ export function ApiKeyRowActions({
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      apiKeyDeleteAction({ id: apiKey.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => apiKeyDeleteAction({ id: apiKey.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

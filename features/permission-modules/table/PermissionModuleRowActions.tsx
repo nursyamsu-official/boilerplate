@@ -20,6 +20,7 @@ import {
   IconTooltipButton,
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
 
 import {
   permissionModuleDeleteAction,
@@ -54,17 +55,16 @@ export function PermissionModuleRowActions({
   };
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      permissionModuleDeleteAction({ id: module.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => permissionModuleDeleteAction({ id: module.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

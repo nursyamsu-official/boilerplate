@@ -21,6 +21,8 @@ import {
   TooltipIconTrigger,
 } from "@/components/ui/icon-tooltip-button";
 
+import { runRowActionWithToast } from "@/lib/run-row-action-with-toast";
+
 import { permissionDeleteAction } from "../actions/permission-delete.action";
 import type { PermissionTableRow } from "../types/permission.type";
 
@@ -38,17 +40,16 @@ export function PermissionRowActions({
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
-    setIsDeleting(true);
-    toast.promise(
-      permissionDeleteAction({ id: permission.id })
-        .then(() => onRefresh())
-        .finally(() => setIsDeleting(false)),
-      {
+    runRowActionWithToast({
+      action: () => permissionDeleteAction({ id: permission.id }),
+      onSuccess: onRefresh,
+      toast: {
         loading: "Deleting...",
         success: "Deleted successfully",
-        error: "Failed to delete",
+        errorFallback: "Failed to delete",
       },
-    );
+      setPending: setIsDeleting,
+    });
   };
 
   return (

@@ -1,5 +1,6 @@
 "use server";
 
+import { runAction, type ActionResult } from "@/lib/action-result";
 import { requireSessionUserId } from "@/lib/require-session";
 
 import { emailSettingDeleteSchema } from "../schemas/email-setting-create.schema";
@@ -9,15 +10,19 @@ import {
   emailSettingToggleStatusService,
 } from "../services/email-setting-update.service";
 
-export async function emailSettingDeleteAction(input: unknown) {
+export async function emailSettingDeleteAction(
+  input: unknown,
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof emailSettingDeleteService>>>
+> {
   await requireSessionUserId();
 
   const parsed = emailSettingDeleteSchema.safeParse(input);
   if (!parsed.success) {
-    throw new Error("Invalid setting id");
+    return { ok: false, message: "Invalid setting id" };
   }
 
-  return emailSettingDeleteService(parsed.data.id);
+  return runAction(() => emailSettingDeleteService(parsed.data.id));
 }
 
 export async function emailSettingToggleStatusAction(input: unknown) {
