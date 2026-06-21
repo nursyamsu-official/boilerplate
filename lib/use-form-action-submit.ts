@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { toast } from "sonner";
 import type { ZodTypeAny } from "zod";
 
@@ -9,6 +8,30 @@ import {
   mapActionFailureToValidatorErrors,
   mapZodErrorToFormFieldErrors,
 } from "@/lib/zod-form-validator";
+
+const DIALOG_CLOSE_REFRESH_DELAY_MS = 150;
+
+export function createDialogSubmitSuccessHandler(
+  onOpenChange: (open: boolean) => void,
+  onRefresh: () => void,
+): () => void {
+  return () => {
+    onOpenChange(false);
+    window.setTimeout(onRefresh, DIALOG_CLOSE_REFRESH_DELAY_MS);
+  };
+}
+
+export function createDialogSubmitSuccessHandlerWithData<TResult>(
+  onOpenChange: (open: boolean) => void,
+  onRefresh: () => void,
+  onClose?: (data: TResult) => void,
+): (data: TResult) => void {
+  return (data) => {
+    onOpenChange(false);
+    onClose?.(data);
+    window.setTimeout(onRefresh, DIALOG_CLOSE_REFRESH_DELAY_MS);
+  };
+}
 
 export type FormActionSubmitConfig<TValues, TResult> = {
   schema: ZodTypeAny;
@@ -25,8 +48,6 @@ export type FormActionSubmitConfig<TValues, TResult> = {
 export function useFormActionSubmit<TValues, TResult>(
   config: FormActionSubmitConfig<TValues, TResult>,
 ) {
-  const successDataRef = useRef<TResult | null>(null);
-
   const onSubmitAsync = async ({ value }: { value: TValues }) => {
     const parsed = config.schema.safeParse(value);
 
@@ -40,30 +61,23 @@ export function useFormActionSubmit<TValues, TResult>(
       toast.error(
         formatActionFailureToast(config.toast.errorFallback, result.message),
       );
-      successDataRef.current = null;
       return mapActionFailureToValidatorErrors(result);
     }
 
-    successDataRef.current = result.data;
-    return null;
-  };
-
-  const onSubmit = async () => {
-    const data = successDataRef.current;
-    successDataRef.current = null;
-
-    if (data === null) {
-      return;
-    }
-
     await toast.promise(
-      Promise.resolve(config.onSuccess(data)),
+      Promise.resolve(config.onSuccess(result.data)),
       {
         loading: config.toast.loading,
         success: config.toast.success,
         error: config.toast.errorFallback,
       },
     );
+
+    return null;
+  };
+
+  const onSubmit = async () => {
+    // Success side effects run in onSubmitAsync after the action completes.
   };
 
   return { onSubmitAsync, onSubmit };

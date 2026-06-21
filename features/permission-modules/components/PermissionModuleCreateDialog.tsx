@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { permissionModuleCreateAction } from "../actions/permission-module-create.action";
 import { defaultPermissionModuleFormValues } from "../lib/permission-module-form-defaults";
 import { mapFormValuesToPermissionModuleCreateInput } from "../lib/permission-module-form-mapper";
@@ -50,10 +52,10 @@ export function PermissionModuleCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import type { RoleOption } from "@/features/roles";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { ssoProviderCreateAction } from "../actions/sso-provider-create.action";
 import { defaultSsoProviderFormValues } from "../lib/sso-provider-form-defaults";
 import { mapFormValuesToSsoProviderCreateInput } from "../lib/sso-provider-form-mapper";
@@ -54,10 +56,10 @@ export function SsoProviderCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

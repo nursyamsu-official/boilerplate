@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import type { UserOption } from "@/features/users";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { apiKeyUpdateAction } from "../actions/api-key.action";
 import { mapFormValuesToUpdateInput } from "../lib/api-key-form";
 import { apiKeyFormFieldsSchema } from "../schemas/api-key.schema";
@@ -59,10 +61,10 @@ export function ApiKeyEditDialog({
               success: "Updated successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

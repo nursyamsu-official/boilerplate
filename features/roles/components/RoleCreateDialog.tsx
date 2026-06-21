@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import type { PermissionOptionGroup } from "@/features/permissions";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { roleCreateAction } from "../actions/role-create.action";
 import { defaultRoleFormValues } from "../lib/role-form-defaults";
 import { mapFormValuesToRoleCreateInput } from "../lib/role-form-mapper";
@@ -54,10 +56,10 @@ export function RoleCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

@@ -10,6 +10,8 @@ import {
 import type { SsoProviderOption } from "@/features/sso-providers";
 import type { UserOption } from "@/features/users";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { ssoUserCreateAction } from "../actions/sso-user-create.action";
 import { defaultSsoUserFormValues } from "../lib/sso-user-form-defaults";
 import { mapFormValuesToSsoUserCreateInput } from "../lib/sso-user-form-mapper";
@@ -58,10 +60,10 @@ export function SsoUserCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

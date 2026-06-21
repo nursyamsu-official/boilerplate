@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { emailTemplateCreateAction } from "../actions/email-template-create.action";
 import { defaultEmailTemplateFormValues } from "../lib/email-template-form-defaults";
 import { mapFormValuesToEmailTemplateCreateInput } from "../lib/email-template-form-mapper";
@@ -50,10 +52,10 @@ export function EmailTemplateCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

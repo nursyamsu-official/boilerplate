@@ -9,6 +9,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { emailTemplateUpdateAction } from "../actions/email-template-update.action";
 import { mapFormValuesToEmailTemplateUpdateInput } from "../lib/email-template-form-mapper";
 import { emailTemplateFormFieldsSchema } from "../schemas/email-template-create.schema";
@@ -59,10 +61,10 @@ export function EmailTemplateEditDialog({
                 success: "Updated successfully",
                 errorFallback: "Failed to save",
               },
-              onSuccess: () => {
-                onOpenChange(false);
-                onSuccess();
-              },
+              onSuccess: createDialogSubmitSuccessHandler(
+                onOpenChange,
+                onSuccess,
+              ),
             }}
           />
         ) : (

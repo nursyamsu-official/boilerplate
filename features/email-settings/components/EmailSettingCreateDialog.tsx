@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { emailSettingCreateAction } from "../actions/email-setting-create.action";
 import { defaultEmailSettingFormValues } from "../lib/email-setting-form-defaults";
 import { emailSettingCreateSchema, emailSettingFormFieldsSchema } from "../schemas/email-setting-create.schema";
@@ -49,10 +51,10 @@ export function EmailSettingCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

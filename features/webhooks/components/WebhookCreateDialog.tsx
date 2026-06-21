@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import type { UserOption } from "@/features/users";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { webhookCreateAction } from "../actions/webhook-create.action";
 import { defaultWebhookFormValues } from "../lib/webhook-form-defaults";
 import { mapFormValuesToWebhookCreateInput } from "../lib/webhook-form-mapper";
@@ -54,10 +56,10 @@ export function WebhookCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

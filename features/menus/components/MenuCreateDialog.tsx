@@ -8,6 +8,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { menuCreateAction } from "../actions/menu-create.action";
 import { defaultMenuFormValues } from "../lib/menu-form-defaults";
 import { mapFormValuesToCreateInput } from "../lib/menu-form-mapper";
@@ -54,10 +56,10 @@ export function MenuCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>

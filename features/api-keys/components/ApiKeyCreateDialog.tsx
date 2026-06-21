@@ -18,7 +18,10 @@ import {
 } from "../lib/api-key-form";
 import { apiKeyFormFieldsSchema } from "../schemas/api-key.schema";
 import type { ApiKeyFormValues } from "../types/api-key.type";
-import type { FormActionSubmitConfig } from "@/lib/use-form-action-submit";
+import {
+  createDialogSubmitSuccessHandlerWithData,
+  type FormActionSubmitConfig,
+} from "@/lib/use-form-action-submit";
 import { ApiKeyForm } from "./ApiKeyForm";
 import { ApiKeyRevealDialog } from "./ApiKeyRevealDialog";
 
@@ -59,15 +62,16 @@ export function ApiKeyCreateDialog({
       success: "Created successfully",
       errorFallback: "Failed to save",
     },
-    onSuccess: (data) => {
-      const createResult = data as ApiKeyCreateResult;
-      onOpenChange(false);
-      onSuccess();
-      setRevealState({
-        rawKey: createResult.rawKey,
-        name: submittedNameRef.current,
-      });
-    },
+    onSuccess: createDialogSubmitSuccessHandlerWithData<ApiKeyCreateResult>(
+      onOpenChange,
+      onSuccess,
+      (createResult) => {
+        setRevealState({
+          rawKey: createResult.rawKey,
+          name: submittedNameRef.current,
+        });
+      },
+    ),
   };
 
   return (

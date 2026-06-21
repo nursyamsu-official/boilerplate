@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/dialog";
 import type { RoleOption } from "@/features/roles";
 
+import { createDialogSubmitSuccessHandler } from "@/lib/use-form-action-submit";
+
 import { userCreateAction } from "../actions/user-create.action";
 import { defaultUserCreateFormValues } from "../lib/user-form-defaults";
 import { mapFormValuesToUserCreateInput } from "../lib/user-form-mapper";
@@ -55,10 +57,10 @@ export function UserCreateDialog({
               success: "Created successfully",
               errorFallback: "Failed to save",
             },
-            onSuccess: () => {
-              onOpenChange(false);
-              onSuccess();
-            },
+            onSuccess: createDialogSubmitSuccessHandler(
+              onOpenChange,
+              onSuccess,
+            ),
           }}
         />
       </DialogScrollContent>
