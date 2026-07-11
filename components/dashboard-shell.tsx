@@ -25,7 +25,9 @@ export function DashboardShell({
     <SidebarProvider>
       <AppSidebar appName={appName} menuTree={menuTree} user={user} />
       <SidebarInset>
-        <DashboardHeader menuTree={menuTree} />
+        <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <DashboardHeader menuTree={menuTree} />
+        </header>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
