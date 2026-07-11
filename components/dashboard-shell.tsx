@@ -8,6 +8,8 @@ import type {
   NavigationUser,
 } from "@/features/navigation";
 
+import { ModeToggle } from "@/components/ui/toggle-theme";
+
 type DashboardShellProps = {
   appName: string;
   menuTree: NavigationMenuTreeNode[];
@@ -26,9 +28,12 @@ export function DashboardShell({
       <AppSidebar appName={appName} menuTree={menuTree} user={user} />
       <SidebarInset>
         <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <DashboardHeader menuTree={menuTree} />
+          <div className="flex items-center gap-2 justify-between w-full">
+            <DashboardHeader menuTree={menuTree} />
+            <ModeToggle />
+          </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

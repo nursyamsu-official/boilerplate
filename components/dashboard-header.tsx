@@ -34,11 +34,13 @@ export function DashboardHeader({ menuTree }: DashboardHeaderProps) {
   const pathname = usePathname();
   const labels = findNavigationPathLabels(menuTree, pathname);
   const pageTitle =
-    labels.length > 0 ? labels[labels.length - 1] : formatPathFallback(pathname);
+    labels.length > 0
+      ? labels[labels.length - 1]
+      : formatPathFallback(pathname);
 
   return (
-    <header className="flex h-16 shrink-0 items-center gap-2 border-b">
-      <div className="flex items-center gap-2 px-4">
+    <header className="flex h-16 shrink-0 items-center gap-2 ">
+      <div className="flex items-center gap-2 px-0">
         <SidebarTrigger className="-ml-1" />
         <Separator
           orientation="vertical"
