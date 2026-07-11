@@ -1,3 +1,5 @@
+export { canAccessMenuPath } from "./lib/can-access-menu-path";
+export { collectNavigationPaths } from "./lib/collect-navigation-paths";
 export {
   findNavigationPathLabels,
   isNavigationNodeActive,
