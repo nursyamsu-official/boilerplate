@@ -97,7 +97,14 @@ export async function seedAccessManagement() {
 
     const record = await prisma.menu.upsert({
       where: { code: menu.code },
-      update: {},
+      update: {
+        label: menu.label,
+        path: menu.path,
+        icon: menu.icon,
+        parentId,
+        sortOrder: menu.sortOrder,
+        isActive: true,
+      },
       create: {
         code: menu.code,
         label: menu.label,
@@ -110,6 +117,11 @@ export async function seedAccessManagement() {
     });
     menuIdByCode.set(menu.code, record.id);
   }
+
+  await prisma.menu.updateMany({
+    where: { code: "system_settings" },
+    data: { isActive: false },
+  });
 
   let roleMenuCount = 0;
   for (const assignment of roleMenus) {

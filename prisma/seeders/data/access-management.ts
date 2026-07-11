@@ -224,11 +224,19 @@ export const menus: MenuSeed[] = [
     sortOrder: 3,
   },
   {
+    code: "user_management",
+    label: "User Management",
+    path: null,
+    icon: "Users",
+    parentCode: "admin",
+    sortOrder: 1,
+  },
+  {
     code: "users",
     label: "Users",
     path: "/dashboard/admin-page/user-management/users",
     icon: "Users",
-    parentCode: "admin",
+    parentCode: "user_management",
     sortOrder: 1,
   },
   {
@@ -236,7 +244,7 @@ export const menus: MenuSeed[] = [
     label: "Roles",
     path: "/dashboard/admin-page/user-management/roles",
     icon: "ShieldCheck",
-    parentCode: "admin",
+    parentCode: "user_management",
     sortOrder: 2,
   },
   {
@@ -244,7 +252,7 @@ export const menus: MenuSeed[] = [
     label: "Permissions",
     path: "/dashboard/admin-page/user-management/permissions",
     icon: "Lock",
-    parentCode: "admin",
+    parentCode: "user_management",
     sortOrder: 3,
   },
   {
@@ -252,7 +260,7 @@ export const menus: MenuSeed[] = [
     label: "Permission Modules",
     path: "/dashboard/admin-page/user-management/permission-modules",
     icon: "Layers",
-    parentCode: "admin",
+    parentCode: "user_management",
     sortOrder: 4,
   },
   {
@@ -260,7 +268,7 @@ export const menus: MenuSeed[] = [
     label: "Login History",
     path: "/dashboard/admin-page/user-management/login-history",
     icon: "History",
-    parentCode: "admin",
+    parentCode: "user_management",
     sortOrder: 5,
   },
   {
@@ -269,7 +277,7 @@ export const menus: MenuSeed[] = [
     path: "/dashboard/admin-page/menus",
     icon: "Menu",
     parentCode: "admin",
-    sortOrder: 6,
+    sortOrder: 2,
   },
   {
     code: "security",
@@ -277,7 +285,7 @@ export const menus: MenuSeed[] = [
     path: null,
     icon: "Shield",
     parentCode: "admin",
-    sortOrder: 7,
+    sortOrder: 3,
   },
   {
     code: "sessions",
@@ -317,7 +325,7 @@ export const menus: MenuSeed[] = [
     path: null,
     icon: "Mail",
     parentCode: "admin",
-    sortOrder: 8,
+    sortOrder: 4,
   },
   {
     code: "email_settings",
@@ -349,7 +357,7 @@ export const menus: MenuSeed[] = [
     path: null,
     icon: "Link",
     parentCode: "admin",
-    sortOrder: 9,
+    sortOrder: 5,
   },
   {
     code: "webhooks",
@@ -383,26 +391,24 @@ export const menus: MenuSeed[] = [
     parentCode: "integration",
     sortOrder: 4,
   },
-  {
-    code: "system_settings",
-    label: "System Settings",
-    path: "/dashboard/admin-page/system-settings",
-    icon: "Server",
-    parentCode: "admin",
-    sortOrder: 10,
-  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
 
-const menuGroupCodes = new Set(["admin", "email", "security", "integration"]);
+const menuGroupCodes = new Set([
+  "admin",
+  "user_management",
+  "email",
+  "security",
+  "integration",
+]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
 const adminFullCrudMenuCodes = allMenuCodes.filter(
   (code) => !menuGroupCodes.has(code) && !userNavMenuCodes.has(code),
 );
 
-const adminExcludedMenuCodes = new Set(["permissions", "system_settings"]);
+const adminExcludedMenuCodes = new Set(["permissions"]);
 
 function buildRoleMenuAssignments(
   roleCode: string,
