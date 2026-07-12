@@ -46,3 +46,9 @@ export async function companyCountOrganizationalUnitsRepository(id: string) {
     where: { companyId: id },
   });
 }
+
+export async function companyCountLogisticUnitsRepository(id: string) {
+  return prisma.logisticUnit.count({
+    where: { companyId: id },
+  });
+}

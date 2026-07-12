@@ -1,4 +1,5 @@
 import {
+  companyCountLogisticUnitsRepository,
   companyCountOrganizationalUnitsRepository,
   companyGetByIdRepository,
 } from "../repositories/company-create.repository";
@@ -13,6 +14,11 @@ export async function companyDeleteService(id: string) {
   const unitCount = await companyCountOrganizationalUnitsRepository(id);
   if (unitCount > 0) {
     throw new Error("Cannot delete company with organizational units");
+  }
+
+  const logisticUnitCount = await companyCountLogisticUnitsRepository(id);
+  if (logisticUnitCount > 0) {
+    throw new Error("Cannot delete company with logistic units");
   }
 
   return companyDeleteRepository(id);

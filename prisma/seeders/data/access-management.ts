@@ -111,7 +111,7 @@ export const modules: ModuleSeed[] = [
   {
     code: "organization_management",
     name: "Organization Management",
-    description: "Manage companies and organizational units",
+    description: "Manage companies, organizational units, and logistic units",
     sortOrder: 9,
   },
 ];
@@ -193,6 +193,12 @@ export const permissions: PermissionSeed[] = [
     code: "manage_organizational_unit",
     name: "Manage Organizational Unit",
     description: "Create, update, and remove organizational units",
+    moduleCode: "organization_management",
+  },
+  {
+    code: "manage_logistic_unit",
+    name: "Manage Logistic Unit",
+    description: "Create, update, and remove logistic units",
     moduleCode: "organization_management",
   },
 ];
@@ -432,6 +438,14 @@ export const menus: MenuSeed[] = [
     icon: "Network",
     parentCode: "organization",
     sortOrder: 2,
+  },
+  {
+    code: "logistic_units",
+    label: "Logistic Units",
+    path: "/dashboard/admin-page/organization/logistic_units",
+    icon: "Truck",
+    parentCode: "organization",
+    sortOrder: 3,
   },
 ];
 

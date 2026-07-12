@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-import { companies, organizationalUnits } from "../data/organization";
+import { companies, logisticUnits, organizationalUnits } from "../data/organization";
 
 export async function seedOrganization() {
   const companyIdByCode = new Map<string, string>();
@@ -67,7 +67,53 @@ export async function seedOrganization() {
     unitIdByKey.set(`${unit.companyCode}:${unit.code}`, record.id);
   }
 
+  const logisticUnitIdByKey = new Map<string, string>();
+
+  for (const unit of logisticUnits) {
+    const companyId = companyIdByCode.get(unit.companyCode);
+    if (!companyId) {
+      throw new Error(`Missing company for logistic unit: ${unit.code}`);
+    }
+
+    const parentId = unit.parentCode
+      ? (logisticUnitIdByKey.get(`${unit.companyCode}:${unit.parentCode}`) ??
+        null)
+      : null;
+
+    if (unit.parentCode && !parentId) {
+      throw new Error(`Missing parent unit for code: ${unit.code}`);
+    }
+
+    const record = await prisma.logisticUnit.upsert({
+      where: {
+        companyId_code: {
+          companyId,
+          code: unit.code,
+        },
+      },
+      update: {
+        name: unit.name,
+        description: unit.description,
+        parentId,
+        sortOrder: unit.sortOrder,
+        isActive: true,
+      },
+      create: {
+        companyId,
+        code: unit.code,
+        name: unit.name,
+        description: unit.description,
+        parentId,
+        sortOrder: unit.sortOrder,
+        isActive: true,
+      },
+    });
+
+    logisticUnitIdByKey.set(`${unit.companyCode}:${unit.code}`, record.id);
+  }
+
   console.log("Organization seed complete:");
   console.log(`  companies:             ${companies.length}`);
   console.log(`  organizational units:  ${organizationalUnits.length}`);
+  console.log(`  logistic units:        ${logisticUnits.length}`);
 }

@@ -14,6 +14,10 @@ const navItems = [
     href: "/dashboard/admin-page/organization/organizational_units",
     label: "Organizational Units",
   },
+  {
+    href: "/dashboard/admin-page/organization/logistic_units",
+    label: "Logistic Units",
+  },
 ] as const;
 
 export function OrganizationNav() {
