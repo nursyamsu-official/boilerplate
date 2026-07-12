@@ -138,6 +138,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage product types, groups, categories, and products",
     sortOrder: 13,
   },
+  {
+    code: "evaluation_management",
+    name: "Evaluation Management",
+    description: "Manage evaluation methods, scoring methods, templates, and criteria",
+    sortOrder: 14,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -296,6 +302,30 @@ export const permissions: PermissionSeed[] = [
     name: "Manage Product",
     description: "Create, update, and remove products",
     moduleCode: "product_attribute_management",
+  },
+  {
+    code: "manage_evaluation_method",
+    name: "Manage Evaluation Method",
+    description: "Create, update, and remove evaluation methods",
+    moduleCode: "evaluation_management",
+  },
+  {
+    code: "manage_evaluation_scoring_method",
+    name: "Manage Evaluation Scoring Method",
+    description: "Create, update, and remove evaluation scoring methods",
+    moduleCode: "evaluation_management",
+  },
+  {
+    code: "manage_evaluation_template",
+    name: "Manage Evaluation Template",
+    description: "Create, update, and remove evaluation templates",
+    moduleCode: "evaluation_management",
+  },
+  {
+    code: "manage_evaluation_criteria",
+    name: "Manage Evaluation Criteria",
+    description: "Create, update, and remove evaluation criteria",
+    moduleCode: "evaluation_management",
   },
 ];
 
@@ -671,6 +701,46 @@ export const menus: MenuSeed[] = [
     parentCode: "product_attribute",
     sortOrder: 4,
   },
+  {
+    code: "evaluation",
+    label: "Evaluation",
+    path: null,
+    icon: "ClipboardCheck",
+    parentCode: "admin",
+    sortOrder: 11,
+  },
+  {
+    code: "evaluation_methods",
+    label: "Evaluation Methods",
+    path: "/dashboard/admin-page/evaluation/evaluation-methods",
+    icon: "GitCompare",
+    parentCode: "evaluation",
+    sortOrder: 1,
+  },
+  {
+    code: "evaluation_scoring_methods",
+    label: "Scoring Methods",
+    path: "/dashboard/admin-page/evaluation/evaluation-scoring-methods",
+    icon: "Calculator",
+    parentCode: "evaluation",
+    sortOrder: 2,
+  },
+  {
+    code: "evaluation_templates",
+    label: "Evaluation Templates",
+    path: "/dashboard/admin-page/evaluation/evaluation-templates",
+    icon: "LayoutTemplate",
+    parentCode: "evaluation",
+    sortOrder: 3,
+  },
+  {
+    code: "evaluation_criteria",
+    label: "Evaluation Criteria",
+    path: "/dashboard/admin-page/evaluation/evaluation-criteria",
+    icon: "ListChecks",
+    parentCode: "evaluation",
+    sortOrder: 4,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -686,6 +756,7 @@ const menuGroupCodes = new Set([
   "document_configuration",
   "uom",
   "product_attribute",
+  "evaluation",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 

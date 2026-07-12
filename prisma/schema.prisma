@@ -941,3 +941,80 @@ model Product {
   @@index([isActive])
   @@map("md_products")
 }
+
+// ============================================================
+//  EVALUATION
+// ============================================================
+
+model EvaluationMethod {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  templates EvaluationTemplate[]
+
+  @@index([isActive])
+  @@map("md_evaluation_methods")
+}
+
+model EvaluationScoringMethod {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  templates EvaluationTemplate[]
+
+  @@index([isActive])
+  @@map("md_evaluation_scoring_methods")
+}
+
+model EvaluationTemplate {
+  id                       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                     String   @unique
+  name                     String
+  description              String?
+  evaluationMethodId       String   @db.Uuid @map("evaluation_method_id")
+  evaluationScoringMethodId String  @db.Uuid @map("evaluation_scoring_method_id")
+  isActive                 Boolean  @default(true) @map("is_active")
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+
+  evaluationMethod       EvaluationMethod       @relation(fields: [evaluationMethodId], references: [id], onDelete: Restrict)
+  evaluationScoringMethod EvaluationScoringMethod @relation(fields: [evaluationScoringMethodId], references: [id], onDelete: Restrict)
+  criteria               EvaluationCriteria[]
+
+  @@index([evaluationMethodId])
+  @@index([evaluationScoringMethodId])
+  @@index([isActive])
+  @@map("md_evaluation_templates")
+}
+
+model EvaluationCriteria {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  templateId  String   @db.Uuid @map("template_id")
+  code        String
+  name        String
+  description String?
+  weight      Decimal  @default(0) @db.Decimal(5, 2)
+  maxScore    Decimal? @db.Decimal(8, 2) @map("max_score")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  template EvaluationTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+  @@unique([templateId, code])
+  @@index([templateId])
+  @@index([isActive])
+  @@index([sortOrder])
+  @@map("md_evaluation_criteria")
+}

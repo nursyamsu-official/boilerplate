@@ -6,6 +6,7 @@ import { seedDocumentConfiguration } from "./seeds/document-configuration.seed";
 import { seedEmail } from "./seeds/email.seed";
 import { seedOrganization } from "./seeds/organization.seed";
 import { seedProductAttribute } from "./seeds/product-attribute.seed";
+import { seedEvaluation } from "./seeds/evaluation.seed";
 import { seedUom } from "./seeds/uom.seed";
 
 async function main() {
@@ -15,6 +16,7 @@ async function main() {
   await seedDocumentConfiguration();
   await seedUom();
   await seedProductAttribute();
+  await seedEvaluation();
   await seedEmail();
 }
 
