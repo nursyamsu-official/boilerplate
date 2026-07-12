@@ -15,7 +15,7 @@ export function FormDialogLayout({
 }: FormDialogLayoutProps) {
   return (
     <div className={cn("flex min-h-0 flex-1 flex-col gap-4", className)}>
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">{children}</div>
+      <div className="scrollbar-thin min-h-0 flex-1 overflow-y-auto pr-1">{children}</div>
       <div className="flex shrink-0 justify-end gap-2 border-t pt-4">
         {actions}
       </div>
