@@ -808,3 +808,55 @@ model DocumentType {
   @@index([isActive])
   @@map("doc_types")
 }
+
+// ============================================================
+//  UOM
+// ============================================================
+
+enum UomType {
+  WEIGHT
+  VOLUME
+  LENGTH
+  COUNT
+  OTHER
+}
+
+model Uom {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code          String   @unique
+  name          String
+  symbol        String?
+  description   String?
+  uomType       UomType  @default(OTHER) @map("uom_type")
+  decimalPlaces Int      @default(0) @map("decimal_places")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  conversionsFrom UomGlobalConversion[] @relation("UomConversionFrom")
+  conversionsTo   UomGlobalConversion[] @relation("UomConversionTo")
+
+  @@index([isActive])
+  @@index([uomType])
+  @@map("md_uoms")
+}
+
+model UomGlobalConversion {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fromUomId        String   @db.Uuid @map("from_uom_id")
+  toUomId          String   @db.Uuid @map("to_uom_id")
+  conversionFactor Decimal  @db.Decimal(18, 6) @map("conversion_factor")
+  description      String?
+  isActive         Boolean  @default(true) @map("is_active")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  fromUom Uom @relation("UomConversionFrom", fields: [fromUomId], references: [id], onDelete: Restrict)
+  toUom   Uom @relation("UomConversionTo", fields: [toUomId], references: [id], onDelete: Restrict)
+
+  @@unique([fromUomId, toUomId])
+  @@index([fromUomId])
+  @@index([toUomId])
+  @@index([isActive])
+  @@map("md_uom_global_conversions")
+}

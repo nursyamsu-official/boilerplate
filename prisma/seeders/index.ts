@@ -5,12 +5,14 @@ import { seedAddress } from "./seeds/address.seed";
 import { seedDocumentConfiguration } from "./seeds/document-configuration.seed";
 import { seedEmail } from "./seeds/email.seed";
 import { seedOrganization } from "./seeds/organization.seed";
+import { seedUom } from "./seeds/uom.seed";
 
 async function main() {
   await seedAccessManagement();
   await seedOrganization();
   await seedAddress();
   await seedDocumentConfiguration();
+  await seedUom();
   await seedEmail();
 }
 

@@ -126,6 +126,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage document categories and document types",
     sortOrder: 11,
   },
+  {
+    code: "uom_management",
+    name: "UOM Management",
+    description: "Manage units of measure and global conversions",
+    sortOrder: 12,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -248,6 +254,18 @@ export const permissions: PermissionSeed[] = [
     name: "Manage Document Type",
     description: "Create, update, and remove document types",
     moduleCode: "document_configuration_management",
+  },
+  {
+    code: "manage_uom",
+    name: "Manage UOM",
+    description: "Create, update, and remove units of measure",
+    moduleCode: "uom_management",
+  },
+  {
+    code: "manage_uom_global_conversion",
+    name: "Manage UOM Global Conversion",
+    description: "Create, update, and remove global UOM conversions",
+    moduleCode: "uom_management",
   },
 ];
 
@@ -559,6 +577,30 @@ export const menus: MenuSeed[] = [
     parentCode: "document_configuration",
     sortOrder: 2,
   },
+  {
+    code: "uom",
+    label: "UOM",
+    path: null,
+    icon: "Ruler",
+    parentCode: "admin",
+    sortOrder: 9,
+  },
+  {
+    code: "uoms",
+    label: "UOMs",
+    path: "/dashboard/admin-page/uom/uoms",
+    icon: "Scale",
+    parentCode: "uom",
+    sortOrder: 1,
+  },
+  {
+    code: "uom_global_conversions",
+    label: "Global Conversions",
+    path: "/dashboard/admin-page/uom/uom-global-conversions",
+    icon: "ArrowLeftRight",
+    parentCode: "uom",
+    sortOrder: 2,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -572,6 +614,7 @@ const menuGroupCodes = new Set([
   "organization",
   "address",
   "document_configuration",
+  "uom",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
