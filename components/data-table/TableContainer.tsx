@@ -9,7 +9,7 @@ export function TableContainer({ children, className }: TableContainerProps) {
   return (
     <div
       className={cn(
-        "overflow-auto rounded-lg border bg-base-100",
+        "w-full min-w-0 overflow-x-auto rounded-lg border bg-base-100",
         className,
       )}
     >

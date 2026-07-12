@@ -24,16 +24,18 @@ export function DashboardShell({
   children,
 }: DashboardShellProps) {
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-svh overflow-hidden">
       <AppSidebar appName={appName} menuTree={menuTree} user={user} />
-      <SidebarInset>
-        <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <div className="flex items-center gap-2 justify-between w-full">
+      <SidebarInset className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <div className="flex w-full items-center justify-between gap-2">
             <DashboardHeader menuTree={menuTree} />
             <ModeToggle />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">{children}</div>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-auto p-4">
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

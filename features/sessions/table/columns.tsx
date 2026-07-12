@@ -93,7 +93,7 @@ export function createSessionColumns({
       header: "User agent",
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="max-w-xs truncate text-muted-foreground">
+        <span className="block max-w-xs truncate text-muted-foreground">
           {row.original.userAgent ?? "—"}
         </span>
       ),
