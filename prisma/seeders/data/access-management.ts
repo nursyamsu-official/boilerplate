@@ -114,6 +114,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage companies, organizational units, logistic units, and purchasing groups",
     sortOrder: 9,
   },
+  {
+    code: "address_management",
+    name: "Address Management",
+    description: "Manage countries, provinces, and districts",
+    sortOrder: 10,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -206,6 +212,24 @@ export const permissions: PermissionSeed[] = [
     name: "Manage Purchasing Group",
     description: "Create, update, and remove purchasing groups",
     moduleCode: "organization_management",
+  },
+  {
+    code: "manage_country",
+    name: "Manage Country",
+    description: "Create, update, and remove countries",
+    moduleCode: "address_management",
+  },
+  {
+    code: "manage_province",
+    name: "Manage Province",
+    description: "Create, update, and remove provinces",
+    moduleCode: "address_management",
+  },
+  {
+    code: "manage_district",
+    name: "Manage District",
+    description: "Create, update, and remove districts",
+    moduleCode: "address_management",
   },
 ];
 
@@ -461,6 +485,38 @@ export const menus: MenuSeed[] = [
     parentCode: "organization",
     sortOrder: 4,
   },
+  {
+    code: "address",
+    label: "Address",
+    path: null,
+    icon: "MapPin",
+    parentCode: "admin",
+    sortOrder: 7,
+  },
+  {
+    code: "countries",
+    label: "Countries",
+    path: "/dashboard/admin-page/address/countries",
+    icon: "Globe",
+    parentCode: "address",
+    sortOrder: 1,
+  },
+  {
+    code: "provinces",
+    label: "Provinces",
+    path: "/dashboard/admin-page/address/provinces",
+    icon: "Map",
+    parentCode: "address",
+    sortOrder: 2,
+  },
+  {
+    code: "districts",
+    label: "Districts",
+    path: "/dashboard/admin-page/address/districts",
+    icon: "MapPinned",
+    parentCode: "address",
+    sortOrder: 3,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -472,6 +528,7 @@ const menuGroupCodes = new Set([
   "security",
   "integration",
   "organization",
+  "address",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 

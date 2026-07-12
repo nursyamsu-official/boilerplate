@@ -709,3 +709,59 @@ model PurchasingGroup {
   @@index([isActive])
   @@map("os_purchasing_groups")
 }
+
+// ============================================================
+//  ADDRESS
+// ============================================================
+
+model Country {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  provinces Province[]
+
+  @@index([isActive])
+  @@map("addr_countries")
+}
+
+model Province {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  countryId   String   @db.Uuid
+  code        String
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  country   Country    @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  districts District[]
+
+  @@unique([countryId, code])
+  @@index([countryId])
+  @@index([isActive])
+  @@map("addr_provinces")
+}
+
+model District {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provinceId  String   @db.Uuid
+  code        String
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  province Province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+
+  @@unique([provinceId, code])
+  @@index([provinceId])
+  @@index([isActive])
+  @@map("addr_districts")
+}
