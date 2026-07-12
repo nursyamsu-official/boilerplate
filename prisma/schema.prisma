@@ -619,3 +619,45 @@ model SystemSetting {
   @@index([isPublic])
   @@map("system_setting")
 }
+
+// ============================================================
+//  ORGANIZATION
+// ============================================================
+
+model Company {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  organizationalUnits OrganizationalUnit[]
+
+  @@index([isActive])
+  @@map("os_companies")
+}
+
+model OrganizationalUnit {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyId   String   @db.Uuid
+  code        String
+  name        String
+  description String?
+  parentId    String?  @db.Uuid
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company              @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent   OrganizationalUnit?  @relation("OrganizationalUnitToOrganizationalUnit", fields: [parentId], references: [id], onDelete: SetNull)
+  children OrganizationalUnit[] @relation("OrganizationalUnitToOrganizationalUnit")
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([parentId])
+  @@index([isActive])
+  @@map("os_organizational_units")
+}

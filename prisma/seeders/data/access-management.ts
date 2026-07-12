@@ -108,6 +108,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage sessions, 2FA, API keys, and audit logs",
     sortOrder: 8,
   },
+  {
+    code: "organization_management",
+    name: "Organization Management",
+    description: "Manage companies and organizational units",
+    sortOrder: 9,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -176,6 +182,18 @@ export const permissions: PermissionSeed[] = [
     name: "Manage Security",
     description: "Manage sessions, two-factor auth, API keys, and audit logs",
     moduleCode: "security_management",
+  },
+  {
+    code: "manage_company",
+    name: "Manage Company",
+    description: "Create, update, and remove companies",
+    moduleCode: "organization_management",
+  },
+  {
+    code: "manage_organizational_unit",
+    name: "Manage Organizational Unit",
+    description: "Create, update, and remove organizational units",
+    moduleCode: "organization_management",
   },
 ];
 
@@ -391,6 +409,30 @@ export const menus: MenuSeed[] = [
     parentCode: "integration",
     sortOrder: 4,
   },
+  {
+    code: "organization",
+    label: "Organization",
+    path: null,
+    icon: "Building2",
+    parentCode: "admin",
+    sortOrder: 6,
+  },
+  {
+    code: "companies",
+    label: "Companies",
+    path: "/dashboard/admin-page/organization/companies",
+    icon: "Building",
+    parentCode: "organization",
+    sortOrder: 1,
+  },
+  {
+    code: "organizational_units",
+    label: "Organizational Units",
+    path: "/dashboard/admin-page/organization/organizational_units",
+    icon: "Network",
+    parentCode: "organization",
+    sortOrder: 2,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -401,6 +443,7 @@ const menuGroupCodes = new Set([
   "email",
   "security",
   "integration",
+  "organization",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 

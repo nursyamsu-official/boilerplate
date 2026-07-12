@@ -4,6 +4,7 @@ const ACTION_ERROR_FIELD_MAP: Record<string, string> = {
   "Menu code already exists": "code",
   "Permission code already exists": "code",
   "Module code already exists": "code",
+  "Company code already exists": "code",
   "Provider code already exists": "code",
   "Email already exists": "email",
   "Username already exists": "username",
