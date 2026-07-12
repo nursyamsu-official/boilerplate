@@ -5,6 +5,7 @@ import { companyOptionsService } from "@/features/companies";
 import {
   OrganizationalUnitManagement,
   organizationalUnitGetListService,
+  organizationalUnitGetPreviewListService,
   parseOrganizationalUnitFilter,
 } from "@/features/organizational-units";
 
@@ -23,9 +24,10 @@ export default async function OrganizationalUnitsPage({
   const resolvedSearchParams = await searchParams;
   const filters = parseOrganizationalUnitFilter(resolvedSearchParams);
 
-  const [initialData, companyOptions] = await Promise.all([
+  const [initialData, companyOptions, previewItems] = await Promise.all([
     organizationalUnitGetListService(filters),
     companyOptionsService(),
+    organizationalUnitGetPreviewListService(),
   ]);
 
   return (
@@ -33,6 +35,7 @@ export default async function OrganizationalUnitsPage({
       initialData={initialData}
       initialFilters={filters}
       companyOptions={companyOptions}
+      previewItems={previewItems}
     />
   );
 }

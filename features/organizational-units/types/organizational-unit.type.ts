@@ -51,4 +51,19 @@ export type OrganizationalUnitParentOption = {
   parentId: string | null;
 };
 
+export type OrganizationalUnitPreviewItem = {
+  id: string;
+  code: string;
+  name: string;
+  companyId: string;
+  companyName: string;
+  parentId: string | null;
+  sortOrder: number;
+  isActive: boolean;
+};
+
+export type OrganizationalUnitTreeNode = OrganizationalUnitPreviewItem & {
+  children: OrganizationalUnitTreeNode[];
+};
+
 export type OrganizationalUnitListFilters = OrganizationalUnitFilterInput;

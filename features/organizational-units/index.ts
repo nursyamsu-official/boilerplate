@@ -20,6 +20,8 @@ export type {
   OrganizationalUnitTableRow,
   OrganizationalUnitDetail,
   OrganizationalUnitParentOption,
+  OrganizationalUnitPreviewItem,
 } from "./types/organizational-unit.type";
 
 export { organizationalUnitGetListService } from "./services/organizational-unit-get-list.service";
+export { organizationalUnitGetPreviewListService } from "./services/organizational-unit-get-preview-list.service";

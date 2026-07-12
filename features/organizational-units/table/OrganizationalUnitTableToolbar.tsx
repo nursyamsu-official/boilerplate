@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
+import { EyeIcon, PlusIcon, RotateCcwIcon, SearchIcon } from "lucide-react";
 
 import { useDebouncedFilterValue } from "@/components/data-table/use-debounced-filter-value";
 import { TableToolbar } from "@/components/data-table/TableToolbar";
@@ -22,6 +22,7 @@ type OrganizationalUnitTableToolbarProps = {
   companyOptions: CompanyOption[];
   onFiltersChange: (filters: Partial<OrganizationalUnitFilterInput>) => void;
   onCreate: () => void;
+  onPreview: () => void;
 };
 
 export function OrganizationalUnitTableToolbar({
@@ -29,6 +30,7 @@ export function OrganizationalUnitTableToolbar({
   companyOptions,
   onFiltersChange,
   onCreate,
+  onPreview,
 }: OrganizationalUnitTableToolbarProps) {
   const {
     value: searchValue,
@@ -117,6 +119,11 @@ export function OrganizationalUnitTableToolbar({
           </Button>
         ) : null}
       </div>
+
+      <Button type="button" variant="outline" onClick={onPreview}>
+        <EyeIcon className="size-4" />
+        Preview
+      </Button>
 
       <Button type="button" onClick={onCreate}>
         <PlusIcon className="size-4" />

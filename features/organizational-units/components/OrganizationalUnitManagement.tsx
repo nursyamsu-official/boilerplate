@@ -15,16 +15,19 @@ import type {
   OrganizationalUnitFormValues,
   OrganizationalUnitListResult,
   OrganizationalUnitParentOption,
+  OrganizationalUnitPreviewItem,
   OrganizationalUnitTableRow,
 } from "../types/organizational-unit.type";
 import { OrganizationalUnitTable } from "@/features/organizational-units/table/OrganizationalUnitTable";
 import { OrganizationalUnitCreateDialog } from "./OrganizationalUnitCreateDialog";
 import { OrganizationalUnitEditDialog } from "./OrganizationalUnitEditDialog";
+import { OrganizationalUnitPreviewDialog } from "./OrganizationalUnitPreviewDialog";
 
 type OrganizationalUnitManagementProps = {
   initialData: OrganizationalUnitListResult;
   initialFilters: OrganizationalUnitFilterInput;
   companyOptions: CompanyOption[];
+  previewItems: OrganizationalUnitPreviewItem[];
 };
 
 type EditDialogState = {
@@ -37,9 +40,11 @@ export function OrganizationalUnitManagement({
   initialData,
   initialFilters,
   companyOptions,
+  previewItems,
 }: OrganizationalUnitManagementProps) {
   const router = useRouter();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editDialogState, setEditDialogState] =
     useState<EditDialogState | null>(null);
   const isEditLoading =
@@ -101,7 +106,14 @@ export function OrganizationalUnitManagement({
         onFiltersChange={handleFiltersChange}
         onEdit={handleEdit}
         onCreate={() => setIsCreateOpen(true)}
+        onPreview={() => setIsPreviewOpen(true)}
         onRefresh={handleRefresh}
+      />
+
+      <OrganizationalUnitPreviewDialog
+        open={isPreviewOpen}
+        items={previewItems}
+        onOpenChange={setIsPreviewOpen}
       />
 
       <OrganizationalUnitCreateDialog

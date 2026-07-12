@@ -23,6 +23,7 @@ type OrganizationalUnitTableProps = {
   onFiltersChange: (filters: Partial<OrganizationalUnitFilterInput>) => void;
   onEdit: (unit: OrganizationalUnitTableRow) => void;
   onCreate: () => void;
+  onPreview: () => void;
   onRefresh: () => void;
 };
 
@@ -34,6 +35,7 @@ export function OrganizationalUnitTable({
   onFiltersChange,
   onEdit,
   onCreate,
+  onPreview,
   onRefresh,
 }: OrganizationalUnitTableProps) {
   const sorting: SortingState = useMemo(
@@ -90,6 +92,7 @@ export function OrganizationalUnitTable({
         companyOptions={companyOptions}
         onFiltersChange={onFiltersChange}
         onCreate={onCreate}
+        onPreview={onPreview}
       />
 
       <DataTable
