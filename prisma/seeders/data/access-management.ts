@@ -120,6 +120,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage countries, provinces, and districts",
     sortOrder: 10,
   },
+  {
+    code: "document_configuration_management",
+    name: "Document Configuration Management",
+    description: "Manage document categories and document types",
+    sortOrder: 11,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -230,6 +236,18 @@ export const permissions: PermissionSeed[] = [
     name: "Manage District",
     description: "Create, update, and remove districts",
     moduleCode: "address_management",
+  },
+  {
+    code: "manage_document_category",
+    name: "Manage Document Category",
+    description: "Create, update, and remove document categories",
+    moduleCode: "document_configuration_management",
+  },
+  {
+    code: "manage_document_type",
+    name: "Manage Document Type",
+    description: "Create, update, and remove document types",
+    moduleCode: "document_configuration_management",
   },
 ];
 
@@ -517,6 +535,30 @@ export const menus: MenuSeed[] = [
     parentCode: "address",
     sortOrder: 3,
   },
+  {
+    code: "document_configuration",
+    label: "Document Configuration",
+    path: null,
+    icon: "FileText",
+    parentCode: "admin",
+    sortOrder: 8,
+  },
+  {
+    code: "document_categories",
+    label: "Document Categories",
+    path: "/dashboard/admin-page/document-configuration/document-categories",
+    icon: "FolderTree",
+    parentCode: "document_configuration",
+    sortOrder: 1,
+  },
+  {
+    code: "document_types",
+    label: "Document Types",
+    path: "/dashboard/admin-page/document-configuration/document-types",
+    icon: "FileType",
+    parentCode: "document_configuration",
+    sortOrder: 2,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -529,6 +571,7 @@ const menuGroupCodes = new Set([
   "integration",
   "organization",
   "address",
+  "document_configuration",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
