@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
-import { companies, logisticUnits, organizationalUnits } from "../data/organization";
+import { companies, logisticUnits, organizationalUnits, purchasingGroups } from "../data/organization";
 
 export async function seedOrganization() {
   const companyIdByCode = new Map<string, string>();
@@ -112,8 +112,54 @@ export async function seedOrganization() {
     logisticUnitIdByKey.set(`${unit.companyCode}:${unit.code}`, record.id);
   }
 
+  const purchasingGroupIdByKey = new Map<string, string>();
+
+  for (const group of purchasingGroups) {
+    const companyId = companyIdByCode.get(group.companyCode);
+    if (!companyId) {
+      throw new Error(`Missing company for purchasing group: ${group.code}`);
+    }
+
+    const parentId = group.parentCode
+      ? (purchasingGroupIdByKey.get(`${group.companyCode}:${group.parentCode}`) ??
+        null)
+      : null;
+
+    if (group.parentCode && !parentId) {
+      throw new Error(`Missing parent group for code: ${group.code}`);
+    }
+
+    const record = await prisma.purchasingGroup.upsert({
+      where: {
+        companyId_code: {
+          companyId,
+          code: group.code,
+        },
+      },
+      update: {
+        name: group.name,
+        description: group.description,
+        parentId,
+        sortOrder: group.sortOrder,
+        isActive: true,
+      },
+      create: {
+        companyId,
+        code: group.code,
+        name: group.name,
+        description: group.description,
+        parentId,
+        sortOrder: group.sortOrder,
+        isActive: true,
+      },
+    });
+
+    purchasingGroupIdByKey.set(`${group.companyCode}:${group.code}`, record.id);
+  }
+
   console.log("Organization seed complete:");
   console.log(`  companies:             ${companies.length}`);
   console.log(`  organizational units:  ${organizationalUnits.length}`);
   console.log(`  logistic units:        ${logisticUnits.length}`);
+  console.log(`  purchasing groups:     ${purchasingGroups.length}`);
 }

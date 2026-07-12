@@ -635,6 +635,7 @@ model Company {
 
   organizationalUnits OrganizationalUnit[]
   logisticUnits       LogisticUnit[]
+  purchasingGroups    PurchasingGroup[]
 
   @@index([isActive])
   @@map("os_companies")
@@ -684,4 +685,27 @@ model LogisticUnit {
   @@index([parentId])
   @@index([isActive])
   @@map("os_logistic_units")
+}
+
+model PurchasingGroup {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyId   String   @db.Uuid
+  code        String
+  name        String
+  description String?
+  parentId    String?  @db.Uuid
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  company  Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent   PurchasingGroup? @relation("PurchasingGroupToPurchasingGroup", fields: [parentId], references: [id], onDelete: SetNull)
+  children PurchasingGroup[] @relation("PurchasingGroupToPurchasingGroup")
+
+  @@unique([companyId, code])
+  @@index([companyId])
+  @@index([parentId])
+  @@index([isActive])
+  @@map("os_purchasing_groups")
 }

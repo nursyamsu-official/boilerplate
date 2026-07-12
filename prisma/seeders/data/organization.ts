@@ -22,6 +22,15 @@ export type LogisticUnitSeed = {
   sortOrder: number;
 };
 
+export type PurchasingGroupSeed = {
+  code: string;
+  name: string;
+  description: string | null;
+  companyCode: string;
+  parentCode: string | null;
+  sortOrder: number;
+};
+
 export const companies: CompanySeed[] = [
   {
     code: "albayyinah",
@@ -96,6 +105,41 @@ export const logisticUnits: LogisticUnitSeed[] = [
     description: null,
     companyCode: "albayyinah",
     parentCode: "logistics",
+    sortOrder: 3,
+  },
+];
+
+export const purchasingGroups: PurchasingGroupSeed[] = [
+  {
+    code: "procurement",
+    name: "Procurement",
+    description: null,
+    companyCode: "albayyinah",
+    parentCode: null,
+    sortOrder: 1,
+  },
+  {
+    code: "direct_materials",
+    name: "Direct Materials",
+    description: null,
+    companyCode: "albayyinah",
+    parentCode: "procurement",
+    sortOrder: 1,
+  },
+  {
+    code: "indirect_materials",
+    name: "Indirect Materials",
+    description: null,
+    companyCode: "albayyinah",
+    parentCode: "procurement",
+    sortOrder: 2,
+  },
+  {
+    code: "services",
+    name: "Services",
+    description: null,
+    companyCode: "albayyinah",
+    parentCode: "procurement",
     sortOrder: 3,
   },
 ];

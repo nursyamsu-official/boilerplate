@@ -111,7 +111,7 @@ export const modules: ModuleSeed[] = [
   {
     code: "organization_management",
     name: "Organization Management",
-    description: "Manage companies, organizational units, and logistic units",
+    description: "Manage companies, organizational units, logistic units, and purchasing groups",
     sortOrder: 9,
   },
 ];
@@ -199,6 +199,12 @@ export const permissions: PermissionSeed[] = [
     code: "manage_logistic_unit",
     name: "Manage Logistic Unit",
     description: "Create, update, and remove logistic units",
+    moduleCode: "organization_management",
+  },
+  {
+    code: "manage_purchasing_group",
+    name: "Manage Purchasing Group",
+    description: "Create, update, and remove purchasing groups",
     moduleCode: "organization_management",
   },
 ];
@@ -446,6 +452,14 @@ export const menus: MenuSeed[] = [
     icon: "Truck",
     parentCode: "organization",
     sortOrder: 3,
+  },
+  {
+    code: "purchasing_groups",
+    label: "Purchasing Groups",
+    path: "/dashboard/admin-page/organization/purchasing_groups",
+    icon: "ShoppingCart",
+    parentCode: "organization",
+    sortOrder: 4,
   },
 ];
 
