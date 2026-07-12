@@ -835,6 +835,7 @@ model Uom {
 
   conversionsFrom UomGlobalConversion[] @relation("UomConversionFrom")
   conversionsTo   UomGlobalConversion[] @relation("UomConversionTo")
+  products        Product[]
 
   @@index([isActive])
   @@index([uomType])
@@ -859,4 +860,84 @@ model UomGlobalConversion {
   @@index([toUomId])
   @@index([isActive])
   @@map("md_uom_global_conversions")
+}
+
+// ============================================================
+//  PRODUCT ATTRIBUTE
+// ============================================================
+
+model ProductType {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@index([isActive])
+  @@map("md_product_types")
+}
+
+model ProductGroup {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  categories ProductCategory[]
+  products   Product[]
+
+  @@index([isActive])
+  @@map("md_product_groups")
+}
+
+model ProductCategory {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  groupId     String   @db.Uuid @map("group_id")
+  code        String
+  name        String
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  group    ProductGroup @relation(fields: [groupId], references: [id], onDelete: Restrict)
+  products Product[]
+
+  @@unique([groupId, code])
+  @@index([groupId])
+  @@index([isActive])
+  @@map("md_product_categories")
+}
+
+model Product {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String   @unique
+  name              String
+  description       String?
+  productTypeId     String   @db.Uuid @map("product_type_id")
+  productGroupId    String   @db.Uuid @map("product_group_id")
+  productCategoryId String   @db.Uuid @map("product_category_id")
+  baseUomId         String?  @db.Uuid @map("base_uom_id")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  productType     ProductType     @relation(fields: [productTypeId], references: [id], onDelete: Restrict)
+  productGroup    ProductGroup    @relation(fields: [productGroupId], references: [id], onDelete: Restrict)
+  productCategory ProductCategory @relation(fields: [productCategoryId], references: [id], onDelete: Restrict)
+  baseUom         Uom?            @relation(fields: [baseUomId], references: [id], onDelete: Restrict)
+
+  @@index([productTypeId])
+  @@index([productGroupId])
+  @@index([productCategoryId])
+  @@index([baseUomId])
+  @@index([isActive])
+  @@map("md_products")
 }

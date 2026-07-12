@@ -132,6 +132,12 @@ export const modules: ModuleSeed[] = [
     description: "Manage units of measure and global conversions",
     sortOrder: 12,
   },
+  {
+    code: "product_attribute_management",
+    name: "Product Attribute Management",
+    description: "Manage product types, groups, categories, and products",
+    sortOrder: 13,
+  },
 ];
 
 export const permissions: PermissionSeed[] = [
@@ -266,6 +272,30 @@ export const permissions: PermissionSeed[] = [
     name: "Manage UOM Global Conversion",
     description: "Create, update, and remove global UOM conversions",
     moduleCode: "uom_management",
+  },
+  {
+    code: "manage_product_type",
+    name: "Manage Product Type",
+    description: "Create, update, and remove product types",
+    moduleCode: "product_attribute_management",
+  },
+  {
+    code: "manage_product_group",
+    name: "Manage Product Group",
+    description: "Create, update, and remove product groups",
+    moduleCode: "product_attribute_management",
+  },
+  {
+    code: "manage_product_category",
+    name: "Manage Product Category",
+    description: "Create, update, and remove product categories",
+    moduleCode: "product_attribute_management",
+  },
+  {
+    code: "manage_product",
+    name: "Manage Product",
+    description: "Create, update, and remove products",
+    moduleCode: "product_attribute_management",
   },
 ];
 
@@ -601,6 +631,46 @@ export const menus: MenuSeed[] = [
     parentCode: "uom",
     sortOrder: 2,
   },
+  {
+    code: "product_attribute",
+    label: "Product Attribute",
+    path: null,
+    icon: "Package",
+    parentCode: "admin",
+    sortOrder: 10,
+  },
+  {
+    code: "product_types",
+    label: "Product Types",
+    path: "/dashboard/admin-page/product-attribute/product-types",
+    icon: "Tags",
+    parentCode: "product_attribute",
+    sortOrder: 1,
+  },
+  {
+    code: "product_groups",
+    label: "Product Groups",
+    path: "/dashboard/admin-page/product-attribute/product-groups",
+    icon: "Layers",
+    parentCode: "product_attribute",
+    sortOrder: 2,
+  },
+  {
+    code: "product_categories",
+    label: "Product Categories",
+    path: "/dashboard/admin-page/product-attribute/product-categories",
+    icon: "FolderTree",
+    parentCode: "product_attribute",
+    sortOrder: 3,
+  },
+  {
+    code: "products",
+    label: "Products",
+    path: "/dashboard/admin-page/product-attribute/products",
+    icon: "Box",
+    parentCode: "product_attribute",
+    sortOrder: 4,
+  },
 ];
 
 const allMenuCodes = menus.map((menu) => menu.code);
@@ -615,6 +685,7 @@ const menuGroupCodes = new Set([
   "address",
   "document_configuration",
   "uom",
+  "product_attribute",
 ]);
 const userNavMenuCodes = new Set(["dashboard", "settings"]);
 
