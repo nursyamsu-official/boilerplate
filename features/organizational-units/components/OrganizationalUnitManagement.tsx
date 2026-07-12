@@ -5,11 +5,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import type { CompanyOption } from "@/features/companies";
-import { OrganizationNav } from "@/features/organization";
 
-import {
-  organizationalUnitGetByIdAction,
-} from "../actions/organizational-unit-update.action";
+import { organizationalUnitGetByIdAction } from "../actions/organizational-unit-update.action";
 import { organizationalUnitGetParentOptionsAction } from "../actions/organizational-unit-delete.action";
 import { buildOrganizationalUnitListUrl } from "../lib/organizational-unit-filter-url";
 import { mapOrganizationalUnitDetailToFormValues } from "../lib/organizational-unit-form-defaults";
@@ -20,7 +17,7 @@ import type {
   OrganizationalUnitParentOption,
   OrganizationalUnitTableRow,
 } from "../types/organizational-unit.type";
-import { OrganizationalUnitTable } from "../table/OrganizationalUnitTable";
+import { OrganizationalUnitTable } from "@/features/organizational-units/table/OrganizationalUnitTable";
 import { OrganizationalUnitCreateDialog } from "./OrganizationalUnitCreateDialog";
 import { OrganizationalUnitEditDialog } from "./OrganizationalUnitEditDialog";
 
@@ -89,8 +86,6 @@ export function OrganizationalUnitManagement({
 
   return (
     <div className="flex flex-col gap-6">
-      <OrganizationNav />
-
       <div>
         <h2 className="text-xl font-semibold">Organizational Units</h2>
         <p className="text-sm text-muted-foreground">

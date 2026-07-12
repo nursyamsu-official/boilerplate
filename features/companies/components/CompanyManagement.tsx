@@ -4,8 +4,6 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { OrganizationNav } from "@/features/organization";
-
 import { companyGetByIdAction } from "../actions/company-update.action";
 import { buildCompanyListUrl } from "../lib/company-filter-url";
 import { mapCompanyDetailToFormValues } from "../lib/company-form-defaults";
@@ -15,7 +13,7 @@ import type {
   CompanyListResult,
   CompanyTableRow,
 } from "../types/company.type";
-import { CompanyTable } from "../table/CompanyTable";
+import { CompanyTable } from "@/features/companies/table/CompanyTable";
 import { CompanyCreateDialog } from "./CompanyCreateDialog";
 import { CompanyEditDialog } from "./CompanyEditDialog";
 
@@ -73,8 +71,6 @@ export function CompanyManagement({
 
   return (
     <div className="flex flex-col gap-6">
-      <OrganizationNav />
-
       <div>
         <h2 className="text-xl font-semibold">Companies</h2>
         <p className="text-sm text-muted-foreground">
