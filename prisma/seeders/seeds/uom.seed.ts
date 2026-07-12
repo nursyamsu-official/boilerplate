@@ -60,4 +60,8 @@ export async function seedUom() {
       },
     });
   }
+
+  console.log("UOM seed complete:");
+  console.log(`  uoms:                 ${uoms.length}`);
+  console.log(`  global conversions:   ${uomGlobalConversions.length}`);
 }
