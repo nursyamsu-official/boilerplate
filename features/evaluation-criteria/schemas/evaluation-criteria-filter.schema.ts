@@ -3,6 +3,7 @@ import { z } from "zod";
 import { appConfig } from "@/config/app.config";
 
 export const evaluationCriteriaSortByValues = [
+  "templateName",
   "code",
   "name",
   "sortOrder",

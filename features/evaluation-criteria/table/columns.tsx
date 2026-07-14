@@ -64,8 +64,15 @@ export function createEvaluationCriteriaColumns({
   return [
     {
       accessorKey: "templateName",
-      header: "Template",
-      enableSorting: false,
+      header: () => (
+        <SortableHeader
+          label="Template"
+          columnId="templateName"
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortChange={onSortChange}
+        />
+      ),
     },
     {
       accessorKey: "code",

@@ -25,6 +25,10 @@ export async function evaluationCriteriaListRepository(
   };
 
   const skip = (filters.page - 1) * filters.pageSize;
+  const orderBy =
+    filters.sortBy === "templateName"
+      ? { template: { name: filters.sortOrder } }
+      : { [filters.sortBy]: filters.sortOrder };
 
   const [rows, total] = await Promise.all([
     prisma.evaluationCriteria.findMany({
@@ -43,7 +47,7 @@ export async function evaluationCriteriaListRepository(
         updatedAt: true,
         template: { select: { name: true } },
       },
-      orderBy: { [filters.sortBy]: filters.sortOrder },
+      orderBy,
       skip,
       take: filters.pageSize,
     }),

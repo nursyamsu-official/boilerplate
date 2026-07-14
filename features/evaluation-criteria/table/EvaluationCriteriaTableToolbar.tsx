@@ -66,10 +66,10 @@ export function EvaluationCriteriaTableToolbar({
           }
         >
           <SelectTrigger className="w-full sm:w-48" size="sm">
-            <SelectValue placeholder="Product group" />
+            <SelectValue placeholder="Template" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All groups</SelectItem>
+            <SelectItem value="all">All templates</SelectItem>
             {templateOptions.map((option) => (
               <SelectItem key={option.id} value={option.id}>
                 {option.name}

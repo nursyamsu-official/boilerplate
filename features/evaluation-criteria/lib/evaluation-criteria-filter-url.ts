@@ -16,6 +16,10 @@ export function buildEvaluationCriteriaListUrl(filters: EvaluationCriteriaFilter
     params.set("isActive", filters.isActive);
   }
 
+  if (filters.templateId !== "all") {
+    params.set("templateId", filters.templateId);
+  }
+
   const query = params.toString();
   return query
     ? `/dashboard/admin-page/evaluation/evaluation-criteria?${query}`
