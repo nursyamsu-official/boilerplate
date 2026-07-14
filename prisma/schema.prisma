@@ -676,7 +676,7 @@ model LogisticUnit {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company  Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company  Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   parent   LogisticUnit?  @relation("LogisticUnitToLogisticUnit", fields: [parentId], references: [id], onDelete: SetNull)
   children LogisticUnit[] @relation("LogisticUnitToLogisticUnit")
 
@@ -699,8 +699,8 @@ model PurchasingGroup {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  company  Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  parent   PurchasingGroup? @relation("PurchasingGroupToPurchasingGroup", fields: [parentId], references: [id], onDelete: SetNull)
+  company  Company           @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  parent   PurchasingGroup?  @relation("PurchasingGroupToPurchasingGroup", fields: [parentId], references: [id], onDelete: SetNull)
   children PurchasingGroup[] @relation("PurchasingGroupToPurchasingGroup")
 
   @@unique([companyId, code])
@@ -787,7 +787,7 @@ model DocumentCategory {
 
 model DocumentType {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  categoryId      String   @db.Uuid @map("category_id")
+  categoryId      String   @map("category_id") @db.Uuid
   code            String
   name            String
   description     String?
@@ -844,9 +844,9 @@ model Uom {
 
 model UomGlobalConversion {
   id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  fromUomId        String   @db.Uuid @map("from_uom_id")
-  toUomId          String   @db.Uuid @map("to_uom_id")
-  conversionFactor Decimal  @db.Decimal(18, 6) @map("conversion_factor")
+  fromUomId        String   @map("from_uom_id") @db.Uuid
+  toUomId          String   @map("to_uom_id") @db.Uuid
+  conversionFactor Decimal  @map("conversion_factor") @db.Decimal(18, 6)
   description      String?
   isActive         Boolean  @default(true) @map("is_active")
   createdAt        DateTime @default(now()) @map("created_at")
@@ -899,7 +899,7 @@ model ProductGroup {
 
 model ProductCategory {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  groupId     String   @db.Uuid @map("group_id")
+  groupId     String   @map("group_id") @db.Uuid
   code        String
   name        String
   description String?
@@ -921,10 +921,10 @@ model Product {
   code              String   @unique
   name              String
   description       String?
-  productTypeId     String   @db.Uuid @map("product_type_id")
-  productGroupId    String   @db.Uuid @map("product_group_id")
-  productCategoryId String   @db.Uuid @map("product_category_id")
-  baseUomId         String?  @db.Uuid @map("base_uom_id")
+  productTypeId     String   @map("product_type_id") @db.Uuid
+  productGroupId    String   @map("product_group_id") @db.Uuid
+  productCategoryId String   @map("product_category_id") @db.Uuid
+  baseUomId         String?  @map("base_uom_id") @db.Uuid
   isActive          Boolean  @default(true) @map("is_active")
   createdAt         DateTime @default(now()) @map("created_at")
   updatedAt         DateTime @updatedAt @map("updated_at")
@@ -977,19 +977,19 @@ model EvaluationScoringMethod {
 }
 
 model EvaluationTemplate {
-  id                       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code                     String   @unique
-  name                     String
-  description              String?
-  evaluationMethodId       String   @db.Uuid @map("evaluation_method_id")
-  evaluationScoringMethodId String  @db.Uuid @map("evaluation_scoring_method_id")
-  isActive                 Boolean  @default(true) @map("is_active")
-  createdAt                DateTime @default(now()) @map("created_at")
-  updatedAt                DateTime @updatedAt @map("updated_at")
+  id                        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                      String   @unique
+  name                      String
+  description               String?
+  evaluationMethodId        String   @map("evaluation_method_id") @db.Uuid
+  evaluationScoringMethodId String   @map("evaluation_scoring_method_id") @db.Uuid
+  isActive                  Boolean  @default(true) @map("is_active")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
 
-  evaluationMethod       EvaluationMethod       @relation(fields: [evaluationMethodId], references: [id], onDelete: Restrict)
+  evaluationMethod        EvaluationMethod        @relation(fields: [evaluationMethodId], references: [id], onDelete: Restrict)
   evaluationScoringMethod EvaluationScoringMethod @relation(fields: [evaluationScoringMethodId], references: [id], onDelete: Restrict)
-  criteria               EvaluationCriteria[]
+  criteria                EvaluationCriteria[]
 
   @@index([evaluationMethodId])
   @@index([evaluationScoringMethodId])
@@ -999,12 +999,12 @@ model EvaluationTemplate {
 
 model EvaluationCriteria {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  templateId  String   @db.Uuid @map("template_id")
+  templateId  String   @map("template_id") @db.Uuid
   code        String
   name        String
   description String?
   weight      Decimal  @default(0) @db.Decimal(5, 2)
-  maxScore    Decimal? @db.Decimal(8, 2) @map("max_score")
+  maxScore    Decimal? @map("max_score") @db.Decimal(8, 2)
   sortOrder   Int      @default(0) @map("sort_order")
   isActive    Boolean  @default(true) @map("is_active")
   createdAt   DateTime @default(now()) @map("created_at")
